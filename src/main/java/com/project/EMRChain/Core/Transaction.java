@@ -1,10 +1,13 @@
 package com.project.EMRChain.Core;
+import com.project.EMRChain.Core.Utilities.EcdsaUtil;
 import com.project.EMRChain.Core.Utilities.HashUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.EHR.MedicalRecord;
 import com.project.EMRChain.EHR.PatientInfo;
 import com.project.EMRChain.Utilities.JsonUtil;
 
+import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +20,7 @@ public class Transaction
     private PublicKey sender; // Sender's address/public key.
     private PublicKey recipient; // Recipient's address/public key.
     public byte[] signature;
-    private static int sequence = 0; // A count of the number of transactions
+    private int sequence = 0; // A count of the number of transactions
 
     //private ArrayList<TransactionInput> inputs = new ArrayList<>();
     //private ArrayList<TransactionOutput> outputs = new ArrayList<>();
@@ -29,18 +32,38 @@ public class Transaction
         this.recipient = recipient;
         //this.inputs = inputs;
     }
-
-    private byte[] getHash() {
-        sequence++; // Increase sequence to avoid 2 transactions having same hash
-
-        if (transactionData == null) {
-            transactionData = new MedicalRecord();
-        }
-
-        String dataString = JsonUtil.createJson(transactionData);
-        String keys = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(recipient);
-
-        byte[] hashedData = (dataString + keys + sequence).getBytes();
-        return HashUtil.SHA256(hashedData);
+    
+    public byte[] getSignature() {
+        return signature;
+    }
+    public void setSignature(byte[] signature) {
+        this.signature = signature;
+    }
+    public PublicKey getSender() {
+        return sender;
+    }
+    public PublicKey getRecipient() {
+        return recipient;
+    }
+    public MedicalRecord getTransactionData() {
+        return transactionData;
+    }
+    public int getSequence() {
+        return sequence;
+    }
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+    public void setTransactionData(MedicalRecord transactionData) {
+        this.transactionData = transactionData;
+    }
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+    public void setSender(PublicKey sender) {
+        this.sender = sender;
+    }
+    public void setRecipient(PublicKey recipient) {
+        this.recipient = recipient;
     }
 }
