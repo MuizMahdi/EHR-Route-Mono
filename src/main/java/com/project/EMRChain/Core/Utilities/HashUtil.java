@@ -47,14 +47,10 @@ public class HashUtil
         transaction.setSequence(transaction.getSequence()+1); // This works though.
 
         if (transaction.getTransactionData() == null) {
-            transaction.setTransactionData(new MedicalRecord());
+            transaction.setRecord(new MedicalRecord());
         }
 
-        String stringData =
-        JsonUtil.createJson(transaction.getTransactionData()) +
-        StringUtil.getStringFromKey(transaction.getSender()) +
-        StringUtil.getStringFromKey(transaction.getRecipient()) +
-        transaction.getSequence();
+        String stringData = transaction.getTransactionData() + transaction.getSequence();
 
         byte[] dataBytes = stringData.getBytes();
 

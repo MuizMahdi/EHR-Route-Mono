@@ -12,7 +12,7 @@ public class EcdsaUtil
     private static Logger logger = LoggerFactory.getLogger(EcdsaUtil.class);
 
     // Applies ECDSA Signature and returns the result (as bytes)
-    public static byte[] EC_Sign(PrivateKey privateKey, Transaction transaction) throws Exception
+    public static byte[] ecSign(PrivateKey privateKey, Transaction transaction) throws Exception
     {
         Signature digitalSignatureAlgorithm = Signature.getInstance("SHA256withECDSA");
 
@@ -29,7 +29,31 @@ public class EcdsaUtil
         return signature;
     }
 
-    public static KeyPair EC_GenerateKeyPair() throws Exception
+    public static boolean ecVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
+    {
+        String data = transaction.getTransactionData();
+
+        if (transaction.getSignature() == null) {
+            transaction.setSignature("".getBytes());
+        }
+
+        byte[] signature = transaction.getSignature();
+
+        try
+        {
+            Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
+            ecdsaVerify.initVerify(publicKey);
+            ecdsaVerify.update(data.getBytes());
+            return ecdsaVerify.verify(signature);
+        }
+        catch(GeneralSecurityException exception)
+        {
+            logger.error(exception.getMessage());
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public static KeyPair ecGenerateKeyPair() throws Exception
     {
         ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("EC");
