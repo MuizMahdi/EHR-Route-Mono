@@ -38,21 +38,13 @@ public class HashUtil
         return hexString.toString();
     }
 
-    public static byte[] hashTransaction(Transaction transaction)
+    public static byte[] hashTransactionData(Transaction transaction)
     {
-        // int transactionSequence = transaction.getSequence();  Todo: This did not work.
-        // transaction.setSequence(transactionSequence++);       Todo: Figure out why.
-
-        // Increase sequence to avoid 2 transactions having same hash
-        transaction.setSequence(transaction.getSequence()+1); // This works though.
-
         if (transaction.getTransactionData() == null) {
             transaction.setRecord(new MedicalRecord());
         }
 
-        String stringData = transaction.getTransactionData() + transaction.getSequence();
-
-        byte[] dataBytes = stringData.getBytes();
+        byte[] dataBytes = transaction.getTransactionData().getBytes();
 
         return HashUtil.SHA256(dataBytes);
     }

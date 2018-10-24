@@ -11,7 +11,7 @@ public class EcdsaUtil
 {
     private static Logger logger = LoggerFactory.getLogger(EcdsaUtil.class);
 
-    // Applies ECDSA Signature and returns the result (as bytes)
+    // Applies ECDSA Signature to a transaction and returns signature.
     public static byte[] ecSign(PrivateKey privateKey, Transaction transaction) throws Exception
     {
         Signature digitalSignatureAlgorithm = Signature.getInstance("SHA256withECDSA");
