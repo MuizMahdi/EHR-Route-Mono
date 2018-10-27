@@ -29,6 +29,7 @@ public class EcdsaUtil
         return signature;
     }
 
+    // Verifies whether the Transaction belongs to sender or not
     public static boolean ecVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
     {
         String data = transaction.getTransactionData();
@@ -53,15 +54,24 @@ public class EcdsaUtil
         }
     }
 
-    public static KeyPair ecGenerateKeyPair() throws Exception
+    public static KeyPair ecGenerateKeyPair()
     {
-        ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
-        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("EC");
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        try
+        {
+            ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
+            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("EC");
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
 
-        keyPairGen.initialize(ecSpec, random);
+            keyPairGen.initialize(ecSpec, random);
 
-        return keyPairGen.generateKeyPair();
+            return keyPairGen.generateKeyPair();
+        }
+        catch (GeneralSecurityException exception)
+        {
+            logger.error(exception.getMessage());
+            throw new RuntimeException(exception);
+        }
+
     }
 
 }
