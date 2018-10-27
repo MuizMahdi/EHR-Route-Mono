@@ -6,6 +6,22 @@ public class AddressUtil
 {
     public static String generateAddress(PublicKey publicKey)
     {
-        return null;
+        // Perform SHA-256 hashing on the public key
+        byte[] hash = HashUtil.SHA256(StringUtil.getStringFromKey(publicKey).getBytes());
+
+        // Perform RIPEMD-160 hashing on the result of SHA-256
+        RIPEMD160Digest digest = new RIPEMD160Digest();
+        digest.update(hash, 0, hash.length);
+        byte[] RIPEMD160Hash = new byte[digest.getDigestSize()];
+        digest.doFinal(RIPEMD160Hash, 0);
+
+        // Add version byte in front of RIPEMD-160 hash
+        byte[] extendedRIPEMD160Hash = new byte[RIPEMD160Hash.length+1];
+        System.arraycopy(RIPEMD160Hash, 0, extendedRIPEMD160Hash, 1, RIPEMD160Hash.length);
+
+        // Perform Base58Check
+        String address = Base58.encodeChecked(1, extendedRIPEMD160Hash);
+
+        return address;
     }
 }
