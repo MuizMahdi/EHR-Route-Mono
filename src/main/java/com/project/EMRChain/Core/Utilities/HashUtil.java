@@ -24,17 +24,19 @@ public class HashUtil
         }
     }
 
-    public static String toString(byte[] hash)
+    public static byte[] SHA256Twice(byte[] input, int offset, int length)
     {
-        StringBuffer hexString = new StringBuffer();
-
-        for (byte b: hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
+        try
+        {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(input, offset, length);
+            return digest.digest(digest.digest());
         }
-
-        return hexString.toString();
+        catch (NoSuchAlgorithmException exception)
+        {
+            logger.error(exception.getMessage());
+            return null;
+        }
     }
 
     public static byte[] hashTransactionData(Transaction transaction)
@@ -46,5 +48,18 @@ public class HashUtil
         byte[] dataBytes = transaction.getTransactionData().getBytes();
 
         return HashUtil.SHA256(dataBytes);
+    }
+
+    public static String toString(byte[] hash)
+    {
+        StringBuffer hexString = new StringBuffer();
+
+        for (byte b: hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+
+        return hexString.toString();
     }
 }

@@ -12,7 +12,8 @@ public class TEST
 {
     public static void main(String args[]) throws Exception
     {
-        test01();
+        //test01();
+        test02();
     }
 
     public static void test01() throws Exception
@@ -30,8 +31,8 @@ public class TEST
         byte[] recipientPubKeyBytes = StringUtil.getStringFromKey(recipientPublicKey).getBytes();
 
         // Base58 encoded Public Keys
-        String senderBase58Key = Base58Util.encode(senderPubKeyBytes);
-        String recipientBase58Key = Base58Util.encode(recipientPubKeyBytes);
+        String senderBase58Key = Base58.encode(senderPubKeyBytes);
+        String recipientBase58Key = Base58.encode(recipientPubKeyBytes);
 
         // Public Keys from Base58 Keys = Addresses
         PublicKey senderAddress = ECKeyUtil.getPublicKeyFromString(senderBase58Key);
@@ -39,8 +40,8 @@ public class TEST
 
 
         // Decoded Addresses
-        byte[] senderDecodedAddress = Base58Util.decode(StringUtil.getStringFromKey(senderAddress));
-        byte[] recipientDecodedAddress = Base58Util.decode(StringUtil.getStringFromKey(recipientAddress));
+        byte[] senderDecodedAddress = Base58.decode(StringUtil.getStringFromKey(senderAddress));
+        byte[] recipientDecodedAddress = Base58.decode(StringUtil.getStringFromKey(recipientAddress));
         PublicKey senderDecodedPubKey = ECKeyUtil.getPublicKeyFromString(StringUtil.getStringFromBytes(senderDecodedAddress));
         PublicKey recipientDecodedPubKey = ECKeyUtil.getPublicKeyFromString(StringUtil.getStringFromBytes(recipientDecodedAddress));
 
@@ -99,5 +100,18 @@ public class TEST
 
         System.out.println("Tx Verification using WRONG Decoded Address:");
         System.out.println(EcdsaUtil.ecVerifyTransactionSignature(recipientDecodedPubKey, transaction));
+    }
+
+    static void test02() throws Exception
+    {
+        KeyPair senderKeyPair = EcdsaUtil.ecGenerateKeyPair();
+        PublicKey senderPublicKey = senderKeyPair.getPublic();
+
+        /*
+        String senderPubKeyBytes = StringUtil.getStringFromKey(senderPublicKey);
+        String senderBase58Key = Base58.encode(senderPubKeyBytes.getBytes());
+        System.out.println(senderBase58Key);
+        PublicKey senderAddress = ECKeyUtil.getPublicKeyFromString(senderPubKeyBytes);
+        */
     }
 }

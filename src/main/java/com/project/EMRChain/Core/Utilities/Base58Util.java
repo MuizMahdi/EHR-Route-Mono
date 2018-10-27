@@ -2,17 +2,19 @@ package com.project.EMRChain.Core.Utilities;
 
 public class Base58Util
 {
-    private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-    .toCharArray();
+    private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
     private static final int BASE_58 = ALPHABET.length;
     private static final int BASE_256 = 256;
     private static final int[] INDEXES = new int[128];
 
-    static {
-        for (int i = 0; i < INDEXES.length; i++) {
+    static
+    {
+        for (int i = 0; i < INDEXES.length; i++)
+        {
             INDEXES[i] = -1;
         }
-        for (int i = 0; i < ALPHABET.length; i++) {
+        for (int i = 0; i < ALPHABET.length; i++)
+        {
             INDEXES[ALPHABET[i]] = i;
         }
     }
@@ -39,10 +41,12 @@ public class Base58Util
         // The actual encoding
         byte[] temp = new byte[input.length * 2];
         int j = temp.length;
-
         int startAt = zeroCount;
-        while (startAt < input.length) {
+
+        while (startAt < input.length)
+        {
             byte mod = divmod58(input, startAt);
+
             if (input[startAt] == 0) {
                 ++startAt;
             }

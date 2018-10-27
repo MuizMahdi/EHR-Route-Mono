@@ -45,31 +45,32 @@ public class Base58
             return "";
         }
 
-        // Count the leading zeros
-        int zerosCount = 0;
-        while (zerosCount < input.length && input[zerosCount] == 0) {
-            zerosCount++;
+        // Make a copy of the input since we are going to modify it.
+        input = copyOfRange(input, 0, input.length);
+
+
+        // Count leading zeroes
+        int zeroCount = 0;
+        while (zeroCount < input.length && input[zeroCount] == 0) {
+            ++zeroCount;
         }
 
                 // -- Convert base-256 digits to base-58 digits (plus conversion to ASCII characters) -- \\
 
-        // Create a copy of the input, since we modify it in-place.
-        input = copyOfRange(input, 0, input.length);
-
                                                 // -- Encode -- \\
         byte[] temp = new byte[input.length * 2]; // temp array with double the size if input (upper bound ~encoded)
         int j = temp.length;
-        int startAt = zerosCount; // Skip the zeros (start at where the zeroes end)
+        int startAt = zeroCount; // Skip the zeros (start at where the zeroes end)
 
         while (startAt < input.length)
         {
             byte mod = divmod58(input, startAt);
 
             if (input[startAt] == 0) {
-                startAt++; // Skip leading zeros
+                ++startAt; // Skip leading zeros
             }
 
-            temp[j--] = (byte) ALPHABET[mod];
+            temp[--j] = (byte) ALPHABET[mod];
         }
 
         // Preserve exactly as many leading encoded zeros in output as there were leading zeros in input.
@@ -78,7 +79,7 @@ public class Base58
         }
 
         // Add as many leading '1' as there were leading zeros.
-        while (zerosCount-- >= 0) {
+        while (zeroCount-- >= 0) {
             temp[j--] = (byte) ENCODED_ZERO;
         }
 
@@ -145,6 +146,28 @@ public class Base58
 
         return copyOfRange(temp, j - zeroCount, temp.length);
     }
+
+    /**
+    * Encodes the given version and bytes as a base58 string. A checksum is appended.
+    *
+    * @param version the version to encode
+    * @param payload the bytes to encode, e.g. pubkey hash
+    * @return the base58-encoded string
+    */
+    public static String encodeChecked(int version, byte[] payload)
+    {
+        if (version < 0 || version > 255) throw new IllegalArgumentException("Version not in range.");
+
+        // A stringified buffer is:
+        // 1 byte version + data bytes + 4 bytes check code (a truncated hash)
+        byte[] addressBytes = new byte[1 + payload.length + 4];
+        addressBytes[0] = (byte) version;
+        System.arraycopy(payload, 0, addressBytes, 1, payload.length);
+        byte[] checksum = HashUtil.SHA256Twice(addressBytes, 0, payload.length + 1);
+        System.arraycopy(checksum, 0, addressBytes, payload.length + 1, 4);
+        return Base58.encode(addressBytes);
+    }
+
 
     // Copes values from source array into a new array and returns it
     private static byte[] copyOfRange(byte[] source, int from, int to)
