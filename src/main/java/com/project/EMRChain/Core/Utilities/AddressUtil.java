@@ -1,4 +1,6 @@
 package com.project.EMRChain.Core.Utilities;
+import com.project.EMRChain.Core.Address;
+import com.project.EMRChain.Core.Transaction;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import java.security.PublicKey;
 
@@ -23,5 +25,23 @@ public class AddressUtil
         String address = Base58.encodeChecked(1, extendedRIPEMD160Hash);
 
         return address;
+    }
+
+    public static boolean confirmTransactionSenderAddress(Transaction transaction)
+    {
+        String senderAddress = transaction.getSenderAddress().getAddress();
+        PublicKey senderPubKey = transaction.getSenderPubKey();
+
+        if (senderAddress == null || senderAddress.isEmpty() || senderPubKey == null)
+        {
+            return false;
+        }
+
+        if (!senderAddress.equals(AddressUtil.generateAddress(senderPubKey)))
+        {
+            return false;
+        }
+
+        return true;
     }
 }
