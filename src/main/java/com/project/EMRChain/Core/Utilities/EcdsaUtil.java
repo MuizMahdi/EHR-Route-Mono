@@ -17,9 +17,7 @@ public class EcdsaUtil
 
         digitalSignatureAlgorithm.initSign(privateKey);
 
-        String data = StringUtil.getStringFromKey(transaction.getSender()) +
-        StringUtil.getStringFromKey(transaction.getRecipient()) +
-        JsonUtil.createJson(transaction);
+        String data = transaction.getTransactionData();
 
         digitalSignatureAlgorithm.update(data.getBytes());
 
