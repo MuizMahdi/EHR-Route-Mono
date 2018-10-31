@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -42,27 +43,19 @@ public class HashUtil
         }
     }
 
-    public byte[] hashTransactionData(Transaction transaction)
+    public byte[] hashTransactionData(Transaction transaction) throws Exception
     {
-        if (transaction.getTransactionData() == null) {
+        if (transaction.getTransactionData() == null)
+        {
             transaction.setRecord(new MedicalRecord());
+
+            if (transaction.getSenderAddress() == null || transaction.getRecipientAddress() == null) {
+                throw new Exception("Transaction Sender or Recipient not found");
+            }
         }
 
         byte[] dataBytes = transaction.getTransactionData().getBytes();
 
         return SHA256(dataBytes);
-    }
-
-    public String toString(byte[] hash)
-    {
-        StringBuffer hexString = new StringBuffer();
-
-        for (byte b: hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-
-        return hexString.toString();
     }
 }
