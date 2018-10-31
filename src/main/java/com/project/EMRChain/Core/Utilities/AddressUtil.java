@@ -4,7 +4,6 @@ import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.KeyPair;
 import java.security.PublicKey;
 
 @Component
