@@ -18,16 +18,16 @@ import static org.mockito.Mockito.when;
 public class AddressUtilTest
 {
     @Mock
-    EcdsaUtil ecdsaUtil;
+    private EcdsaUtil ecdsaUtil;
 
     @Mock
-    StringUtil stringUtil;
+    private StringUtil stringUtil;
 
     @Mock
-    HashUtil hashUtil;
+    private HashUtil hashUtil;
 
     @Mock
-    Base58 base58;
+    private Base58 base58;
 
     @InjectMocks
     private AddressUtil addressUtil;

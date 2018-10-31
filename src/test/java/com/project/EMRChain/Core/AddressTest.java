@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 public class AddressTest
 {
     @Mock
-    AddressUtil addressUtil;
+    private AddressUtil addressUtil;
 
     @InjectMocks
     private Address address;
