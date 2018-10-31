@@ -3,14 +3,17 @@ import com.project.EMRChain.Core.Transaction;
 import com.project.EMRChain.EHR.MedicalRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+@Component
 public class HashUtil
 {
-    private static Logger logger = LoggerFactory.getLogger(HashUtil.class);
+    private Logger logger = LoggerFactory.getLogger(HashUtil.class);
 
-    public static byte[] SHA256(byte[] input)
+    public byte[] SHA256(byte[] input)
     {
         try
         {
@@ -24,7 +27,7 @@ public class HashUtil
         }
     }
 
-    public static byte[] SHA256Twice(byte[] input, int offset, int length)
+    public byte[] SHA256Twice(byte[] input, int offset, int length)
     {
         try
         {
@@ -39,7 +42,7 @@ public class HashUtil
         }
     }
 
-    public static byte[] hashTransactionData(Transaction transaction)
+    public byte[] hashTransactionData(Transaction transaction)
     {
         if (transaction.getTransactionData() == null) {
             transaction.setRecord(new MedicalRecord());
@@ -47,10 +50,10 @@ public class HashUtil
 
         byte[] dataBytes = transaction.getTransactionData().getBytes();
 
-        return HashUtil.SHA256(dataBytes);
+        return SHA256(dataBytes);
     }
 
-    public static String toString(byte[] hash)
+    public String toString(byte[] hash)
     {
         StringBuffer hexString = new StringBuffer();
 

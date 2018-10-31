@@ -2,10 +2,17 @@ package com.project.EMRChain.Core;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.EHR.MedicalRecord;
 import com.project.EMRChain.Utilities.JsonUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.security.PublicKey;
 
+@Component
 public class Transaction
 {
+    @Autowired
+    private StringUtil stringUtil;
+
     private String transactionId; // Hash of transaction
     private MedicalRecord record;
     private PublicKey senderPubKey; // Sender's public key.
@@ -13,19 +20,21 @@ public class Transaction
     private Address recipientAddress;
     private byte[] signature;
 
+
     public Transaction() { }
     public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) {
         this.record = record;
         this.senderPubKey = senderPubKey;
         this.recipientAddress = recipientAddress;
-        this.senderAddress = new Address(senderPubKey);
+        this.senderAddress = new Address();
+        this.senderAddress.generateAddress(senderPubKey);
     }
 
     public String getTransactionData()
     {
         String data =
         JsonUtil.createJson(record) +
-        StringUtil.getStringFromKey(senderPubKey) +
+        stringUtil.getStringFromKey(senderPubKey) +
         senderAddress.getAddress() +
         recipientAddress.getAddress();
         return data;

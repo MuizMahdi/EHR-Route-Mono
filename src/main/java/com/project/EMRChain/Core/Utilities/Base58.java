@@ -1,5 +1,6 @@
 package com.project.EMRChain.Core.Utilities;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
 *   Base58 is a way to encode addresses (or arbitrary data) as alphanumeric strings.
@@ -11,13 +12,13 @@ package com.project.EMRChain.Core.Utilities;
 *   - And finally represent the resulting base-58 digits as alphanumeric ASCII characters.
 */
 
-
+@Component
 public class Base58
 {
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
-    private static final int BASE_58 = ALPHABET.length; // 58 ~ Used for getting remainder
-    private static final char ENCODED_ZERO = ALPHABET[0];
-    private static final int BASE_256 = 256;
+    private final int BASE_58 = ALPHABET.length; // 58 ~ Used for getting remainder
+    private final char ENCODED_ZERO = ALPHABET[0];
+    private final int BASE_256 = 256;
     private static final int[] INDEXES = new int[128];
 
     static
@@ -39,7 +40,7 @@ public class Base58
     *  @param input the bytes to encode
     *  @return the base58-encoded string
     */
-    public static String encode(byte[] input)
+    public String encode(byte[] input)
     {
         if (input.length == 0) {
             return "";
@@ -94,7 +95,7 @@ public class Base58
     * @param input the base58-encoded string to decode
     * @return the decoded data bytes
     */
-    public static byte[] decode(String input)
+    public byte[] decode(String input)
     {
         if (input.length() == 0) {
             return new byte[0];
@@ -154,7 +155,11 @@ public class Base58
     * @param payload the bytes to encode, e.g. pubkey hash
     * @return the base58-encoded string
     */
-    public static String encodeChecked(int version, byte[] payload)
+
+    @Autowired
+    HashUtil hashUtil;
+
+    public String encodeChecked(int version, byte[] payload)
     {
         if (version < 0 || version > 255) throw new IllegalArgumentException("Version not in range.");
 
@@ -163,14 +168,14 @@ public class Base58
         byte[] addressBytes = new byte[1 + payload.length + 4];
         addressBytes[0] = (byte) version;
         System.arraycopy(payload, 0, addressBytes, 1, payload.length);
-        byte[] checksum = HashUtil.SHA256Twice(addressBytes, 0, payload.length + 1);
+        byte[] checksum = hashUtil.SHA256Twice(addressBytes, 0, payload.length + 1);
         System.arraycopy(checksum, 0, addressBytes, payload.length + 1, 4);
-        return Base58.encode(addressBytes);
+        return encode(addressBytes);
     }
 
 
     // Copes values from source array into a new array and returns it
-    private static byte[] copyOfRange(byte[] source, int from, int to)
+    private byte[] copyOfRange(byte[] source, int from, int to)
     {
         byte[] range = new byte[to-from];
         System.arraycopy(source, from, range, 0, range.length); // Faster than Arrays.copyOf
@@ -185,7 +190,7 @@ public class Base58
 
     // Returns number % 58 remainder, used for encoding
     @SuppressWarnings("Duplicates")
-    private static byte divmod58(byte[] number, int startAt)
+    private byte divmod58(byte[] number, int startAt)
     {
         int remainder = 0;
 
@@ -210,7 +215,7 @@ public class Base58
 
     // Returns number % 256 remainder, used for decoding
     @SuppressWarnings("Duplicates")
-    private static byte divmod256(byte[] number58, int startAt)
+    private byte divmod256(byte[] number58, int startAt)
     {
         int remainder = 0;
 

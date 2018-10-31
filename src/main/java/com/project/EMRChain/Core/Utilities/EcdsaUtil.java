@@ -3,15 +3,18 @@ import com.project.EMRChain.Core.Transaction;
 import com.project.EMRChain.Utilities.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 
+@Component
 public class EcdsaUtil
 {
-    private static Logger logger = LoggerFactory.getLogger(EcdsaUtil.class);
+    private Logger logger = LoggerFactory.getLogger(EcdsaUtil.class);
 
     // Applies ECDSA Signature to a transaction and returns signature.
-    public static byte[] ecSign(PrivateKey privateKey, Transaction transaction) throws Exception
+    public byte[] ecSign(PrivateKey privateKey, Transaction transaction) throws Exception
     {
         Signature digitalSignatureAlgorithm = Signature.getInstance("SHA256withECDSA");
 
@@ -27,7 +30,7 @@ public class EcdsaUtil
     }
 
     // Verifies whether the Transaction belongs to sender or not
-    public static boolean ecVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
+    public boolean ecVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
     {
         String data = transaction.getTransactionData();
 
@@ -51,7 +54,7 @@ public class EcdsaUtil
         }
     }
 
-    public static KeyPair ecGenerateKeyPair()
+    public KeyPair ecGenerateKeyPair()
     {
         try
         {

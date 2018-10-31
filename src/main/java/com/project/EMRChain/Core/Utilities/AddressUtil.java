@@ -1,15 +1,32 @@
 package com.project.EMRChain.Core.Utilities;
-import com.project.EMRChain.Core.Address;
 import com.project.EMRChain.Core.Transaction;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.security.KeyPair;
 import java.security.PublicKey;
 
+@Component
 public class AddressUtil
 {
-    public static String generateAddress(PublicKey publicKey)
+    private StringUtil stringUtil;
+    private HashUtil hashUtil;
+    private Base58 base58;
+
+    @Autowired
+    public AddressUtil(StringUtil stringUtil, HashUtil hashUtil ,Base58 base58) {
+        this.stringUtil = stringUtil;
+        this.hashUtil = hashUtil;
+        this.base58 = base58;
+    }
+
+
+    public String generateAddress(PublicKey publicKey)
     {
+        //stringUtil = new StringUtil();
         // Perform SHA-256 hashing on the public key
-        byte[] hash = HashUtil.SHA256(StringUtil.getStringFromKey(publicKey).getBytes());
+        byte[] hash = hashUtil.SHA256(stringUtil.getStringFromKey(publicKey).getBytes());
 
         // Perform RIPEMD-160 hashing on the result of SHA-256
         RIPEMD160Digest digest = new RIPEMD160Digest();
@@ -22,23 +39,19 @@ public class AddressUtil
         System.arraycopy(RIPEMD160Hash, 0, extendedRIPEMD160Hash, 1, RIPEMD160Hash.length);
 
         // Perform Base58Check
-        String address = Base58.encodeChecked(1, extendedRIPEMD160Hash);
+        String address = base58.encodeChecked(1, extendedRIPEMD160Hash);
 
         return address;
     }
 
-    public static boolean confirmTransactionSenderAddress(Transaction transaction)
+    public boolean confirmTransactionSenderAddress(Transaction transaction)
     {
         String senderAddress = transaction.getSenderAddress().getAddress();
         PublicKey senderPubKey = transaction.getSenderPubKey();
 
-        if (senderAddress == null || senderAddress.isEmpty() || senderPubKey == null)
-        {
-            return false;
-        }
-
-        if (!senderAddress.equals(AddressUtil.generateAddress(senderPubKey)))
-        {
+        if (senderAddress == null || senderAddress.isEmpty() ||
+            senderPubKey == null || !senderAddress.equals(generateAddress(senderPubKey))
+        ) {
             return false;
         }
 

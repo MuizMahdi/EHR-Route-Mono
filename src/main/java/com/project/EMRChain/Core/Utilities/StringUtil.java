@@ -1,15 +1,18 @@
 package com.project.EMRChain.Core.Utilities;
+import org.springframework.stereotype.Component;
+
 import java.security.*;
 import java.util.Base64;
 
+@Component
 public class StringUtil
 {
-    public static String getStringFromKey(Key key)
+    public String getStringFromKey(Key key)
     {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
-    public static String getStringFromBytes(byte[] input)
+    public String getStringFromBytes(byte[] input)
     {
         StringBuffer hexString = new StringBuffer();
 
