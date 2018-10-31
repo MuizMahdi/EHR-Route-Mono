@@ -17,7 +17,7 @@ public class AddressTest
     AddressUtil addressUtil;
 
     @InjectMocks
-    Address address;
+    private Address address;
 
     @Test
     public void testAddressGenerated()

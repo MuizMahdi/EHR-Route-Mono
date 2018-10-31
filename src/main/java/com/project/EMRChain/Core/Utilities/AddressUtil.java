@@ -3,7 +3,6 @@ import com.project.EMRChain.Core.Transaction;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.security.PublicKey;
 
 @Component
@@ -23,7 +22,6 @@ public class AddressUtil
 
     public String generateAddress(PublicKey publicKey)
     {
-        //stringUtil = new StringUtil();
         // Perform SHA-256 hashing on the public key
         byte[] hash = hashUtil.SHA256(stringUtil.getStringFromKey(publicKey).getBytes());
 
