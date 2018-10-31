@@ -10,8 +10,8 @@ import java.security.PublicKey;
 @Component
 public class Transaction
 {
-    @Autowired
     private StringUtil stringUtil;
+    private JsonUtil jsonUtil;
 
     private String transactionId; // Hash of transaction
     private MedicalRecord record;
@@ -21,7 +21,15 @@ public class Transaction
     private byte[] signature;
 
 
+    @Autowired
+    public Transaction(StringUtil stringUtil, JsonUtil jsonUtil)
+    {
+        this.stringUtil = stringUtil;
+        this.jsonUtil = jsonUtil;
+    }
+
     public Transaction() { }
+
     public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) {
         this.record = record;
         this.senderPubKey = senderPubKey;
@@ -33,7 +41,7 @@ public class Transaction
     public String getTransactionData()
     {
         String data =
-        JsonUtil.createJson(record) +
+        jsonUtil.createJson(record) +
         stringUtil.getStringFromKey(senderPubKey) +
         senderAddress.getAddress() +
         recipientAddress.getAddress();
