@@ -1,4 +1,4 @@
-package com.project.EMRChain.Utilities;
+package com.project.EMRChain.Core.Utilities;
 import com.project.EMRChain.Core.Address;
 import com.project.EMRChain.Core.Transaction;
 import com.project.EMRChain.Core.Utilities.*;
