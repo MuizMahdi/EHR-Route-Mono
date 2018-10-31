@@ -1,5 +1,6 @@
 package com.project.EMRChain.Core.Utilities;
 import com.project.EMRChain.Core.Transaction;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,7 @@ public class EcdsaUtil
 
         try
         {
+            Security.addProvider(new BouncyCastleProvider());
             Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
             ecdsaVerify.initVerify(publicKey);
             ecdsaVerify.update(data.getBytes());
