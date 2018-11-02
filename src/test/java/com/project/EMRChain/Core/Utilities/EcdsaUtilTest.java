@@ -1,11 +1,9 @@
 package com.project.EMRChain.Core.Utilities;
 import com.project.EMRChain.Core.Transaction;
-import com.project.EMRChain.EHR.MedicalRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -75,5 +73,5 @@ public class EcdsaUtilTest
         assertTrue(ecdsaUtil.ecGenerateKeyPair().getPublic() instanceof PublicKey);
         assertTrue(ecdsaUtil.ecGenerateKeyPair().getPrivate() instanceof PrivateKey);
     }
-    
+
 }

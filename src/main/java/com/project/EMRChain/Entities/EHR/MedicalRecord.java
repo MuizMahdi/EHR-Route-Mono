@@ -1,4 +1,4 @@
-package com.project.EMRChain.EHR;
+package com.project.EMRChain.Entities.EHR;
 import java.util.List;
 import java.util.Map;
 
