@@ -24,6 +24,7 @@ public class AppUserDetailsService implements UserDetailsService
         this.userRepository = userRepository;
     }
 
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -32,8 +33,9 @@ public class AppUserDetailsService implements UserDetailsService
             new UsernameNotFoundException("User User not found with username or email: " + usernameOrEmail)
         );
 
-        return null; // Todo: Return UserPrincipal(implements UserDetails)
+        return UserPrincipal.create(user);
     }
+
 
     @Transactional
     public UserDetails loadUserById(Long id) { // Load by ID is used for JWT Authentication Filter
@@ -42,6 +44,7 @@ public class AppUserDetailsService implements UserDetailsService
             new UsernameNotFoundException("User not found with id: " + id)
         );
 
-        return null; // Todo: Return UserPrincipal(implements UserDetails)
+        return UserPrincipal.create(user);
     }
+
 }
