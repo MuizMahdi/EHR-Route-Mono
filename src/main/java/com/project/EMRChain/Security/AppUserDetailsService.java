@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 *   It is used as a user DAO and is the strategy used by the DaoAuthenticationProvider.
 */
 
-
+@Service
 public class AppUserDetailsService implements UserDetailsService
 {
     private UserRepository userRepository;
