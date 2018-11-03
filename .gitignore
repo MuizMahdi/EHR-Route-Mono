@@ -24,3 +24,8 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Properties File ###
+application.properties
+*.properties
+application.properties
