@@ -67,14 +67,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             "/**/*.html",
             "/**/*.css",
             "/**/*.js",
-            "/api/auth/**",
-            "/api/user/checkUsernameAvailability",
-            "/api/user/checkEmailAvailability"
+            "/user/**"
     };
 
     // Matchers available for public via HTTP GET
     private String[] GET_Public_Matchers = {
-            "/api/users/**"
+            "/users/**"
     };
 
 
