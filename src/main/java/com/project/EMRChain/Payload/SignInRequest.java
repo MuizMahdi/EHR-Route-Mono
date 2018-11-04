@@ -1,7 +1,7 @@
 package com.project.EMRChain.Payload;
 import javax.validation.constraints.NotBlank;
 
-public class LoginRequest
+public class SignInRequest
 {
     @NotBlank
     private String usernameOrEmail;
