@@ -19,10 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AppUserDetailsService implements UserDetailsService
 {
     private UserRepository userRepository;
+    private UserPrincipal userPrincipal;
 
     @Autowired
-    public AppUserDetailsService(UserRepository userRepository) {
+    public AppUserDetailsService(UserRepository userRepository, UserPrincipal userPrincipal) {
         this.userRepository = userRepository;
+        this.userPrincipal = userPrincipal;
     }
 
 
@@ -35,7 +37,7 @@ public class AppUserDetailsService implements UserDetailsService
             new UsernameNotFoundException("User User not found with username or email: " + usernameOrEmail)
         );
 
-        return UserPrincipal.create(user);
+        return userPrincipal.create(user);
     }
 
 
@@ -46,7 +48,7 @@ public class AppUserDetailsService implements UserDetailsService
             new UsernameNotFoundException("User not found with id: " + id)
         );
 
-        return UserPrincipal.create(user);
+        return userPrincipal.create(user);
     }
 
 }

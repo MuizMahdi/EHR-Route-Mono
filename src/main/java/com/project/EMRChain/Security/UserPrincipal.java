@@ -4,6 +4,8 @@ import com.project.EMRChain.Entities.Auth.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 *   authentication and authorization.
 */
 
+@Component
 public class UserPrincipal implements UserDetails
 {
     private Long id;
@@ -25,6 +28,7 @@ public class UserPrincipal implements UserDetails
     private Collection<? extends GrantedAuthority> authorities;
 
 
+    public UserPrincipal() { }
     public UserPrincipal(Long id, String name, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
@@ -38,7 +42,7 @@ public class UserPrincipal implements UserDetails
     // CREATE METHOD
     // Returns a UserPrincipal object that has the user details/info
 
-    public static UserPrincipal create(User user)
+    public UserPrincipal create(User user)
     {
         // Create a list of GrantedAuthorities from the user roles
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
