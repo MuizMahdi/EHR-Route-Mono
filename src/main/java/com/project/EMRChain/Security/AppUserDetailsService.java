@@ -26,6 +26,8 @@ public class AppUserDetailsService implements UserDetailsService
         this.userRepository = userRepository;
         this.userPrincipal = userPrincipal;
     }
+    public AppUserDetailsService() { }
+
 
 
     @Override
