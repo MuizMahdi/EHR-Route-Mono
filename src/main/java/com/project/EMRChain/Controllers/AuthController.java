@@ -1,6 +1,8 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
+import com.project.EMRChain.Entities.Auth.VerificationToken;
+import com.project.EMRChain.Events.OnRegistrationCompleteEvent;
 import com.project.EMRChain.Exceptions.InternalErrorExcpetion;
 import com.project.EMRChain.Models.RoleName;
 import com.project.EMRChain.Payload.ApiResponse;
@@ -10,7 +12,9 @@ import com.project.EMRChain.Payload.SignUpRequest;
 import com.project.EMRChain.Repositories.RoleRepository;
 import com.project.EMRChain.Repositories.UserRepository;
 import com.project.EMRChain.Security.JwtTokenProvider;
+import com.project.EMRChain.Services.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,15 +22,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Calendar;
 import java.util.Collections;
+
 
 @RestController
 @RequestMapping("/user")
@@ -37,15 +39,19 @@ public class AuthController
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private RoleRepository roleRepository;
+    private ApplicationEventPublisher eventPublisher;
+    private VerificationTokenService verificationTokenService;
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository)
+    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService)
     {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.eventPublisher = eventPublisher;
+        this.verificationTokenService = verificationTokenService;
     }
 
 
@@ -122,11 +128,59 @@ public class AuthController
 
         User result = userRepository.save(user);
 
+        // Send a verification token to the user's email
+        String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl));
+
         URI location = ServletUriComponentsBuilder
         .fromCurrentContextPath().path("/users/{username}")
         .buildAndExpand(result.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+    }
+
+
+    @RequestMapping("/registration-confirm/{verificationToken}")
+    public ResponseEntity<ApiResponse> confirmRegistration(@PathVariable("verificationToken") String token)
+    {
+        // Get current calendar time
+        Calendar cal = Calendar.getInstance();
+
+        // Get token object from DB using the token string taken from url.
+        VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
+
+        // Invalid token
+        if (verificationToken == null)
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid or expired email verification link "),
+                HttpStatus.BAD_REQUEST
+            );
+
+        }
+
+        // Expired token
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0)
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Expired email verification link"),
+                HttpStatus.BAD_REQUEST
+            );
+
+        }
+
+        User user = verificationToken.getUser(); // Get the token's user
+
+        // Enable user account
+        user.setEnabled(true);
+
+        // Update user isEnabled on DB
+        userRepository.save(user);
+
+        return new ResponseEntity<>(
+                new ApiResponse(true, "User account verified successfully"),
+                HttpStatus.OK
+        );
     }
 
 }
