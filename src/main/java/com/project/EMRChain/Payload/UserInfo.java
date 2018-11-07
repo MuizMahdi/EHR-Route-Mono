@@ -5,11 +5,13 @@ public class UserInfo
     private Long id;
     private String username;
     private String name;
+    private boolean isFirstLogin;
 
-    public UserInfo(Long id, String username, String name) {
+    public UserInfo(Long id, String username, String name, boolean isFirstLogin) {
         this.id = id;
         this.username = username;
         this.name = name;
+        this.isFirstLogin = isFirstLogin;
     }
 
     public Long getId() {
