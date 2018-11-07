@@ -3,7 +3,7 @@ import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Exceptions.InternalErrorExcpetion;
 import com.project.EMRChain.Models.RoleName;
-import com.project.EMRChain.Payload.SignUpRequest;
+import com.project.EMRChain.Payload.Auth.SignUpRequest;
 import com.project.EMRChain.Repositories.RoleRepository;
 import com.project.EMRChain.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

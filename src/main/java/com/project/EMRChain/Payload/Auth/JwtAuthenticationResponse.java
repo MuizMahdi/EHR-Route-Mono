@@ -1,4 +1,4 @@
-package com.project.EMRChain.Payload;
+package com.project.EMRChain.Payload.Auth;
 
 
 public class JwtAuthenticationResponse

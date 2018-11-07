@@ -49,4 +49,6 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
         mailSender.send(mailMessage);
     }
+
+
 }

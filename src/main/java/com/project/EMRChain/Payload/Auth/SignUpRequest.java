@@ -1,4 +1,4 @@
-package com.project.EMRChain.Payload;
+package com.project.EMRChain.Payload.Auth;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
