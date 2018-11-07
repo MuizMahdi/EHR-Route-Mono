@@ -39,6 +39,9 @@ public class User extends DateAudit
     @Column(name = "enabled")
     private boolean isEnabled;
 
+    @Column(name = "firstLogin")
+    private boolean isFirstLogin;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
@@ -56,6 +59,7 @@ public class User extends DateAudit
         this.email = email;
         this.password = password;
         this.isEnabled = false;
+        this.isFirstLogin = false;
     }
 
     public Long getId() {
@@ -79,6 +83,9 @@ public class User extends DateAudit
     public boolean isEnabled() {
         return isEnabled;
     }
+    public boolean isFirstLogin() {
+        return isFirstLogin;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -101,4 +108,10 @@ public class User extends DateAudit
     public void setPassword(String password) {
         this.password = password;
     }
+    public void setFirstLogin(boolean firstLogin) {
+        isFirstLogin = firstLogin;
+    }
+
+
+
 }
