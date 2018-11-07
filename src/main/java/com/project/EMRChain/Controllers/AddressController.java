@@ -35,7 +35,7 @@ public class AddressController
     }
 
 
-    @GetMapping("/get/{username}")
+    @GetMapping("/generate/{username}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> generateUserAddress(@PathVariable("username") String username)
     {
