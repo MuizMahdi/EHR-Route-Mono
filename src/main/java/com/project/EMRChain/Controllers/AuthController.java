@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/auth")
 public class AuthController
 {
     private AuthenticationManager authenticationManager;

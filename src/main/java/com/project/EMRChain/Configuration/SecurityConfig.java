@@ -27,20 +27,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     // ### AutoWiring ### //
     private AppUserDetailsService userDetailsService;
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private JwtAuthenticationFilter authenticationFilter;
 
     @Autowired
-    public SecurityConfig(AppUserDetailsService userDetailsService, JwtAuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityConfig(JwtAuthenticationFilter authenticationFilter, AppUserDetailsService userDetailsService, JwtAuthenticationEntryPoint authenticationEntryPoint) {
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.authenticationFilter = authenticationFilter;
     }
 
-
-
     // ### Beans ### //
+    /*
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
+    */
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -72,7 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 
     // Matchers available for public via HTTP GET
     private String[] GET_Public_Matchers = {
-            "/users/**"
+            "/user/**"
     };
 
 
@@ -98,7 +100,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
         .antMatchers(HttpMethod.GET, GET_Public_Matchers).permitAll()
         .anyRequest().authenticated();
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
 }
