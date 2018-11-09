@@ -1,5 +1,4 @@
 package com.project.EMRChain.Controllers;
-import com.project.EMRChain.Core.Address;
 import com.project.EMRChain.Core.Utilities.AddressUtil;
 import com.project.EMRChain.Core.Utilities.EcdsaUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
