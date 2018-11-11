@@ -1,5 +1,6 @@
 package com.project.EMRChain.Entities.Auth;
 import com.project.EMRChain.Audits.DateAudit;
+import com.project.EMRChain.Entities.App.Network;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -50,6 +51,14 @@ public class User extends DateAudit
     )
     private Set<Role> roles = new HashSet<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_network",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "network_id")
+    )
+    private Network network;
+
 
 
     public User() { }
@@ -73,6 +82,9 @@ public class User extends DateAudit
     }
     public Set<Role> getRoles() {
         return roles;
+    }
+    public Network getNetwork() {
+        return network;
     }
     public String getUsername() {
         return username;
@@ -102,6 +114,9 @@ public class User extends DateAudit
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
     }
+    public void setNetwork(Network network) {
+        this.network = network;
+    }
     public void setUsername(String username) {
         this.username = username;
     }
@@ -111,7 +126,4 @@ public class User extends DateAudit
     public void setNonFirstLogin(boolean firstLogin) {
         isNonFirstLogin = firstLogin;
     }
-
-
-
 }
