@@ -1,12 +1,7 @@
 package com.project.EMRChain.Controllers;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,18 +12,20 @@ public class ChainController
 {
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    
-
-    @GetMapping("/chaingivers")
-    public SseEmitter chainGiver()
+    @GetMapping("/chaingiver/{uuid}")
+    public SseEmitter chainGiver(@PathVariable("uuid") String UUID)
     {
+        // Todo: Add the client uuid to ChainGivers Cluster
+
         // Returns notification SSE
         return null;
     }
 
-    @GetMapping("/chaingetters")
-    public SseEmitter chainGetter()
+    @GetMapping("/chaingetter/{uuid}")
+    public SseEmitter chainGetter(@PathVariable("uuid") String UUID)
     {
+        // Todo: Add the client uuid to ChainGetters Cluster
+
         // Returns notification SSE
         return null;
     }
@@ -55,25 +52,13 @@ public class ChainController
     }
 
 
-
-    @GetMapping("/stream")
-    public SseEmitter stream()
+    // Called when client closes app or onDestroy
+    @GetMapping("/close/{uuid}")
+    public ResponseEntity closeConnection(@PathVariable("uuid") String UUID)
     {
-        SseEmitter emitter = new SseEmitter();
-
-        executorService.execute(() -> {
-            try
-            {
-                emitter.send(new Date().getTime(), MediaType.APPLICATION_JSON);
-                emitter.complete();
-            }
-            catch (Exception Ex)
-            {
-                emitter.completeWithError(Ex);
-            }
-        });
-
-        return emitter;
+        // Todo: remove the client from clusters
+        // Returns chain
+        return null;
     }
 
 }
