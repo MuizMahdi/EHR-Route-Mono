@@ -1,16 +1,9 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Node;
 import com.project.EMRChain.Core.NodeCluster;
-import com.project.EMRChain.Payload.Auth.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
