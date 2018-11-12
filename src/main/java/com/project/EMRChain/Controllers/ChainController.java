@@ -21,8 +21,6 @@ public class ChainController
 {
     private ExecutorService executorService = Executors.newCachedThreadPool();
     private NodeCluster chainProviders = new NodeCluster();
-    private NodeCluster chainConsumers = new NodeCluster();
-    private NodeCluster chainUpdateList = new NodeCluster();
 
 
     @GetMapping("/chainprovider/{nodeuuid}/{netuuid}")
