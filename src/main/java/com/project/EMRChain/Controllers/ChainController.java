@@ -2,6 +2,7 @@ package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Node;
 import com.project.EMRChain.Core.NodeCluster;
 import com.project.EMRChain.Events.GetChainFromProviderEvent;
+import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import org.slf4j.Logger;
@@ -14,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
@@ -33,12 +33,12 @@ public class ChainController
         this.eventPublisher = eventPublisher;
     }
 
-
     private final Logger logger = LoggerFactory.getLogger(ChainController.class);
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     private NodeCluster chainProviders = new NodeCluster();
     private NodeCluster chainConsumers = new NodeCluster();
+
 
 
     @GetMapping("/chainprovider/{nodeuuid}/{netuuid}")
@@ -95,8 +95,8 @@ public class ChainController
     @PostMapping("/chaingive")
     public ResponseEntity chainGive(/* CHAIN REQUEST PAYLOAD RECEIVED HERE [Includes ConsumerUUID] */)
     {
-        // Publish a SendChainToGetter event, which causes a SSE to be sent through chainConsumer to the
-        // Node with the consumerUUID
+        // Todo: 1. Check whether ConsumerUUID is valid or not
+        // Todo: 2. Publish a SendChainToGetter event with the consumerUUID
 
         // Returns HttpStatus.OK on success
         return null;
@@ -150,13 +150,6 @@ public class ChainController
         );
     }
 
-    @GetMapping("/chainupdate")
-    public SseEmitter chainUpdate()
-    {
-        // Returns chain
-        return null;
-    }
-
 
     // Called when client closes app or onDestroy
     @GetMapping("/close/{uuid}")
@@ -168,24 +161,6 @@ public class ChainController
     }
 
 
-    @EventListener
-    private void SseKeepAlive(SseKeepAliveEvent event)
-    {
-        chainProviders.getCluster().forEach((uuid, node) -> {
-            try
-            {
-                System.out.println("Sending Keep-Alive Event to node: " + uuid);
-                // Send fake data every 4 minutes to keep the connection alive
-                event.setKeepAliveData("0"); // Data to be sent
-                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-            }
-            catch (IOException Ex) {
-                this.chainProviders.removeNode(uuid);
-                logger.error(Ex.getMessage());
-            }
-
-        });
-    }
 
     @EventListener
     private void getChainFromProvider(GetChainFromProviderEvent event) throws IOException
@@ -201,10 +176,49 @@ public class ChainController
         // Get the provider's emitter
         SseEmitter providerEmitter = providerNode.getValue().getEmitter();
 
-
         // Send a ChainRequest SSE through ChainProviders stream that contains the consumerUUID to the provider
         providerEmitter.send(consumerUUID);
     }
+
+    @EventListener
+    private void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
+    {
+        String consumerUUID = event.getConsumerUUID();
+
+        // Todo: Send a ChainGive response SSE which contains the chain through ChainConsumers stream
+        // Todo: to the consumer in the consumer with the ConsumerUUID
+    }
+
+    @EventListener
+    private void SseKeepAlive(SseKeepAliveEvent event)
+    {
+        event.setKeepAliveData("0"); // Keep-Alive fake data
+
+        chainProviders.getCluster().forEach((uuid, node) -> {
+            try
+            {
+                System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
+                // Send fake data every 4 minutes to keep the connection alive
+                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+            }
+            catch (IOException Ex) {
+                this.chainProviders.removeNode(uuid);
+                logger.error(Ex.getMessage());
+            }
+        });
+        chainConsumers.getCluster().forEach((uuid, node) -> {
+            try
+            {
+                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+            }
+            catch (IOException Ex) {
+                this.chainConsumers.removeNode(uuid);
+                logger.error(Ex.getMessage());
+            }
+        });
+    }
+
+
 
     private boolean isValidUUID(String uuid)
     {
