@@ -38,7 +38,7 @@ public class NodeController
         }
 
         return new ResponseEntity<>(
-                new ApiResponse(false, "Valid Provider"),
+                new ApiResponse(true, "Valid Provider"),
                 HttpStatus.OK
         );
     }
