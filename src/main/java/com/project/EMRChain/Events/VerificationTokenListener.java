@@ -2,33 +2,31 @@ package com.project.EMRChain.Events;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Services.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent>
+public class VerificationTokenListener
 {
     private JavaMailSender mailSender;
     private VerificationTokenService verificationTokenService;
 
     @Autowired
-    public RegistrationListener(JavaMailSender mailSender, VerificationTokenService verificationTokenService) {
+    public VerificationTokenListener(JavaMailSender mailSender, VerificationTokenService verificationTokenService) {
         this.mailSender = mailSender;
         this.verificationTokenService = verificationTokenService;
     }
 
 
-
-    @Override
-    public void onApplicationEvent(OnRegistrationCompleteEvent event)
-    {
+    @EventListener
+    public void onRegistrationCompleteEvent(RegistrationCompleteEvent event) {
         this.confirmRegistration(event);
     }
 
-    private void confirmRegistration(OnRegistrationCompleteEvent event)
+    private void confirmRegistration(RegistrationCompleteEvent event)
     {
         User user = event.getUser();
 
@@ -49,6 +47,5 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
         mailSender.send(mailMessage);
     }
-
 
 }

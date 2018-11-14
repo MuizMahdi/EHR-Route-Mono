@@ -4,14 +4,14 @@ import org.springframework.context.ApplicationEvent;
 import java.util.Locale;
 
 
-public class OnRegistrationCompleteEvent extends ApplicationEvent
+public class RegistrationCompleteEvent extends ApplicationEvent
 {
     private String appUrl;
     private Locale locale;
     private User user;
 
 
-    public OnRegistrationCompleteEvent(User user, String appUrl)
+    public RegistrationCompleteEvent(User user, String appUrl)
     {
         super(user);
         this.user = user;

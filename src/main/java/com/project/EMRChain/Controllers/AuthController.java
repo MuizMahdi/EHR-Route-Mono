@@ -2,7 +2,7 @@ package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Entities.Auth.VerificationToken;
-import com.project.EMRChain.Events.OnRegistrationCompleteEvent;
+import com.project.EMRChain.Events.RegistrationCompleteEvent;
 import com.project.EMRChain.Models.RoleName;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Auth.JwtAuthenticationResponse;
@@ -101,7 +101,7 @@ public class AuthController
 
         // Send a verification token to the user's email
         String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl));
+        eventPublisher.publishEvent(new RegistrationCompleteEvent(user, appUrl));
 
         URI location = ServletUriComponentsBuilder
         .fromCurrentContextPath().path("/users/{username}")
