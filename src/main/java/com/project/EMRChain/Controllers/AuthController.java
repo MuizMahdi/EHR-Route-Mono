@@ -1,7 +1,9 @@
 package com.project.EMRChain.Controllers;
+import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Entities.Auth.VerificationToken;
 import com.project.EMRChain.Events.OnRegistrationCompleteEvent;
+import com.project.EMRChain.Models.RoleName;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Auth.JwtAuthenticationResponse;
 import com.project.EMRChain.Payload.Auth.SignInRequest;
@@ -150,6 +152,70 @@ public class AuthController
                 new ApiResponse(true, "User account verified successfully"),
                 HttpStatus.OK
         );
+    }
+
+    @RequestMapping("/role-change/{role}/{verificationToken}")
+    public ResponseEntity<ApiResponse> roleChange(@PathVariable("role") String role, @PathVariable("verificationToken") String token)
+    {
+        // Check if role is a valid role
+        if (!isRoleValid(role)) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid Role"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Get current calendar time
+        Calendar cal = Calendar.getInstance();
+
+        // Get token object from DB using the token string taken from url.
+        VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
+
+        // Invalid token
+        if (verificationToken == null) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid or expired role change token"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Expired token
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Expired role change token"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Get the token's user
+        User user = verificationToken.getUser();
+
+        // Create Role from 'role' String
+        Role userRole = new Role();
+        userRole.setName(RoleName.valueOf(role));
+
+        // Add it to user roles
+        user.getRoles().add(userRole);
+
+        // Update user data with the new role on DB
+        userService.saveUser(user);
+
+        return new ResponseEntity<>(
+                new ApiResponse(true, "User account verified successfully"),
+                HttpStatus.OK
+        );
+    }
+
+    private boolean isRoleValid(String role)
+    {
+        for (RoleName roleName : RoleName.values())
+        {
+            if(roleName.toString().equals(role)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
