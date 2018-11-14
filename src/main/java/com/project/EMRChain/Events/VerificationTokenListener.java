@@ -23,10 +23,15 @@ public class VerificationTokenListener
 
     @EventListener
     public void onRegistrationCompleteEvent(RegistrationCompleteEvent event) {
-        this.confirmRegistration(event);
+        this.sendRegistrationToken(event);
     }
 
-    private void confirmRegistration(RegistrationCompleteEvent event)
+    @EventListener
+    public void onRoleChangeEvent(RoleChangeEvent event) {
+        this.sendRoleChangeToken(event);
+    }
+
+    private void sendRegistrationToken(RegistrationCompleteEvent event)
     {
         User user = event.getUser();
 
@@ -39,6 +44,30 @@ public class VerificationTokenListener
         String subject = "Registration Confirmation";
         String confirmationUrl = event.getAppUrl() + "/auth/registration-confirm/" + verificationToken;
         String message = "Account Confirmation Link: " + confirmationUrl;
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(recipientAddress);
+        mailMessage.setSubject(subject);
+        mailMessage.setText(message);
+
+        mailSender.send(mailMessage);
+    }
+
+    private void sendRoleChangeToken(RoleChangeEvent event)
+    {
+        User user = event.getUser();
+        String role = event.getRole();
+
+        String verificationToken = UUID.randomUUID().toString();
+
+        // Persist the token
+        verificationTokenService.createVerificationToken(user, verificationToken);
+
+        // Email with link containing the token
+        String recipientAddress = user.getEmail();
+        String subject = "Role Change Confirmation";
+        String confirmationUrl = event.getAppUrl() + "/auth/role-change/" + role + "/" + verificationToken;
+        String message = "Role Change Confirmation Link: " + confirmationUrl;
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(recipientAddress);

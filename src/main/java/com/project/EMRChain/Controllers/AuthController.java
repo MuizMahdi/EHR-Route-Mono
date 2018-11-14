@@ -3,11 +3,11 @@ import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Entities.Auth.VerificationToken;
 import com.project.EMRChain.Events.RegistrationCompleteEvent;
+import com.project.EMRChain.Events.RoleChangeEvent;
+import com.project.EMRChain.Exceptions.InternalErrorExcpetion;
 import com.project.EMRChain.Models.RoleName;
-import com.project.EMRChain.Payload.Auth.ApiResponse;
-import com.project.EMRChain.Payload.Auth.JwtAuthenticationResponse;
-import com.project.EMRChain.Payload.Auth.SignInRequest;
-import com.project.EMRChain.Payload.Auth.SignUpRequest;
+import com.project.EMRChain.Payload.Auth.*;
+import com.project.EMRChain.Repositories.RoleRepository;
 import com.project.EMRChain.Security.JwtTokenProvider;
 import com.project.EMRChain.Services.UserService;
 import com.project.EMRChain.Services.VerificationTokenService;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @RestController
@@ -35,15 +39,17 @@ public class AuthController
     private ApplicationEventPublisher eventPublisher;
     private VerificationTokenService verificationTokenService;
     private UserService userService;
+    private RoleRepository roleRepository;
 
     @Autowired
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService)
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService, RoleRepository roleRepository)
     {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.eventPublisher = eventPublisher;
         this.verificationTokenService = verificationTokenService;
         this.userService = userService;
+        this.roleRepository = roleRepository;
     }
 
 
@@ -154,7 +160,37 @@ public class AuthController
         );
     }
 
+
+    @PostMapping("/generate-role-change-token")
+    public ResponseEntity<?> roleChangeToken(@Valid @RequestBody RoleChangeRequest roleChangeRequest)
+    {
+        User user = userService.findUserByUsernameOrEmail(roleChangeRequest.getUsername());
+
+        if (user == null) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "User doesn't exists"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Get current app url
+        String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
+
+        String role = roleChangeRequest.getRole(); // Role to be added
+
+        // Send a role change token to the user's email
+        eventPublisher.publishEvent(new RoleChangeEvent(user, appUrl, role));
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/users/{username}")
+                .buildAndExpand(user.getUsername()).toUri();
+
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Role change token sent successfully"));
+    }
+
+
     @RequestMapping("/role-change/{role}/{verificationToken}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> roleChange(@PathVariable("role") String role, @PathVariable("verificationToken") String token)
     {
         // Check if role is a valid role
@@ -190,21 +226,25 @@ public class AuthController
         // Get the token's user
         User user = verificationToken.getUser();
 
-        // Create Role from 'role' String
-        Role userRole = new Role();
-        userRole.setName(RoleName.valueOf(role));
+        // Get the 'ADMIN' role
+        Role userRole = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(() ->
+                new InternalErrorExcpetion("Invalid Role")
+        );
 
-        // Add it to user roles
-        user.getRoles().add(userRole);
+        // Update the user roles set
+        Set<Role> userRoles = user.getRoles();
+        userRoles.add(userRole);
+        user.setRoles(userRoles);
 
-        // Update user data with the new role on DB
+        // Persist the user updates to DB
         userService.saveUser(user);
 
         return new ResponseEntity<>(
-                new ApiResponse(true, "User account verified successfully"),
+                new ApiResponse(true, "User Role Was Added Successfully."),
                 HttpStatus.OK
         );
     }
+
 
     private boolean isRoleValid(String role)
     {
