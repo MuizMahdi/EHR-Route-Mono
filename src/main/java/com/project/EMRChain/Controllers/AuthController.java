@@ -162,6 +162,7 @@ public class AuthController
 
 
     @PostMapping("/generate-role-change-token")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> roleChangeToken(@Valid @RequestBody RoleChangeRequest roleChangeRequest)
     {
         User user = userService.findUserByUsernameOrEmail(roleChangeRequest.getUsername());
@@ -190,7 +191,6 @@ public class AuthController
 
 
     @RequestMapping("/role-change/{role}/{verificationToken}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> roleChange(@PathVariable("role") String role, @PathVariable("verificationToken") String token)
     {
         // Check if role is a valid role

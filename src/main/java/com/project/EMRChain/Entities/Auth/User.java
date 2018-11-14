@@ -43,7 +43,7 @@ public class User extends DateAudit
     @Column(name = "firstLogin")
     private boolean isNonFirstLogin;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
