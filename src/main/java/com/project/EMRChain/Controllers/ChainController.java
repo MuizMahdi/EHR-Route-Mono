@@ -105,19 +105,8 @@ public class ChainController
     @GetMapping("/chainget/{consumeruuid}")
     public ResponseEntity ChainGet(@PathVariable("consumeruuid") String consumerUUID)
     {
-        boolean consumerExists = false;
-
-        // Go through the Chain Consumers and Check whether consumer
-        // exists on the chain consumers list or not
-        for (Map.Entry<String, Node> nodeEntry : chainConsumers.getCluster().entrySet())
-        {
-            if (nodeEntry.getKey().equals(consumerUUID)) {
-                consumerExists = true;
-            }
-        }
-
-        // If it consumer uuid is invalid or not in consumers list
-        if (!isValidUUID(consumerUUID) || !consumerExists)
+        // If the consumer uuid is invalid or not in consumers list
+        if (!isValidUUID(consumerUUID) || !chainConsumers.existsInCluster(consumerUUID))
         {
             return new ResponseEntity<>(
                     new ApiResponse(false, "Invalid consumer UUID or doesn't exist"),
@@ -151,13 +140,23 @@ public class ChainController
     }
 
 
-    // Called when client closes app or onDestroy
+    // Called when client closes app (ngOnDestroy)
     @GetMapping("/close/{uuid}")
-    public ResponseEntity closeConnection(@PathVariable("uuid") String UUID)
+    public ResponseEntity closeConnection(@PathVariable("uuid") String uuid)
     {
-        // Todo: remove the client from clusters
-        // Returns chain
-        return null;
+        // Remove the client from clusters
+        if(chainConsumers.existsInCluster(uuid)) {
+            chainConsumers.removeNode(uuid);
+        }
+
+        if (chainProviders.existsInCluster(uuid)) {
+            chainProviders.removeNode(uuid);
+        }
+
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Connection closed"),
+                HttpStatus.OK
+        );
     }
 
 

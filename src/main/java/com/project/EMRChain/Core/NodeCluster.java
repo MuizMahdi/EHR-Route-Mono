@@ -1,6 +1,7 @@
 package com.project.EMRChain.Core;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.HashMap;
+import java.util.Map;
 
 public class NodeCluster
 {
@@ -24,6 +25,17 @@ public class NodeCluster
 
     public void removeNode(String uuid) {
         this.cluster.remove(uuid);
+    }
+
+    public boolean existsInCluster(String nodeUUID) {
+        for (Map.Entry<String, Node> nodeEntry : cluster.entrySet())
+        {
+            if (nodeEntry.getKey().equals(nodeUUID)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public HashMap<String, Node> getCluster() {
