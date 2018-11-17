@@ -96,7 +96,7 @@ public class ChainController
     public ResponseEntity chainGive(/* CHAIN REQUEST PAYLOAD RECEIVED HERE [Includes ConsumerUUID] */)
     {
         // Todo: 1. Check whether ConsumerUUID is valid or not
-        // Todo: 2. Publish a SendChainToGetter event with the consumerUUID
+        // Todo: 2. Publish a SendChainToGetter event with: [consumerUUID + chain]
 
         // Returns HttpStatus.OK on success
         return null;

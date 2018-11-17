@@ -1,4 +1,4 @@
-package com.project.EMRChain.Payload;
+package com.project.EMRChain.Payload.Auth;
 
 public class UserInfo
 {
@@ -23,6 +23,9 @@ public class UserInfo
     public String getUsername() {
         return username;
     }
+    public boolean isFirstLogin() {
+        return isFirstLogin;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -32,5 +35,8 @@ public class UserInfo
     }
     public void setUsername(String username) {
         this.username = username;
+    }
+    public void setFirstLogin(boolean firstLogin) {
+        isFirstLogin = firstLogin;
     }
 }

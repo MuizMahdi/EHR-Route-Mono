@@ -1,10 +1,9 @@
 package com.project.EMRChain.Controllers;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.project.EMRChain.Core.Utilities.AddressUtil;
 import com.project.EMRChain.Core.Utilities.EcdsaUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.Entities.Auth.User;
-import com.project.EMRChain.Payload.AddressResponse;
+import com.project.EMRChain.Payload.Core.AddressResponse;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.constraints.NotBlank;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+
 
 @RestController
 @RequestMapping("/address")

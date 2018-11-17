@@ -12,8 +12,7 @@ public class Hash
     private StringUtil stringUtil;
 
     @Autowired
-    public Hash(HashUtil hashUtil, StringUtil stringUtil)
-    {
+    public Hash(HashUtil hashUtil, StringUtil stringUtil) {
         this.hashUtil = hashUtil;
         this.stringUtil = stringUtil;
     }
