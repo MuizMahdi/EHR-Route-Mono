@@ -1,4 +1,5 @@
 package com.project.EMRChain.Controllers;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.project.EMRChain.Core.Utilities.AddressUtil;
 import com.project.EMRChain.Core.Utilities.EcdsaUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotBlank;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -33,9 +36,9 @@ public class AddressController
     }
 
 
-    @GetMapping("/generate/{username}")
+    @GetMapping("/generate")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> generateUserAddress(@PathVariable("username") String username)
+    public ResponseEntity<?> generateUserAddress(@RequestParam("username") String username)
     {
         User user = userService.findUserByUsernameOrEmail(username);
 

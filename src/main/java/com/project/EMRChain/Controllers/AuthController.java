@@ -190,8 +190,8 @@ public class AuthController
     }
 
 
-    @RequestMapping("/role-change/{role}/{verificationToken}")
-    public ResponseEntity<ApiResponse> roleChange(@PathVariable("role") String role, @PathVariable("verificationToken") String token)
+    @RequestMapping("/role-change/{verificationToken}")
+    public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role)
     {
         // Check if role is a valid role
         if (!isRoleValid(role)) {

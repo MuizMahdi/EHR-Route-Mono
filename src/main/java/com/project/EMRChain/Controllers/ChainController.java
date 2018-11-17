@@ -41,8 +41,8 @@ public class ChainController
 
 
 
-    @GetMapping("/chainprovider/{nodeuuid}/{netuuid}")
-    public SseEmitter subscribeProvider(@PathVariable("nodeuuid") String nodeUUID, @PathVariable("netuuid") String networkUUID) throws IOException
+    @GetMapping("/chainprovider")
+    public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
         // Create an emitter for the subscribed client node
         SseEmitter emitter = new SseEmitter(2592000000L); // An extremely long timeout
@@ -83,8 +83,8 @@ public class ChainController
         return emitter;
     }
 
-    @GetMapping("/chainconsumer/{uuid}")
-    public SseEmitter chainConsumers(@PathVariable("uuid") String UUID)
+    @GetMapping("/chainconsumer")
+    public SseEmitter chainConsumers(@RequestParam("uuid") String UUID)
     {
         // Todo: Add the client uuid to ChainGetters Cluster
 
@@ -102,8 +102,8 @@ public class ChainController
         return null;
     }
 
-    @GetMapping("/chainget/{consumeruuid}")
-    public ResponseEntity ChainGet(@PathVariable("consumeruuid") String consumerUUID)
+    @GetMapping("/chainget")
+    public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
         if (!isValidUUID(consumerUUID) || !chainConsumers.existsInCluster(consumerUUID))
@@ -141,8 +141,8 @@ public class ChainController
 
 
     // Called when client closes app (ngOnDestroy)
-    @GetMapping("/close/{uuid}")
-    public ResponseEntity closeConnection(@PathVariable("uuid") String uuid)
+    @GetMapping("/close")
+    public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
     {
         // Remove the client from clusters
         if(chainConsumers.existsInCluster(uuid)) {

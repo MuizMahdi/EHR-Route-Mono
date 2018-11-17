@@ -66,7 +66,7 @@ public class VerificationTokenListener
         // Email with link containing the token
         String recipientAddress = user.getEmail();
         String subject = "Role Change Confirmation";
-        String confirmationUrl = event.getAppUrl() + "/auth/role-change/" + role + "/" + verificationToken;
+        String confirmationUrl = event.getAppUrl() + "/auth/role-change/" + verificationToken + "?role=" + role;
         String message = "Role Change Confirmation Link: " + confirmationUrl;
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();

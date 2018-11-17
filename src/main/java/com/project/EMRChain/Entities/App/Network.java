@@ -13,7 +13,7 @@ public class Network
     @NaturalId
     private String networkUUID;
 
-
+    public Network() {}
     public Network(String networkUUID) {
         this.networkUUID = networkUUID;
     }
