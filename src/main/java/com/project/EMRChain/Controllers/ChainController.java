@@ -5,6 +5,7 @@ import com.project.EMRChain.Events.GetChainFromProviderEvent;
 import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
+import com.project.EMRChain.Payload.Core.SerializableChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,10 +94,13 @@ public class ChainController
     }
 
     @PostMapping("/chaingive")
-    public ResponseEntity chainGive(/* CHAIN REQUEST PAYLOAD RECEIVED HERE [Includes ConsumerUUID] */)
+    public ResponseEntity chainGive(@RequestBody SerializableChain chain)
     {
         // Todo: 1. Check whether ConsumerUUID is valid or not
         // Todo: 2. Publish a SendChainToGetter event with: [consumerUUID + chain]
+        System.out.println("SenderAddress: " + chain.getChain().get(1).getTransaction().getSenderAddress());
+        System.out.println("JSON Chain: ");
+
 
         // Returns HttpStatus.OK on success
         return null;
