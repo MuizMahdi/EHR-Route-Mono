@@ -10,6 +10,7 @@ public class SerializableTransaction
     private String recipientAddress;
     private String signature;
 
+    public SerializableTransaction() { }
     public SerializableTransaction(String transactionId, MedicalRecord record, String senderPubKey, String senderAddress, String recipientAddress, String signature) {
         this.transactionId = transactionId;
         this.record = record;
