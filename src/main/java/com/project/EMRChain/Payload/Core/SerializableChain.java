@@ -10,6 +10,11 @@ public class SerializableChain
         this.chain = chain;
     }
 
+    public void addBlock(SerializableBlock block)
+    {
+        this.chain.add(block);
+    }
+
     public List<SerializableBlock> getChain() {
         return chain;
     }

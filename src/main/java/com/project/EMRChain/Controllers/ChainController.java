@@ -6,6 +6,7 @@ import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.SerializableChain;
+import com.project.EMRChain.Utilities.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,9 +99,9 @@ public class ChainController
     {
         // Todo: 1. Check whether ConsumerUUID is valid or not
         // Todo: 2. Publish a SendChainToGetter event with: [consumerUUID + chain]
-        System.out.println("SenderAddress: " + chain.getChain().get(1).getTransaction().getSenderAddress());
-        System.out.println("JSON Chain: ");
 
+        //JsonUtil jsonUtil = new JsonUtil();
+        //System.out.println(jsonUtil.createJson(chain));
 
         // Returns HttpStatus.OK on success
         return null;

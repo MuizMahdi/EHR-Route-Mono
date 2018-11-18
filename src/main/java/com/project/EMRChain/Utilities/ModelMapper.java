@@ -1,5 +1,5 @@
 package com.project.EMRChain.Utilities;
-import com.project.EMRChain.Core.Block;
+import com.project.EMRChain.Core.*;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.Payload.Core.SerializableBlock;
 import com.project.EMRChain.Payload.Core.SerializableBlockHeader;
@@ -12,11 +12,11 @@ public class ModelMapper
 {
     private StringUtil stringUtil;
 
-
     @Autowired
     public ModelMapper(StringUtil stringUtil) {
         this.stringUtil = stringUtil;
     }
+    public ModelMapper() { }
 
     public SerializableBlock mapBlockToSerializableBlock(Block block)
     {
