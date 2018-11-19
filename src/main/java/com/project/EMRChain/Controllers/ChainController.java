@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -64,20 +66,9 @@ public class ChainController
 
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> {
-            this.chainProviders.removeNode(nodeUUID);
-            System.out.println("########## EMITTER TIMEOUT ##########");
-        });
-
-        emitter.onCompletion(() -> {
-            this.chainProviders.removeNode(nodeUUID);
-            System.out.println("######### EMITTER COMPLETION #########");
-        });
-
-        emitter.onError(error -> {
-            this.chainProviders.removeNode(nodeUUID);
-            System.out.println("########## EMITTER ERROR: " + error.getMessage() + " ##########");
-        });
+        emitter.onTimeout(() -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onError(error -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onCompletion(() -> this.chainProviders.removeNode(nodeUUID));
 
         // Returns the GetChainFromProviderEvent notification SSE
         return emitter;
@@ -204,16 +195,40 @@ public class ChainController
         // The passed on consumer UUID from chainGet() where the event is published
         String consumerUUID = event.getConsumerUUID();
 
-        // Todo: Check if provider has a valid chain, if not then choose another, and so...
+        SseEmitter consumerEmitter = this.chainConsumers.getNodeEmitter(consumerUUID);
+        String consumerNetworkUUID = this.chainConsumers.getNode(consumerUUID).getNetworkUUID();
+        List<String> consumerNetworkProviders = new ArrayList<>();
 
-        // Get a provider node from the chain providers
-        Map.Entry<String, Node> providerNode = this.chainProviders.getCluster().entrySet().iterator().next();
+        // Find a provider in the same network as the consumer
+        for (Map.Entry<String, Node> nodeEntry : this.chainProviders.getCluster().entrySet())
+        {
+            // If a provider is found with the same NetworkUUID as the consumer NetworkUUID (so both are in same network)
+            if (nodeEntry.getValue().getNetworkUUID().equals(consumerNetworkUUID))
+            {
+                // Add the provider UUID to the consumerNetworkProviders List
+                consumerNetworkProviders.add(nodeEntry.getKey());
+            }
+        }
 
-        // Get the provider's emitter
-        SseEmitter providerEmitter = providerNode.getValue().getEmitter();
 
-        // Send a ChainRequest SSE through ChainProviders stream that contains the consumerUUID to the provider
-        providerEmitter.send(consumerUUID);
+        if (consumerNetworkProviders.isEmpty()) // If no provider was found
+        {
+            // Send response to consumer
+            consumerEmitter.send(new ApiResponse(false, "No provider available in your network"));
+        }
+        else
+        {
+            // Todo: Check if first provider has a valid chain, if not then choose another, and so...
+
+            // Get first provider from list
+            String providerUUID = consumerNetworkProviders.get(0);
+
+            // Get provider emitter
+            SseEmitter providerEmitter = this.chainProviders.getNodeEmitter(providerUUID);
+
+            // Send a ChainRequest SSE through ChainProviders stream that contains the consumerUUID to the provider
+            providerEmitter.send(consumerUUID, MediaType.APPLICATION_JSON);
+        }
     }
 
     @EventListener
@@ -228,7 +243,7 @@ public class ChainController
         SseEmitter consumerEmitter = consumerNode.getEmitter();
 
         // Send the chain through the ChainConsumers SSE stream to the consumer with the consumerUUID
-        consumerEmitter.send(chain);
+        consumerEmitter.send(chain, MediaType.APPLICATION_JSON);
     }
 
     @EventListener
