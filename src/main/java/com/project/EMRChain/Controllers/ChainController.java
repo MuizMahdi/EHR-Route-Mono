@@ -6,7 +6,6 @@ import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.SerializableChain;
-import com.project.EMRChain.Utilities.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +35,12 @@ public class ChainController
     }
 
     private final Logger logger = LoggerFactory.getLogger(ChainController.class);
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-
+    //private ExecutorService executorService = Executors.newCachedThreadPool();
     private NodeCluster chainProviders = new NodeCluster();
     private NodeCluster chainConsumers = new NodeCluster();
 
 
-
+    // Subscribes a node to the chain providers cluster (used to receive a ChainSend SSE)
     @GetMapping("/chainprovider")
     public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
@@ -85,28 +83,64 @@ public class ChainController
         return emitter;
     }
 
+    // Subscribes a node to the chain consumers cluster (used to receive the chain from a provider)
     @GetMapping("/chainconsumer")
-    public SseEmitter chainConsumers(@RequestParam("uuid") String UUID)
+    public SseEmitter chainConsumers(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
-        // Todo: Add the client uuid to ChainGetters Cluster
+        SseEmitter emitter = new SseEmitter(2592000000L);
 
-        // Returns notification SSE
-        return null;
+        if (!isValidUUID(nodeUUID) || !isValidUUID(networkUUID)) {
+            emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
+        }
+        else {
+            Node node = new Node(emitter, networkUUID);
+            this.chainConsumers.addNode(nodeUUID, node);
+        }
+
+        // Remove the emitter on timeout/error/completion
+        emitter.onTimeout(() -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onError(error -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onCompletion(() -> this.chainProviders.removeNode(nodeUUID));
+
+        // Returns the ChainSend and BlockSend SSE
+        return emitter;
     }
 
+    // Publishes a SendChainToConsumerEvent with the chain to the node that needs it
     @PostMapping("/chaingive")
-    public ResponseEntity chainGive(@RequestBody SerializableChain chain)
+    public ResponseEntity chainGive(@RequestBody SerializableChain chain, @RequestParam("consumer") String consumerUUID)
     {
-        // Todo: 1. Check whether ConsumerUUID is valid or not
-        // Todo: 2. Publish a SendChainToGetter event with: [consumerUUID + chain]
+        if (!isValidUUID(consumerUUID)) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid Consumer UUID"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        try
+        {
+            // Send chain through chainconsumer stream SSE
+            SendChainToConsumerEvent sendChainEvent = new SendChainToConsumerEvent(consumerUUID, chain);
+            eventPublisher.publishEvent(sendChainEvent);
+        }
+        catch (Exception Ex)
+        {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid chain or consumer UUID"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
         //JsonUtil jsonUtil = new JsonUtil();
         //System.out.println(jsonUtil.createJson(chain));
 
-        // Returns HttpStatus.OK on success
-        return null;
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Chain was successfully sent"),
+                HttpStatus.ACCEPTED
+        );
     }
 
+    // Publishes a GetChainFromProviderEvent with the node uuid that needs chain
     @GetMapping("/chainget")
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
     {
@@ -137,15 +171,13 @@ public class ChainController
         }
 
 
-        // Returns HttpStatus.OK on success
         return new ResponseEntity<>(
                 new ApiResponse(true, "ChainGet request successfully sent"),
-                HttpStatus.OK
+                HttpStatus.ACCEPTED
         );
     }
 
-
-    // Called when client closes app (ngOnDestroy)
+    // Called when client closes app (ngOnDestroy) to remove node from clusters
     @GetMapping("/close")
     public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
     {
@@ -187,10 +219,16 @@ public class ChainController
     @EventListener
     private void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
     {
+        SerializableChain chain = event.getChain();
         String consumerUUID = event.getConsumerUUID();
 
-        // Todo: Send a ChainGive response SSE which contains the chain through ChainConsumers stream
-        // Todo: to the consumer in the consumer with the ConsumerUUID
+        // Get consumer with consumerUUID from consumers
+        Node consumerNode = this.chainConsumers.getCluster().get(consumerUUID);
+
+        SseEmitter consumerEmitter = consumerNode.getEmitter();
+
+        // Send the chain through the ChainConsumers SSE stream to the consumer with the consumerUUID
+        consumerEmitter.send(chain);
     }
 
     @EventListener
