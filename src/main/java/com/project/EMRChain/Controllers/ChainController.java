@@ -14,6 +14,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class ChainController
 
     // Subscribes a node to the chain providers cluster (used to receive a ChainSend SSE)
     @GetMapping("/chainprovider")
+    @PreAuthorize("hasRole('ADMIN')")
     public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
         // Create an emitter for the subscribed client node
@@ -76,6 +78,7 @@ public class ChainController
 
     // Subscribes a node to the chain consumers cluster (used to receive the chain from a provider)
     @GetMapping("/chainconsumer")
+    @PreAuthorize("hasRole('ADMIN')")
     public SseEmitter chainConsumers(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
         SseEmitter emitter = new SseEmitter(2592000000L);
@@ -99,6 +102,7 @@ public class ChainController
 
     // Publishes a SendChainToConsumerEvent with the chain to the node that needs it
     @PostMapping("/chaingive")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity chainGive(@RequestBody SerializableChain chain, @RequestParam("consumer") String consumerUUID)
     {
         if (!isValidUUID(consumerUUID)) {
@@ -133,6 +137,7 @@ public class ChainController
 
     // Publishes a GetChainFromProviderEvent with the node uuid that needs chain
     @GetMapping("/chainget")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
@@ -170,6 +175,7 @@ public class ChainController
 
     // Called when client closes app (ngOnDestroy) to remove node from clusters
     @GetMapping("/close")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
     {
         // Remove the client from clusters
