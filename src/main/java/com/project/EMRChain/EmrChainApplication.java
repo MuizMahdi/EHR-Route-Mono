@@ -16,8 +16,8 @@ public class EmrChainApplication
     }
 
 
-	public static void main(String[] args) {
-		SpringApplication.run(EmrChainApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(EmrChainApplication.class, args);
+    }
 
 }

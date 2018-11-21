@@ -6,6 +6,7 @@ import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.SerializableChain;
+import com.project.EMRChain.Services.ClustersContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 @RestController
@@ -31,16 +30,18 @@ import java.util.concurrent.Executors;
 public class ChainController
 {
     private ApplicationEventPublisher eventPublisher;
+    private ClustersContainer clustersContainer;
 
     @Autowired
-    public ChainController(ApplicationEventPublisher eventPublisher) {
+    public ChainController(ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
+        this.clustersContainer = clustersContainer;
     }
 
     private final Logger logger = LoggerFactory.getLogger(ChainController.class);
     //private ExecutorService executorService = Executors.newCachedThreadPool();
-    private NodeCluster chainProviders = new NodeCluster();
-    private NodeCluster chainConsumers = new NodeCluster();
+    //private NodeCluster chainProviders = new NodeCluster();
+    //private NodeCluster chainConsumers = new NodeCluster();
 
 
     // Subscribes a node to the chain providers cluster (used to receive a ChainSend SSE)
@@ -61,16 +62,16 @@ public class ChainController
             Node node = new Node(emitter, networkUUID);
 
             // Add the node to providers list
-            this.chainProviders.addNode(nodeUUID, node);
+            clustersContainer.getChainProviders().addNode(nodeUUID, node);
 
-            System.out.println("Node with netUUID: " + this.chainProviders.getNode(nodeUUID).getNetworkUUID() + " Was added to ChainProviders");
+            System.out.println("Node with netUUID: " + clustersContainer.getChainProviders().getNode(nodeUUID).getNetworkUUID() + " Was added to ChainProviders");
         }
 
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> this.chainProviders.removeNode(nodeUUID));
-        emitter.onError(error -> this.chainProviders.removeNode(nodeUUID));
-        emitter.onCompletion(() -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onTimeout(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
+        emitter.onError(error -> clustersContainer.getChainProviders().removeNode(nodeUUID));
+        emitter.onCompletion(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
 
         // Returns the GetChainFromProviderEvent notification SSE
         return emitter;
@@ -88,13 +89,13 @@ public class ChainController
         }
         else {
             Node node = new Node(emitter, networkUUID);
-            this.chainConsumers.addNode(nodeUUID, node);
+            clustersContainer.getChainConsumers().addNode(nodeUUID, node);
         }
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> this.chainProviders.removeNode(nodeUUID));
-        emitter.onError(error -> this.chainProviders.removeNode(nodeUUID));
-        emitter.onCompletion(() -> this.chainProviders.removeNode(nodeUUID));
+        emitter.onTimeout(() -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
+        emitter.onError(error -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
+        emitter.onCompletion(() -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
 
         // Returns the ChainSend and BlockSend SSE
         return emitter;
@@ -141,7 +142,7 @@ public class ChainController
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
-        if (!isValidUUID(consumerUUID) || !chainConsumers.existsInCluster(consumerUUID))
+        if (!isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID))
         {
             return new ResponseEntity<>(
                     new ApiResponse(false, "Invalid consumer UUID or doesn't exist"),
@@ -150,7 +151,7 @@ public class ChainController
         }
 
         // Remove consumer from chain providers list
-        this.chainProviders.removeNode(consumerUUID);
+        clustersContainer.getChainProviders().removeNode(consumerUUID);
 
         try
         {
@@ -179,12 +180,12 @@ public class ChainController
     public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
     {
         // Remove the client from clusters
-        if(chainConsumers.existsInCluster(uuid)) {
-            chainConsumers.removeNode(uuid);
+        if(clustersContainer.getChainConsumers().existsInCluster(uuid)) {
+            clustersContainer.getChainConsumers().removeNode(uuid);
         }
 
-        if (chainProviders.existsInCluster(uuid)) {
-            chainProviders.removeNode(uuid);
+        if (clustersContainer.getChainProviders().existsInCluster(uuid)) {
+            clustersContainer.getChainProviders().removeNode(uuid);
         }
 
         return new ResponseEntity<>(
@@ -196,17 +197,17 @@ public class ChainController
 
 
     @EventListener
-    private void getChainFromProvider(GetChainFromProviderEvent event) throws IOException
+    protected void getChainFromProvider(GetChainFromProviderEvent event) throws IOException
     {
         // The passed on consumer UUID from chainGet() where the event is published
         String consumerUUID = event.getConsumerUUID();
 
-        SseEmitter consumerEmitter = this.chainConsumers.getNodeEmitter(consumerUUID);
-        String consumerNetworkUUID = this.chainConsumers.getNode(consumerUUID).getNetworkUUID();
+        SseEmitter consumerEmitter = clustersContainer.getChainConsumers().getNodeEmitter(consumerUUID);
+        String consumerNetworkUUID = clustersContainer.getChainConsumers().getNode(consumerUUID).getNetworkUUID();
         List<String> consumerNetworkProviders = new ArrayList<>();
 
         // Find a provider in the same network as the consumer
-        for (Map.Entry<String, Node> nodeEntry : this.chainProviders.getCluster().entrySet())
+        for (Map.Entry<String, Node> nodeEntry : clustersContainer.getChainProviders().getCluster().entrySet())
         {
             // If a provider is found with the same NetworkUUID as the consumer NetworkUUID (so both are in same network)
             if (nodeEntry.getValue().getNetworkUUID().equals(consumerNetworkUUID))
@@ -230,7 +231,7 @@ public class ChainController
             String providerUUID = consumerNetworkProviders.get(0);
 
             // Get provider emitter
-            SseEmitter providerEmitter = this.chainProviders.getNodeEmitter(providerUUID);
+            SseEmitter providerEmitter = clustersContainer.getChainProviders().getNodeEmitter(providerUUID);
 
             // Send a ChainRequest SSE through ChainProviders stream that contains the consumerUUID to the provider
             providerEmitter.send(consumerUUID, MediaType.APPLICATION_JSON);
@@ -238,13 +239,13 @@ public class ChainController
     }
 
     @EventListener
-    private void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
+    protected void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
     {
         SerializableChain chain = event.getChain();
         String consumerUUID = event.getConsumerUUID();
 
         // Get consumer with consumerUUID from consumers
-        Node consumerNode = this.chainConsumers.getCluster().get(consumerUUID);
+        Node consumerNode = clustersContainer.getChainConsumers().getCluster().get(consumerUUID);
 
         SseEmitter consumerEmitter = consumerNode.getEmitter();
 
@@ -253,11 +254,11 @@ public class ChainController
     }
 
     @EventListener
-    private void SseKeepAlive(SseKeepAliveEvent event)
+    protected void SseKeepAlive(SseKeepAliveEvent event)
     {
         event.setKeepAliveData("0"); // Keep-Alive fake data
 
-        chainProviders.getCluster().forEach((uuid, node) -> {
+        clustersContainer.getChainProviders().getCluster().forEach((uuid, node) -> {
             try
             {
                 System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
@@ -265,17 +266,17 @@ public class ChainController
                 node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
             }
             catch (IOException Ex) {
-                this.chainProviders.removeNode(uuid);
+                clustersContainer.getChainProviders().removeNode(uuid);
                 logger.error(Ex.getMessage());
             }
         });
-        chainConsumers.getCluster().forEach((uuid, node) -> {
+        clustersContainer.getChainConsumers().getCluster().forEach((uuid, node) -> {
             try
             {
                 node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
             }
             catch (IOException Ex) {
-                this.chainConsumers.removeNode(uuid);
+                clustersContainer.getChainConsumers().removeNode(uuid);
                 logger.error(Ex.getMessage());
             }
         });
