@@ -1,12 +1,12 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Node;
-import com.project.EMRChain.Core.NodeCluster;
 import com.project.EMRChain.Events.GetChainFromProviderEvent;
 import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.SerializableChain;
 import com.project.EMRChain.Services.ClustersContainer;
+import com.project.EMRChain.Utilities.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 @RestController
@@ -31,9 +30,11 @@ public class ChainController
 {
     private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
+    private UuidUtil uuidUtil;
 
     @Autowired
-    public ChainController(ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher) {
+    public ChainController(UuidUtil uuidUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher) {
+        this.uuidUtil = uuidUtil;
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
     }
@@ -52,7 +53,7 @@ public class ChainController
         // Create an emitter for the subscribed client node
         SseEmitter emitter = new SseEmitter(2592000000L); // An extremely long timeout
 
-        if (!isValidUUID(nodeUUID) || !isValidUUID(networkUUID))
+        if (!uuidUtil.isValidUUID(nodeUUID) || !uuidUtil.isValidUUID(networkUUID))
         {
             emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
         }
@@ -84,7 +85,7 @@ public class ChainController
     {
         SseEmitter emitter = new SseEmitter(2592000000L);
 
-        if (!isValidUUID(nodeUUID) || !isValidUUID(networkUUID)) {
+        if (!uuidUtil.isValidUUID(nodeUUID) || !uuidUtil.isValidUUID(networkUUID)) {
             emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
         }
         else {
@@ -106,7 +107,7 @@ public class ChainController
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity chainGive(@RequestBody SerializableChain chain, @RequestParam("consumer") String consumerUUID)
     {
-        if (!isValidUUID(consumerUUID)) {
+        if (!uuidUtil.isValidUUID(consumerUUID)) {
             return new ResponseEntity<>(
                     new ApiResponse(false, "Invalid Consumer UUID"),
                     HttpStatus.BAD_REQUEST
@@ -142,7 +143,7 @@ public class ChainController
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
-        if (!isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID))
+        if (!uuidUtil.isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID))
         {
             return new ResponseEntity<>(
                     new ApiResponse(false, "Invalid consumer UUID or doesn't exist"),
@@ -281,23 +282,4 @@ public class ChainController
             }
         });
     }
-
-
-
-    private boolean isValidUUID(String uuid)
-    {
-        if (uuid.isEmpty()) {
-            return false;
-        }
-
-        try {
-            UUID uuidFromString = UUID.fromString(uuid);
-        }
-        catch (IllegalArgumentException Ex) {
-            return false;
-        }
-
-        return true;
-    }
-
 }
