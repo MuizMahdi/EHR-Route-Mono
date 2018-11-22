@@ -263,6 +263,7 @@ public class ChainController
             try
             {
                 System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
+
                 // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
                 node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
             }

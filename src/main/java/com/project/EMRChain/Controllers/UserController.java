@@ -8,6 +8,7 @@ import com.project.EMRChain.Security.CurrentUser;
 import com.project.EMRChain.Security.UserPrincipal;
 import com.project.EMRChain.Services.ClustersContainer;
 import com.project.EMRChain.Services.UserService;
+import com.project.EMRChain.Utilities.SimpleStringUtil;
 import com.project.EMRChain.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 
@@ -30,10 +30,12 @@ public class UserController
 {
     private UserService userService;
     private ClustersContainer clustersContainer;
+    private SimpleStringUtil simpleStringUtil;
     private UuidUtil uuidUtil;
 
     @Autowired
-    public UserController(ClustersContainer clustersContainer, UserService userService, UuidUtil uuidUtil) {
+    public UserController(SimpleStringUtil simpleStringUtil, ClustersContainer clustersContainer, UserService userService, UuidUtil uuidUtil) {
+        this.simpleStringUtil = simpleStringUtil;
         this.userService = userService;
         this.clustersContainer = clustersContainer;
         this.uuidUtil = uuidUtil;
@@ -73,24 +75,28 @@ public class UserController
 
     @GetMapping("/get-notifications")
     @PreAuthorize("hasRole('USER')")
-    public SseEmitter streamUserNotifications(@PathParam("useruuid") String userUUID ,@CurrentUser UserPrincipal currentUser) throws IOException
+    public SseEmitter streamUserNotifications(@PathParam("user-id") String userID ,@CurrentUser UserPrincipal currentUser) throws IOException
     {
+        /*
+        *   Users are saved in clusters using their IDs that are stored in database
+        *   in order to send consent requests to individual users and save the notifications.
+        */
+
         SseEmitter userNotificationEmitter = new SseEmitter(86400000L); // 1 Day timeout
 
-        if (!uuidUtil.isValidUUID(userUUID))
-        {
-            userNotificationEmitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
+        if (userID == null || userID.isEmpty() || !simpleStringUtil.isValidNumber(userID)) {
+            userNotificationEmitter.send("Invalid user ID", MediaType.APPLICATION_JSON);
         }
 
         if (currentUser != null) {
             Node userNode = new Node(userNotificationEmitter, "");
-            clustersContainer.getAppUsers().addNode(userUUID, userNode);
+            clustersContainer.getAppUsers().addNode(userID, userNode);
         }
 
         // Remove the emitter on timeout/error/completion
-        userNotificationEmitter.onTimeout(() -> clustersContainer.getAppUsers().removeNode(userUUID));
-        userNotificationEmitter.onError(error -> clustersContainer.getAppUsers().removeNode(userUUID));
-        userNotificationEmitter.onCompletion(() -> clustersContainer.getAppUsers().removeNode(userUUID));
+        userNotificationEmitter.onTimeout(() -> clustersContainer.getAppUsers().removeNode(userID));
+        userNotificationEmitter.onError(error -> clustersContainer.getAppUsers().removeNode(userID));
+        userNotificationEmitter.onCompletion(() -> clustersContainer.getAppUsers().removeNode(userID));
 
         return userNotificationEmitter;
     }
@@ -110,5 +116,4 @@ public class UserController
             }
         });
     }
-
 }

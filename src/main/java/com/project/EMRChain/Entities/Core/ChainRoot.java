@@ -1,4 +1,4 @@
-package com.project.EMRChain.Entities.App;
+package com.project.EMRChain.Entities.Core;
 import javax.persistence.*;
 
 @Entity
