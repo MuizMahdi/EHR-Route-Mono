@@ -3,6 +3,7 @@ import com.project.EMRChain.Events.GetUserConsentEvent;
 import com.project.EMRChain.Exceptions.ResourceNotFoundException;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
+import com.project.EMRChain.Services.ChainRootService;
 import com.project.EMRChain.Services.ClustersContainer;
 import com.project.EMRChain.Utilities.SimpleStringUtil;
 import com.project.EMRChain.Utilities.UuidUtil;
@@ -26,9 +27,11 @@ public class TransactionController
     private UuidUtil uuidUtil;
     private SimpleStringUtil simpleStringUtil;
     private ClustersContainer clustersContainer;
+    private ChainRootService chainRootService;
 
     @Autowired
-    public TransactionController(ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil) {
+    public TransactionController(ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil) {
+        this.chainRootService = chainRootService;
         this.clustersContainer = clustersContainer;
         this.eventPublisher = eventPublisher;
         this.simpleStringUtil = simpleStringUtil;
@@ -42,6 +45,7 @@ public class TransactionController
         String providerUUID = blockAddition.getProviderUUID();
         String userID = blockAddition.getEhrUserID();
 
+        // Check if Provider UUID and User ID are valid
         if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID))
         {
             return new ResponseEntity<>(
@@ -50,11 +54,34 @@ public class TransactionController
             );
         }
 
+        // Check if provider exists in providers cluster
+        if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "You are not in the providers list"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Get provider network uuid
+        String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
+        
+        String chainRoot = blockAddition.getChainRootWithoutBlock();
+
+        // Check if provider's chain is valid by Comparing sent chainRoot
+        // with the saved chainRoot (latest valid chain root)
+        if (!chainRootService.checkNetworkChainRoot(providerNetworkUUID, chainRoot))
+        {
+            // Todo-----------------------------|
+            // Resend the chain to the provider
+            // Todo-----------------------------|
+
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid Chain Root, NetworkUUID or Bad Chain"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
         /*
-        Todo-----------------------------------------------------------------|
-              Check if provider's chain is valid by Comparing sent chainRoot
-              with the saved chainRoot (latest valid chain root)
-        Todo-----------------------------------------------------------------|
         Todo-----------------------------------------------------------------|
               Send a notification to the user by adding it on DB for the user
         Todo-----------------------------------------------------------------|
