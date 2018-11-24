@@ -1,15 +1,12 @@
-package com.project.EMRChain.Events;
-import com.project.EMRChain.Payload.Core.SerializableBlock;
-import org.springframework.context.ApplicationEvent;
+package com.project.EMRChain.Payload.Core;
 
-public class GetUserConsentEvent extends ApplicationEvent
+public class UserConsentRequest
 {
     private SerializableBlock block;
     private String providerUUID;
     private String userID;
 
-    public GetUserConsentEvent(Object source, SerializableBlock block, String providerUUID, String userID) {
-        super(source);
+    public UserConsentRequest(SerializableBlock block, String providerUUID, String userID) {
         this.block = block;
         this.providerUUID = providerUUID;
         this.userID = userID;

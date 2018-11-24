@@ -71,14 +71,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             "/**/*.js",
             "/auth/**",
             "/chain/**",
-            "/node/**"
+            "/node/**",
+            "/transaction/**",
+            "/users/**"
     };
 
     // Matchers available for public via HTTP GET
     private String[] GET_Public_Matchers = {
             "/auth/**",
             "/chain/**",
-            "/node/**"
+            "/node/**",
+            "/transaction/**",
+            "/users/**"
     };
 
 

@@ -1,7 +1,7 @@
 package com.project.EMRChain.Services;
 import com.project.EMRChain.Entities.Core.ChainRoot;
 import com.project.EMRChain.Entities.Core.Network;
-import com.project.EMRChain.Exceptions.ResourceNotFoundException;
+import com.project.EMRChain.Exceptions.BadRequestException;
 import com.project.EMRChain.Repositories.ChainRootRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,20 +24,28 @@ public class ChainRootService
     {
         Network network = networkService.findByNetUUID(networkUUID);
 
+        // If it doesn't exist in DB
         if (network == null) {
-            return false;
+            throw new BadRequestException("Invalid Network");
         }
 
-        ChainRoot networkCurrentChainRoot = chainRootRepository.findByNetwork(network).orElse(null);
+        if (chainRoot.isEmpty()) {
+            throw new BadRequestException("Invalid Chain Root");
+        }
+
+        //ChainRoot networkCurrentChainRoot = chainRootRepository.findByNetwork(network).orElse(null);
+
+        // Latest chain root of the network
+        ChainRoot networkCurrentChainRoot = network.getChainRoot();
 
         if (networkCurrentChainRoot == null) {
-            return false;
+            throw new BadRequestException("Network has no Chain Root");
         }
 
         String root = networkCurrentChainRoot.getRoot();
 
-        if (root.isEmpty() || !root.equals(chainRoot)) {
-            return  false;
+        if (!root.equals(chainRoot)) {
+            return false;
         }
 
         return true;

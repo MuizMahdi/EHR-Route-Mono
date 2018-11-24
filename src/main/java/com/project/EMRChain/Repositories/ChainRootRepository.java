@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ChainRootRepository extends JpaRepository<ChainRoot, Long>
 {
-    Optional<ChainRoot> findByNetwork(Network network);
-    Boolean existsByNetwork(Network network);
+    Optional<ChainRoot> findByRoot(String root);
 }

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import javax.websocket.server.PathParam;
@@ -25,7 +26,7 @@ import java.io.IOException;
 
 
 @RestController
-@RequestMapping("/users")
+    @RequestMapping("/users")
 public class UserController
 {
     private UserService userService;
@@ -74,8 +75,8 @@ public class UserController
 
 
     @GetMapping("/get-notifications")
-    @PreAuthorize("hasRole('USER')")
-    public SseEmitter streamUserNotifications(@PathParam("user-id") String userID ,@CurrentUser UserPrincipal currentUser) throws IOException
+    //@PreAuthorize("hasRole('USER')")
+    public SseEmitter streamUserNotifications(@RequestParam("userid") String userID , @CurrentUser UserPrincipal currentUser) throws IOException
     {
         /*
         *   Users are saved in clusters using their IDs that are stored in database
@@ -88,10 +89,15 @@ public class UserController
             userNotificationEmitter.send("Invalid user ID", MediaType.APPLICATION_JSON);
         }
 
+        Node userNode = new Node(userNotificationEmitter, "");
+        clustersContainer.getAppUsers().addNode(userID, userNode);
+
+        /*
         if (currentUser != null) {
             Node userNode = new Node(userNotificationEmitter, "");
             clustersContainer.getAppUsers().addNode(userID, userNode);
         }
+        */
 
         // Remove the emitter on timeout/error/completion
         userNotificationEmitter.onTimeout(() -> clustersContainer.getAppUsers().removeNode(userID));

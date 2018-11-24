@@ -1,10 +1,14 @@
 package com.project.EMRChain.Controllers;
+import com.project.EMRChain.Core.Node;
 import com.project.EMRChain.Events.GetUserConsentEvent;
+import com.project.EMRChain.Exceptions.BadRequestException;
 import com.project.EMRChain.Exceptions.ResourceNotFoundException;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
+import com.project.EMRChain.Payload.Core.UserConsentRequest;
 import com.project.EMRChain.Services.ChainRootService;
 import com.project.EMRChain.Services.ClustersContainer;
+import com.project.EMRChain.Utilities.ChainUtil;
 import com.project.EMRChain.Utilities.SimpleStringUtil;
 import com.project.EMRChain.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.io.IOException;
 
 @RestController
@@ -28,14 +31,16 @@ public class TransactionController
     private SimpleStringUtil simpleStringUtil;
     private ClustersContainer clustersContainer;
     private ChainRootService chainRootService;
+    private ChainUtil chainUtil;
 
     @Autowired
-    public TransactionController(ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil) {
+    public TransactionController(ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil, ChainUtil chainUtil) {
         this.chainRootService = chainRootService;
         this.clustersContainer = clustersContainer;
         this.eventPublisher = eventPublisher;
         this.simpleStringUtil = simpleStringUtil;
         this.uuidUtil = uuidUtil;
+        this.chainUtil = chainUtil;
     }
 
     @PostMapping("/getConsent")
@@ -64,19 +69,57 @@ public class TransactionController
 
         // Get provider network uuid
         String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
-        
+
+        // Check if provider's network uuid is valid
+        if (providerNetworkUUID == null || providerNetworkUUID.isEmpty() || !uuidUtil.isValidUUID(providerUUID)) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid provider network or doesn't exist"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Chain root from addition request payload
         String chainRoot = blockAddition.getChainRootWithoutBlock();
 
-        // Check if provider's chain is valid by Comparing sent chainRoot
-        // with the saved chainRoot (latest valid chain root)
-        if (!chainRootService.checkNetworkChainRoot(providerNetworkUUID, chainRoot))
+
+        /*
+        *   Check if provider's chain is valid by Comparing sent chainRoot
+        *   with the saved chainRoot (latest valid chain root)
+        */
+
+        boolean isValidNetworkChainRoot;
+
+        // Check if sent root is valid
+        try
         {
-            // Todo-----------------------------|
-            // Resend the chain to the provider
-            // Todo-----------------------------|
+            isValidNetworkChainRoot = chainRootService.checkNetworkChainRoot(providerNetworkUUID, chainRoot);
+        }
+        catch (BadRequestException Ex)
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(false, Ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // If not valid
+        if (!isValidNetworkChainRoot)
+        {
+            // Fetch the chain from another provider and send it to this node with invalid chain
+            try
+            {
+                chainUtil.fetchChainForNode(providerUUID);
+            }
+            catch (BadRequestException Ex)
+            {
+                return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid Chain Root or Bad Chain. Chain fetching failed, caused by: " + Ex.getMessage()),
+                    HttpStatus.BAD_REQUEST
+                );
+            }
 
             return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid Chain Root, NetworkUUID or Bad Chain"),
+                new ApiResponse(false, "Invalid Chain Root or Bad Chain, chain fetching request was sent."),
                 HttpStatus.BAD_REQUEST
             );
         }
@@ -91,6 +134,7 @@ public class TransactionController
         try
         {
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
+                    this,
                     blockAddition.getBlock(),
                     providerUUID,
                     userID
@@ -115,7 +159,7 @@ public class TransactionController
     //@PreAuthorize("hasRole('USER')")
     public ResponseEntity giveUserConsent(@RequestBody BlockAddition blockAddition)
     {
-
+        return null;
     }
 
     @EventListener
@@ -128,10 +172,18 @@ public class TransactionController
             throw new ResourceNotFoundException("The User ID", "userID", userID);
         }
 
+        UserConsentRequest userConsentRequest = new UserConsentRequest(
+                event.getBlock(),
+                event.getProviderUUID(),
+                userID
+        );
+
+        // Get user emitter from users cluster
         SseEmitter userEmitter = clustersContainer.getAppUsers().getNodeEmitter(userID);
 
+        // Send the consent request with block data to user
         try {
-            userEmitter.send(event, MediaType.APPLICATION_JSON);
+            userEmitter.send(userConsentRequest, MediaType.APPLICATION_JSON);
         }
         catch (IOException Ex) {
             clustersContainer.getAppUsers().removeNode(userID);

@@ -8,6 +8,7 @@ public class BlockAddition
     private String providerUUID;
     private String ehrUserID;
 
+    public BlockAddition() { }
     public BlockAddition(SerializableBlock block, String chainRootWithoutBlock, String chainRootWithBlock, String providerUUID, String ehrUserID) {
         this.block = block;
         this.chainRootWithoutBlock = chainRootWithoutBlock;
