@@ -167,9 +167,9 @@ public class TransactionController
     {
         String userID = event.getUserID();
 
-        // If user doesn't exist in users cluster
+        // If user doesn't exist in users cluster (also if offline)
         if (!clustersContainer.getAppUsers().existsInCluster(userID)) {
-            throw new ResourceNotFoundException("The User ID", "userID", userID);
+            throw new ResourceNotFoundException("User", "userID", userID);
         }
 
         UserConsentRequest userConsentRequest = new UserConsentRequest(

@@ -60,7 +60,6 @@ public class User extends DateAudit
     private Network network;
 
 
-
     public User() { }
     public User(@NotBlank @Size(max = 40) String name, @NotBlank @Size(max = 15) String username, @NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
         this.name = name;
