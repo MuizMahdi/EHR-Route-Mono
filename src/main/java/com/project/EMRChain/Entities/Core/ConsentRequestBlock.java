@@ -1,4 +1,8 @@
 package com.project.EMRChain.Entities.Core;
+import com.project.EMRChain.Entities.EHR.EhrAllergies;
+import com.project.EMRChain.Entities.EHR.EhrHistory;
+import com.project.EMRChain.Entities.EHR.EhrProblems;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
@@ -19,8 +23,37 @@ public class ConsentRequestBlock
     @NotBlank private String senderPubKey;
     @NotBlank private String senderAddress;
     @NotBlank private String recipientAddress;
+
     // Transaction signature is blank when saved on patient consent requests because the patient is the one that signs it
     private String signature;
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "consent_request_problems",
+            joinColumns = @JoinColumn(name = "consent_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "problem_id")
+    )
+    private EhrProblems problems;
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "consent_request_allergies",
+            joinColumns = @JoinColumn(name = "consent_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "allergy_id")
+    )
+    private EhrAllergies allergies;
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "consent_request_history",
+            joinColumns = @JoinColumn(name = "consent_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "history_id")
+    )
+    private EhrHistory history;
+
 
     public ConsentRequestBlock() { }
     public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long index, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, @NotBlank String signature) {
