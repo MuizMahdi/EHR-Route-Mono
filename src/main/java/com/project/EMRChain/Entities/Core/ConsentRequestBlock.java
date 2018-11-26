@@ -2,9 +2,11 @@ package com.project.EMRChain.Entities.Core;
 import com.project.EMRChain.Entities.EHR.EhrAllergies;
 import com.project.EMRChain.Entities.EHR.EhrHistory;
 import com.project.EMRChain.Entities.EHR.EhrProblems;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "ConsentRequestBlock")
@@ -14,60 +16,67 @@ public class ConsentRequestBlock
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank private String hash;
-    @NotBlank private String previousHash;
-    @NotBlank private Long timeStamp;
-    @NotBlank private Long index;
-    @NotBlank private String merkleRoot;
-    @NotBlank private String transactionId;
-    @NotBlank private String senderPubKey;
-    @NotBlank private String senderAddress;
-    @NotBlank private String recipientAddress;
+    @NotNull @NotBlank private String hash;
+    @NotNull @NotBlank private String previousHash;
+    @NotNull @NotBlank private Long timeStamp;
+    @NotNull @NotBlank private Long blockIndex;
+    @NotNull @NotBlank private String merkleRoot;
+    @NotNull @NotBlank private String transactionId;
+    @NotNull @NotBlank private String senderPubKey;
+    @NotNull @NotBlank private String senderAddress;
+    @NotNull @NotBlank private String recipientAddress;
+    @NotNull @NotBlank private Long userID;
 
     // Transaction signature is blank when saved on patient consent requests because the patient is the one that signs it
     private String signature;
 
+    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+    private Set<EhrProblems> problems = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "consent_request_problems",
-            joinColumns = @JoinColumn(name = "consent_request_id"),
-            inverseJoinColumns = @JoinColumn(name = "problem_id")
-    )
-    private EhrProblems problems;
+    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+    private Set<EhrAllergies> allergies = new HashSet<>();
 
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "consent_request_allergies",
-            joinColumns = @JoinColumn(name = "consent_request_id"),
-            inverseJoinColumns = @JoinColumn(name = "allergy_id")
-    )
-    private EhrAllergies allergies;
-
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "consent_request_history",
-            joinColumns = @JoinColumn(name = "consent_request_id"),
-            inverseJoinColumns = @JoinColumn(name = "history_id")
-    )
-    private EhrHistory history;
+    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+    private Set<EhrHistory> history = new HashSet<>();
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long index, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, @NotBlank String signature) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String signature, @NotBlank Long userID) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
-        this.index = index;
+        this.blockIndex = blockIndex;
         this.merkleRoot = merkleRoot;
         this.transactionId = transactionId;
         this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
         this.signature = signature;
+        this.userID = userID;
     }
+
+
+    public void addProblem(EhrProblems problem) {
+        problems.add(problem);
+    }
+    public void removeProblem(EhrProblems problem) {
+        problems.remove(problem);
+    }
+
+    public void addAllergy(EhrAllergies allergy) {
+        allergies.add(allergy);
+    }
+    public void removeAllergy(EhrAllergies allergy) {
+        allergies.remove(allergy);
+    }
+
+    public void addHistory(EhrHistory historicalCondition) {
+        history.add(historicalCondition);
+    }
+    public void removeHistory(EhrHistory historicalCondition) {
+        history.remove(historicalCondition);
+    }
+
 
     public Long getId() {
         return id;
@@ -75,8 +84,8 @@ public class ConsentRequestBlock
     public String getHash() {
         return hash;
     }
-    public Long getIndex() {
-        return index;
+    public Long getUserID() {
+        return userID;
     }
     public Long getTimeStamp() {
         return timeStamp;
@@ -84,8 +93,14 @@ public class ConsentRequestBlock
     public String getSignature() {
         return signature;
     }
+    public Long getBlockIndex() {
+        return blockIndex;
+    }
     public String getMerkleRoot() {
         return merkleRoot;
+    }
+    public Set<EhrHistory> getHistory() {
+        return history;
     }
     public String getPreviousHash() {
         return previousHash;
@@ -99,6 +114,12 @@ public class ConsentRequestBlock
     public String getSenderAddress() {
         return senderAddress;
     }
+    public Set<EhrProblems> getProblems() {
+        return problems;
+    }
+    public Set<EhrAllergies> getAllergies() {
+        return allergies;
+    }
     public String getRecipientAddress() {
         return recipientAddress;
     }
@@ -109,8 +130,8 @@ public class ConsentRequestBlock
     public void setHash(String hash) {
         this.hash = hash;
     }
-    public void setIndex(Long index) {
-        this.index = index;
+    public void setUserID(Long userID) {
+        this.userID = userID;
     }
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
@@ -118,8 +139,20 @@ public class ConsentRequestBlock
     public void setSignature(String signature) {
         this.signature = signature;
     }
+    public void setHistory(Set<EhrHistory> history) {
+        this.history = history;
+    }
+    public void setBlockIndex(Long blockIndex) {
+        this.blockIndex = blockIndex;
+    }
     public void setMerkleRoot(String merkleRoot) {
         this.merkleRoot = merkleRoot;
+    }
+    public void setProblems(Set<EhrProblems> problems) {
+        this.problems = problems;
+    }
+    public void setAllergies(Set<EhrAllergies> allergies) {
+        this.allergies = allergies;
     }
     public void setSenderPubKey(String senderPubKey) {
         this.senderPubKey = senderPubKey;

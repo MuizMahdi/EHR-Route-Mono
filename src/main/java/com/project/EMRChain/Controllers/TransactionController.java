@@ -124,12 +124,6 @@ public class TransactionController
             );
         }
 
-        /*
-        Todo-----------------------------------------------------------------|
-              Send a notification to the user by adding it on DB for the user
-        Todo-----------------------------------------------------------------|
-        */
-
         // Send a user consent request for adding the block to chain
         try
         {
@@ -169,6 +163,13 @@ public class TransactionController
 
         // If user doesn't exist in users cluster (also if offline)
         if (!clustersContainer.getAppUsers().existsInCluster(userID)) {
+
+            /*
+            Todo---------------------------------------------|
+                Send notification to DB for user
+            Todo---------------------------------------------|
+            */
+
             throw new ResourceNotFoundException("User", "userID", userID);
         }
 
