@@ -1,46 +1,66 @@
 package com.project.EMRChain.Controllers;
-import com.project.EMRChain.Core.Node;
+import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Events.GetUserConsentEvent;
+import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+
 import com.project.EMRChain.Exceptions.BadRequestException;
 import com.project.EMRChain.Exceptions.ResourceNotFoundException;
+
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
+import com.project.EMRChain.Payload.Core.SerializableBlock;
 import com.project.EMRChain.Payload.Core.UserConsentRequest;
+
+import com.project.EMRChain.Services.UserService;
 import com.project.EMRChain.Services.ChainRootService;
 import com.project.EMRChain.Services.ClustersContainer;
+import com.project.EMRChain.Services.ConsentRequestBlockService;
+
+import com.project.EMRChain.Utilities.ModelMapper;
+import com.project.EMRChain.Utilities.UuidUtil;
 import com.project.EMRChain.Utilities.ChainUtil;
 import com.project.EMRChain.Utilities.SimpleStringUtil;
-import com.project.EMRChain.Utilities.UuidUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+
 import org.springframework.context.event.EventListener;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import java.io.IOException;
+
 
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController
 {
     private ApplicationEventPublisher eventPublisher;
-    private UuidUtil uuidUtil;
-    private SimpleStringUtil simpleStringUtil;
     private ClustersContainer clustersContainer;
+    private UserService userService;
     private ChainRootService chainRootService;
+    private ConsentRequestBlockService consentRequestService;
+    private UuidUtil uuidUtil;
     private ChainUtil chainUtil;
+    private ModelMapper modelMapper;
+    private SimpleStringUtil simpleStringUtil;
 
     @Autowired
-    public TransactionController(ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil, ChainUtil chainUtil) {
-        this.chainRootService = chainRootService;
-        this.clustersContainer = clustersContainer;
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper) {
         this.eventPublisher = eventPublisher;
-        this.simpleStringUtil = simpleStringUtil;
+        this.clustersContainer = clustersContainer;
+        this.userService = userService;
+        this.chainRootService = chainRootService;
+        this.consentRequestService = consentRequestService;
         this.uuidUtil = uuidUtil;
         this.chainUtil = chainUtil;
+        this.modelMapper = modelMapper;
+        this.simpleStringUtil = simpleStringUtil;
     }
 
     @PostMapping("/getConsent")
@@ -159,36 +179,58 @@ public class TransactionController
     @EventListener
     protected void getUserConsent(GetUserConsentEvent event) throws IOException
     {
-        String userID = event.getUserID();
+        String stringUserID = event.getUserID();
+        Long userID;
 
-        // If user doesn't exist in users cluster (also if offline)
-        if (!clustersContainer.getAppUsers().existsInCluster(userID)) {
+        try {
+            userID = Long.parseLong(stringUserID);
+        }
+        catch (Exception Ex) { // If user id is invalid Long
+            throw new ResourceNotFoundException("User", "userID", stringUserID);
+        }
 
-            /*
-            Todo---------------------------------------------|
-                Send notification to DB for user
-            Todo---------------------------------------------|
-            */
+        // If user doesn't exist in users cluster caused by user being offline or wrong userID
+        if (!clustersContainer.getAppUsers().existsInCluster(stringUserID)) {
 
-            throw new ResourceNotFoundException("User", "userID", userID);
+            // Save a ConsentRequestBlock notification to DB for user to check when they login
+            try
+            {
+                saveConsentRequest(userID, event.getProviderUUID(), event.getBlock());
+            }
+            catch (Exception Ex) { // If user wasn't found on DB
+                throw new ResourceNotFoundException("User", "userID", stringUserID);
+            }
+
+            throw new ResourceNotFoundException("User", "userID", stringUserID);
         }
 
         UserConsentRequest userConsentRequest = new UserConsentRequest(
                 event.getBlock(),
                 event.getProviderUUID(),
-                userID
+                stringUserID
         );
 
         // Get user emitter from users cluster
-        SseEmitter userEmitter = clustersContainer.getAppUsers().getNodeEmitter(userID);
+        SseEmitter userEmitter = clustersContainer.getAppUsers().getNodeEmitter(stringUserID);
 
         // Send the consent request with block data to user
         try {
             userEmitter.send(userConsentRequest, MediaType.APPLICATION_JSON);
         }
         catch (IOException Ex) {
-            clustersContainer.getAppUsers().removeNode(userID);
+            clustersContainer.getAppUsers().removeNode(stringUserID);
         }
 
+    }
+
+    private void saveConsentRequest(Long userId, String providerUUID, SerializableBlock block)
+    {
+        if (userService.findUserById(userId) == null) {
+            throw new ResourceNotFoundException("User", "userID", userId);
+        }
+
+        ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(userId, providerUUID, block);
+
+        consentRequestService.saveConsentRequest(consentRequest);
     }
 }

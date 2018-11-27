@@ -66,10 +66,10 @@ public class UserController
         return ResponseEntity.ok (
             new UserInfo (
                 user.getId(),
-                        user.getUsername(),
-                        user.getName(),
-                        user.isNonFirstLogin()
-                )
+                user.getUsername(),
+                user.getName(),
+                user.isNonFirstLogin()
+            )
         );
     }
 

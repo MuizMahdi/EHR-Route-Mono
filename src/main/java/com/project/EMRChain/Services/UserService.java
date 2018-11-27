@@ -77,4 +77,10 @@ public class UserService
 
         return user;
     }
+
+    @Transactional
+    public User findUserById(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        return user;
+    }
 }

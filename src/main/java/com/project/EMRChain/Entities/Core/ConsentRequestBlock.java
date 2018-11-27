@@ -1,12 +1,15 @@
 package com.project.EMRChain.Entities.Core;
-import com.project.EMRChain.Entities.EHR.EhrAllergies;
 import com.project.EMRChain.Entities.EHR.EhrHistory;
 import com.project.EMRChain.Entities.EHR.EhrProblems;
+import com.project.EMRChain.Entities.EHR.EhrAllergies;
+
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
+import javax.validation.constraints.NotBlank;
+
 import java.util.Set;
+import java.util.HashSet;
+
 
 @Entity
 @Table(name = "ConsentRequestBlock")
@@ -26,6 +29,8 @@ public class ConsentRequestBlock
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;
     @NotNull @NotBlank private Long userID;
+    @NotNull @NotBlank private String providerUUID;
+
 
     // Transaction signature is blank when saved on patient consent requests because the patient is the one that signs it
     private String signature;
@@ -41,7 +46,7 @@ public class ConsentRequestBlock
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String signature, @NotBlank Long userID) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
@@ -53,6 +58,7 @@ public class ConsentRequestBlock
         this.recipientAddress = recipientAddress;
         this.signature = signature;
         this.userID = userID;
+        this.providerUUID = providerUUID;
     }
 
 
@@ -95,6 +101,9 @@ public class ConsentRequestBlock
     }
     public Long getBlockIndex() {
         return blockIndex;
+    }
+    public String getProviderUUID() {
+        return providerUUID;
     }
     public String getMerkleRoot() {
         return merkleRoot;
@@ -144,6 +153,9 @@ public class ConsentRequestBlock
     }
     public void setBlockIndex(Long blockIndex) {
         this.blockIndex = blockIndex;
+    }
+    public void setProviderUUID(String providerUUID) {
+        this.providerUUID = providerUUID;
     }
     public void setMerkleRoot(String merkleRoot) {
         this.merkleRoot = merkleRoot;

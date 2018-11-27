@@ -1,6 +1,7 @@
 package com.project.EMRChain.Utilities;
 import com.project.EMRChain.Core.*;
 import com.project.EMRChain.Core.Utilities.StringUtil;
+import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
 import com.project.EMRChain.Payload.Core.SerializableBlock;
 import com.project.EMRChain.Payload.Core.SerializableBlockHeader;
 import com.project.EMRChain.Payload.Core.SerializableTransaction;
