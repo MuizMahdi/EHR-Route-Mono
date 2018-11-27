@@ -49,4 +49,23 @@ public class ModelMapper
 
         return serializableBlock;
     }
+
+    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, SerializableBlock block)
+    {
+        ConsentRequestBlock consentRequest = new ConsentRequestBlock();
+        
+        consentRequest.setUserID(userID);
+        consentRequest.setProviderUUID(providerUUID);
+        consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
+        consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
+        consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());
+        consentRequest.setTransactionId(block.getTransaction().getTransactionId());
+        consentRequest.setMerkleRoot(block.getBlockHeader().getMerkleRoot());
+        consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
+        consentRequest.setTimeStamp(block.getBlockHeader().getTimeStamp());
+        consentRequest.setPreviousHash(block.getBlockHeader().getPreviousHash());
+        consentRequest.setHash(block.getBlockHeader().getHash());
+
+        return consentRequest;
+    }
 }
