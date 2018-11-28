@@ -9,6 +9,7 @@ import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
 import com.project.EMRChain.Payload.Core.UserConsentRequest;
 
+import com.project.EMRChain.Payload.Core.UserConsentResponse;
 import com.project.EMRChain.Services.UserService;
 import com.project.EMRChain.Services.ChainRootService;
 import com.project.EMRChain.Services.ClustersContainer;
