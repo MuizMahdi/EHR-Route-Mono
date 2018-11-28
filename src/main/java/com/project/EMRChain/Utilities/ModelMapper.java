@@ -1,6 +1,6 @@
 package com.project.EMRChain.Utilities;
 import com.project.EMRChain.Core.*;
-import com.project.EMRChain.Core.Utilities.ECKeyUtil;
+import com.project.EMRChain.Core.Utilities.KeyUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
 
@@ -19,12 +19,12 @@ import java.security.PublicKey;
 public class ModelMapper
 {
     private StringUtil stringUtil;
-    private ECKeyUtil ecKeyUtil;
+    private KeyUtil keyUtil;
 
     @Autowired
-    public ModelMapper(StringUtil stringUtil, ECKeyUtil ecKeyUtil) {
+    public ModelMapper(StringUtil stringUtil, KeyUtil keyUtil) {
         this.stringUtil = stringUtil;
-        this.ecKeyUtil = ecKeyUtil;
+        this.keyUtil = keyUtil;
     }
 
     public SerializableBlock mapBlockToSerializableBlock(Block block)
@@ -97,7 +97,7 @@ public class ModelMapper
         transaction.setSenderAddress(senderAddress);
 
         String stringSenderPubKey = serializableBlock.getTransaction().getSenderPubKey();
-        PublicKey senderPubKey = ecKeyUtil.getPublicKeyFromString(stringSenderPubKey);
+        PublicKey senderPubKey = keyUtil.getPublicKeyFromString(stringSenderPubKey);
         transaction.setSenderPubKey(senderPubKey);
 
         block.setTransaction(transaction);

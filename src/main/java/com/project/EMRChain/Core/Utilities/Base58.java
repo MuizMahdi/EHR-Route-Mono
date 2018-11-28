@@ -15,6 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class Base58
 {
+    private HashUtil hashUtil;
+
+    @Autowired
+    public Base58(HashUtil hashUtil) {
+        this.hashUtil = hashUtil;
+    }
+
     public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
     private final int BASE_58 = ALPHABET.length; // 58 ~ Used for getting remainder
     private final char ENCODED_ZERO = ALPHABET[0];
@@ -155,9 +162,6 @@ public class Base58
     * @param payload the bytes to encode, e.g. pubkey hash
     * @return the base58-encoded string
     */
-
-    @Autowired
-    HashUtil hashUtil;
 
     public String encodeChecked(int version, byte[] payload)
     {

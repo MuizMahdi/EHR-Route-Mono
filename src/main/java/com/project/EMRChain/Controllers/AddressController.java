@@ -1,6 +1,6 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Utilities.AddressUtil;
-import com.project.EMRChain.Core.Utilities.EcdsaUtil;
+import com.project.EMRChain.Core.Utilities.RsaUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Payload.Core.AddressResponse;
@@ -21,14 +21,14 @@ import java.security.PublicKey;
 public class AddressController
 {
     private UserService userService;
-    private EcdsaUtil ecdsaUtil;
+    private RsaUtil rsaUtil;
     private StringUtil stringUtil;
     private AddressUtil addressUtil;
 
     @Autowired
-    public AddressController(UserService userService, EcdsaUtil ecdsaUtil, StringUtil stringUtil, AddressUtil addressUtil) {
+    public AddressController(UserService userService, RsaUtil rsaUtil, StringUtil stringUtil, AddressUtil addressUtil) {
         this.userService = userService;
-        this.ecdsaUtil = ecdsaUtil;
+        this.rsaUtil = rsaUtil;
         this.stringUtil = stringUtil;
         this.addressUtil = addressUtil;
     }
@@ -62,7 +62,7 @@ public class AddressController
         userService.saveUser(user);
 
         // Generate address
-        KeyPair keyPair = ecdsaUtil.ecGenerateKeyPair();
+        KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey pubKey = keyPair.getPublic();
         PrivateKey privKey = keyPair.getPrivate();
 

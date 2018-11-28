@@ -13,27 +13,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EcdsaUtilTest
+public class RsaUtilTest
 {
-    private final EcdsaUtil ecdsaUtil = new EcdsaUtil();
+    private final RsaUtil rsaUtil = new RsaUtil();
 
     @Test
-    public void ecSign() throws Exception
+    public void rsaSign() throws Exception
     {
-        KeyPair keyPair = ecdsaUtil.ecGenerateKeyPair();
+        KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PrivateKey privateKey = keyPair.getPrivate();
 
         Transaction transaction = mock(Transaction.class);
         when(transaction.getTransactionData()).thenReturn("TransactionData");
 
-        assertNotNull(ecdsaUtil.ecSign(privateKey,transaction));
-        assertTrue(ecdsaUtil.ecSign(privateKey,transaction) instanceof byte[]);
+        assertNotNull(rsaUtil.rsaSign(privateKey,transaction));
+        assertTrue(rsaUtil.rsaSign(privateKey, transaction) instanceof byte[]);
     }
 
     @Test
-    public void testEcVerifyTransactionWithFalseSignature() throws Exception
+    public void testRsaVerifyTransactionWithFalseSignature() throws Exception
     {
-        KeyPair keyPair = ecdsaUtil.ecGenerateKeyPair();
+        KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
 
@@ -41,37 +41,37 @@ public class EcdsaUtilTest
 
         when(transaction.getTransactionData()).thenReturn("TransactionData");
 
-        byte[] signature = ecdsaUtil.ecSign(privateKey, transaction);
+        byte[] signature = rsaUtil.rsaSign(privateKey, transaction);
 
         when(transaction.getSignature()).thenReturn(signature);
 
-        assertFalse(ecdsaUtil.ecVerifyTransactionSignature(publicKey, transaction));
+        assertFalse(rsaUtil.rsaVerifyTransactionSignature(publicKey, transaction));
     }
 
     @Test(expected = Exception.class)
-    public void testEcVerifyTransactionSignatureThrowsException() throws Exception
+    public void testRsaVerifyTransactionSignatureThrowsException() throws Exception
     {
-        KeyPair keyPair = ecdsaUtil.ecGenerateKeyPair();
+        KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
 
         Transaction transaction = mock(Transaction.class);
 
         when(transaction.getTransactionData()).thenReturn("TransactionData");
 
-        assertFalse(ecdsaUtil.ecVerifyTransactionSignature(publicKey, transaction));
+        assertFalse(rsaUtil.rsaVerifyTransactionSignature(publicKey, transaction));
 
         when(transaction.getSignature()).thenReturn("Signature".getBytes());
 
-        ecdsaUtil.ecVerifyTransactionSignature(publicKey, transaction);
+        rsaUtil.rsaVerifyTransactionSignature(publicKey, transaction);
     }
 
     @Test
-    public void ecGenerateKeyPair() throws Exception
+    public void rsaGenerateKeyPair() throws Exception
     {
-        assertNotNull(ecdsaUtil.ecGenerateKeyPair());
-        assertTrue(ecdsaUtil.ecGenerateKeyPair() instanceof KeyPair);
-        assertTrue(ecdsaUtil.ecGenerateKeyPair().getPublic() instanceof PublicKey);
-        assertTrue(ecdsaUtil.ecGenerateKeyPair().getPrivate() instanceof PrivateKey);
+        assertNotNull(rsaUtil.rsaGenerateKeyPair());
+        assertTrue(rsaUtil.rsaGenerateKeyPair() instanceof KeyPair);
+        assertTrue(rsaUtil.rsaGenerateKeyPair().getPublic() instanceof PublicKey);
+        assertTrue(rsaUtil.rsaGenerateKeyPair().getPrivate() instanceof PrivateKey);
     }
 
 }

@@ -1,13 +1,12 @@
 package com.project.EMRChain.Core.Utilities;
 import com.project.EMRChain.Core.Address;
 import com.project.EMRChain.Core.Transaction;
-import com.project.EMRChain.Core.Utilities.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import java.security.KeyPair;
+
 import java.security.PublicKey;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class AddressUtilTest
 {
     @Mock
-    private EcdsaUtil ecdsaUtil;
+    private RsaUtil rsaUtil;
 
     @Mock
     private StringUtil stringUtil;

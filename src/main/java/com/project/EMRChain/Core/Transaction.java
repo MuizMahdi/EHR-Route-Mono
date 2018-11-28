@@ -39,9 +39,12 @@ public class Transaction
 
     public String getTransactionData()
     {
+        JsonUtil jsonUtil1 = new JsonUtil();
+        StringUtil stringUtil1 = new StringUtil();
+
         String data =
-        jsonUtil.createJson(record) +
-        stringUtil.getStringFromKey(senderPubKey) +
+        jsonUtil1.createJson(record) +
+        stringUtil1.getStringFromKey(senderPubKey) +
         senderAddress.getAddress() +
         recipientAddress.getAddress();
         return data;

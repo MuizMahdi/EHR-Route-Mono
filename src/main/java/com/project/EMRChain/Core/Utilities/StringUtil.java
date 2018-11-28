@@ -30,4 +30,8 @@ public class StringUtil
     {
         return new String(bytes, StandardCharsets.UTF_8);
     }
+
+    public String base64EncodeBytes(byte[] bytes) { return Base64.getEncoder().encodeToString(bytes); }
+
+    public byte[] base64DecodeString(String string) { return Base64.getDecoder().decode(string); }
 }

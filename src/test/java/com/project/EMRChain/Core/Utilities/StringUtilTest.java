@@ -15,8 +15,8 @@ public class StringUtilTest
     @Test
     public void getStringFromKey() throws Exception
     {
-        EcdsaUtil ecdsaUtil = new EcdsaUtil();
-        KeyPair keyPair = ecdsaUtil.ecGenerateKeyPair();
+        RsaUtil rsaUtil = new RsaUtil();
+        KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
 
         assertNotNull(stringUtil.getStringFromKey(publicKey));

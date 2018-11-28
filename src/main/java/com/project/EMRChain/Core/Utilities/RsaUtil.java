@@ -1,21 +1,19 @@
 package com.project.EMRChain.Core.Utilities;
 import com.project.EMRChain.Core.Transaction;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
 
 @Component
-public class EcdsaUtil
+public class RsaUtil
 {
-    private Logger logger = LoggerFactory.getLogger(EcdsaUtil.class);
+    private Logger logger = LoggerFactory.getLogger(RsaUtil.class);
 
     // Applies ECDSA Signature to a transaction and returns signature.
-    public byte[] ecSign(PrivateKey privateKey, Transaction transaction) throws Exception
+    public byte[] rsaSign(PrivateKey privateKey, Transaction transaction) throws Exception
     {
-        Signature digitalSignatureAlgorithm = Signature.getInstance("SHA256withECDSA");
+        Signature digitalSignatureAlgorithm = Signature.getInstance("SHA256withRSA");
 
         digitalSignatureAlgorithm.initSign(privateKey);
 
@@ -29,7 +27,7 @@ public class EcdsaUtil
     }
 
     // Verifies whether the Transaction belongs to sender or not
-    public boolean ecVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
+    public boolean rsaVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
     {
         String data = transaction.getTransactionData();
 
@@ -41,11 +39,12 @@ public class EcdsaUtil
 
         try
         {
-            Security.addProvider(new BouncyCastleProvider());
-            Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
-            ecdsaVerify.initVerify(publicKey);
-            ecdsaVerify.update(data.getBytes());
-            return ecdsaVerify.verify(signature);
+            //Security.addProvider(new BouncyCastleProvider());
+            //Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
+            Signature rsaSignature = Signature.getInstance("SHA256withRSA");
+            rsaSignature.initVerify(publicKey);
+            rsaSignature.update(data.getBytes());
+            return rsaSignature.verify(signature);
         }
         catch(GeneralSecurityException exception)
         {
@@ -54,17 +53,14 @@ public class EcdsaUtil
         }
     }
 
-    public KeyPair ecGenerateKeyPair()
+    public KeyPair rsaGenerateKeyPair()
     {
         try
         {
-            ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");
-            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("EC");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            KeyPair keyPair = generator.generateKeyPair();
 
-            keyPairGen.initialize(ecSpec, random);
-
-            return keyPairGen.generateKeyPair();
+            return keyPair;
         }
         catch (GeneralSecurityException exception)
         {
