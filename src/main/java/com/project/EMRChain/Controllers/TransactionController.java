@@ -1,4 +1,8 @@
 package com.project.EMRChain.Controllers;
+import com.project.EMRChain.Core.Block;
+import com.project.EMRChain.Core.Transaction;
+import com.project.EMRChain.Core.Utilities.KeyUtil;
+import com.project.EMRChain.Core.Utilities.RsaUtil;
 import com.project.EMRChain.Events.GetUserConsentEvent;
 import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
 
@@ -7,6 +11,7 @@ import com.project.EMRChain.Exceptions.ResourceNotFoundException;
 
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
+import com.project.EMRChain.Payload.Core.SerializableBlock;
 import com.project.EMRChain.Payload.Core.UserConsentRequest;
 
 import com.project.EMRChain.Payload.Core.UserConsentResponse;
@@ -33,6 +38,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 
 
 @RestController
@@ -44,18 +51,22 @@ public class TransactionController
     private UserService userService;
     private ChainRootService chainRootService;
     private ConsentRequestBlockService consentRequestService;
+    private RsaUtil rsaUtil;
+    private KeyUtil keyUtil;
     private UuidUtil uuidUtil;
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
     private SimpleStringUtil simpleStringUtil;
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
         this.chainRootService = chainRootService;
         this.consentRequestService = consentRequestService;
+        this.rsaUtil = rsaUtil;
+        this.keyUtil = keyUtil;
         this.uuidUtil = uuidUtil;
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
@@ -181,14 +192,18 @@ public class TransactionController
     // Called when a user gives consent and accepts a consent request of a block addition
     @PostMapping("/giveConsent")
     //@PreAuthorize("hasRole('USER')")
-    public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse)
+    public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception
     {
-        // 1. Sign the block.
+        // Sign the block.
+        SerializableBlock signedBlock = signBlock(consentResponse);
 
-        // 2. check if the provider has sent such a block to the user before or not, by checking
+        // check if the provider has sent such a block to the user before or not, by checking
         // the consent requests on DB and validating it.
 
-        // 3. broadcast the block to the other provider nodes.
+
+        // Broadcast the block to the other provider nodes.
+
+
         return null;
     }
 
@@ -249,5 +264,31 @@ public class TransactionController
             clustersContainer.getAppUsers().removeNode(stringUserID);
             throw new BadRequestException("An Error has occurred while sending SSE, user has been removed from AppUsers cluster.");
         }
+    }
+
+    private SerializableBlock signBlock(UserConsentResponse consentResponse) throws Exception
+    {
+        // Get Block from SerializableBlock
+        Block block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
+
+        // Get Transaction from Block
+        Transaction transaction = block.getTransaction();
+
+        // Convert Base64 encoded String privateKey to PrivateKey
+        PrivateKey privateKey = keyUtil.getPrivateKeyFromString(consentResponse.getUserPrivateKey());
+
+        // Sign transaction and get signature
+        byte[] signature = rsaUtil.rsaSign(privateKey, transaction);
+
+        // Change the transaction signature
+        transaction.setSignature(signature);
+
+        // Change the block transaction with the transaction that has the signature
+        block.setTransaction(transaction);
+
+        // Get SerializableBlock from the signed block
+        SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
+
+        return serializableBlock;
     }
 }

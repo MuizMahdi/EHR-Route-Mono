@@ -1,8 +1,4 @@
 package com.project.EMRChain;
-import com.project.EMRChain.Entities.Core.ChainRoot;
-import com.project.EMRChain.Entities.Core.Network;
-import com.project.EMRChain.Repositories.NetworkRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,11 +9,9 @@ import java.util.TimeZone;
 @EnableScheduling
 public class EmrChainApplication
 {
-    @Autowired
-    private NetworkRepository networkRepository;
-
     @PostConstruct
-    void onInit() {
+    void onInit()
+    {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         /*

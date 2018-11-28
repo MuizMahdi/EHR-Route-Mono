@@ -27,7 +27,7 @@ public class ModelMapper
         this.keyUtil = keyUtil;
     }
 
-    public SerializableBlock mapBlockToSerializableBlock(Block block)
+    public SerializableBlock mapBlockToSerializableBlock(Block block) throws GeneralSecurityException
     {
         /*                                                            */
         // ||||| Populate the SerializableBlock with Block data ||||| //
@@ -48,10 +48,16 @@ public class ModelMapper
 
         serializableTransaction.setTransactionId(block.getTransaction().getTransactionId());
         serializableTransaction.setRecord(block.getTransaction().getRecord());
-        serializableTransaction.setSenderPubKey(stringUtil.getStringFromKey(block.getTransaction().getSenderPubKey()));
+
+        PublicKey publicKey = block.getTransaction().getSenderPubKey();
+        String stringPublicKey = keyUtil.getStringFromPublicKey(publicKey);
+        serializableTransaction.setSenderPubKey(stringPublicKey);
+
         serializableTransaction.setSenderAddress(block.getTransaction().getSenderAddress().getAddress());
         serializableTransaction.setRecipientAddress(block.getTransaction().getRecipientAddress().getAddress());
-        serializableTransaction.setSignature(stringUtil.getStringFromBytes(block.getTransaction().getSignature()));
+
+        byte[] signatureBytes = block.getTransaction().getSignature();
+        serializableTransaction.setSignature(stringUtil.base64EncodeBytes(signatureBytes));
 
         serializableBlock.setTransaction(serializableTransaction);
 
@@ -82,7 +88,9 @@ public class ModelMapper
 
         Transaction transaction = new Transaction();
 
-        transaction.setSignature(serializableBlock.getTransaction().getSignature().getBytes());
+        String base64EncodedStringSignature = serializableBlock.getTransaction().getSignature();
+        transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
+
         transaction.setTransactionId(serializableBlock.getTransaction().getTransactionId());
         transaction.setRecord(serializableBlock.getTransaction().getRecord());
 
