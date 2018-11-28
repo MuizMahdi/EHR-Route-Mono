@@ -21,15 +21,15 @@ public class ConsentRequestBlock
 
     @NotNull @NotBlank private String hash;
     @NotNull @NotBlank private String previousHash;
-    @NotNull @NotBlank private Long timeStamp;
-    @NotNull @NotBlank private Long blockIndex;
     @NotNull @NotBlank private String merkleRoot;
     @NotNull @NotBlank private String transactionId;
     @NotNull @NotBlank private String senderPubKey;
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;
-    @NotNull @NotBlank private Long userID;
     @NotNull @NotBlank private String providerUUID;
+    @NotNull private Long userID;
+    @NotNull private Long timeStamp;
+    @NotNull private Long blockIndex;
 
 
     // Transaction signature is blank when saved on patient consent requests because the patient is the one that signs it

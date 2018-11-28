@@ -110,16 +110,19 @@ public class UserController
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
     {
-        event.setKeepAliveData("0"); // Keep-Alive fake data
+        if (clustersContainer.getAppUsers().getCluster().size() > 0)
+        {
+            event.setKeepAliveData("0"); // Keep-Alive fake data
 
-        clustersContainer.getAppUsers().getCluster().forEach((uuid, node) -> {
-            try {
-                // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
-                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-            }
-            catch (IOException Ex) { // If could not be send due to user quitting then remove them from cluster
-                clustersContainer.getAppUsers().removeNode(uuid);
-            }
-        });
+            clustersContainer.getAppUsers().getCluster().forEach((uuid, node) -> {
+                try {
+                    // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
+                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+                }
+                catch (IOException Ex) { // If could not be send due to user quitting then remove them from cluster
+                    clustersContainer.getAppUsers().removeNode(uuid);
+                }
+            });
+        }
     }
 }

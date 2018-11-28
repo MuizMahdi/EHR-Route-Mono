@@ -1,23 +1,31 @@
 package com.project.EMRChain.Utilities;
 import com.project.EMRChain.Core.*;
+import com.project.EMRChain.Core.Utilities.ECKeyUtil;
 import com.project.EMRChain.Core.Utilities.StringUtil;
 import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+
 import com.project.EMRChain.Payload.Core.SerializableBlock;
 import com.project.EMRChain.Payload.Core.SerializableBlockHeader;
 import com.project.EMRChain.Payload.Core.SerializableTransaction;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
+
 
 @Component
 public class ModelMapper
 {
     private StringUtil stringUtil;
+    private ECKeyUtil ecKeyUtil;
 
     @Autowired
-    public ModelMapper(StringUtil stringUtil) {
+    public ModelMapper(StringUtil stringUtil, ECKeyUtil ecKeyUtil) {
         this.stringUtil = stringUtil;
+        this.ecKeyUtil = ecKeyUtil;
     }
-    public ModelMapper() { }
 
     public SerializableBlock mapBlockToSerializableBlock(Block block)
     {
@@ -50,10 +58,57 @@ public class ModelMapper
         return serializableBlock;
     }
 
+    public Block mapSerializableBlockToBlock(SerializableBlock serializableBlock) throws GeneralSecurityException
+    {
+        Block block = new Block();
+
+        BlockHeader blockHeader = new BlockHeader();
+
+        blockHeader.setIndex(serializableBlock.getBlockHeader().getIndex());
+        blockHeader.setTimeStamp(serializableBlock.getBlockHeader().getTimeStamp());
+
+        String stringHash = serializableBlock.getBlockHeader().getHash();
+        Hash hash = new Hash(stringHash.getBytes());
+        blockHeader.setHash(hash);
+
+        String stringPreviousHash = serializableBlock.getBlockHeader().getPreviousHash();
+        Hash previousHash = new Hash(stringPreviousHash.getBytes());
+        blockHeader.setPreviousHash(previousHash);
+
+        String stringMerkleRoot = serializableBlock.getBlockHeader().getMerkleRoot();
+        blockHeader.setMerkleRoot(stringMerkleRoot.getBytes());
+
+        block.setBlockHeader(blockHeader);
+
+        Transaction transaction = new Transaction();
+
+        transaction.setSignature(serializableBlock.getTransaction().getSignature().getBytes());
+        transaction.setTransactionId(serializableBlock.getTransaction().getTransactionId());
+        transaction.setRecord(serializableBlock.getTransaction().getRecord());
+
+        String stringRecipientAddress = serializableBlock.getTransaction().getRecipientAddress();
+        Address recipientAddress = new Address();
+        recipientAddress.setAddress(stringRecipientAddress);
+        transaction.setRecipientAddress(recipientAddress);
+
+        String stringSenderAddress = serializableBlock.getTransaction().getSenderAddress();
+        Address senderAddress = new Address();
+        senderAddress.setAddress(stringSenderAddress);
+        transaction.setSenderAddress(senderAddress);
+
+        String stringSenderPubKey = serializableBlock.getTransaction().getSenderPubKey();
+        PublicKey senderPubKey = ecKeyUtil.getPublicKeyFromString(stringSenderPubKey);
+        transaction.setSenderPubKey(senderPubKey);
+
+        block.setTransaction(transaction);
+
+        return block;
+    }
+
     public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, SerializableBlock block)
     {
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
-        
+
         consentRequest.setUserID(userID);
         consentRequest.setProviderUUID(providerUUID);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());

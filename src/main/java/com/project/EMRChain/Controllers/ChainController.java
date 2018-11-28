@@ -259,28 +259,37 @@ public class ChainController
     {
         event.setKeepAliveData("0"); // Keep-Alive fake data
 
-        clustersContainer.getChainProviders().getCluster().forEach((uuid, node) -> {
-            try
-            {
-                System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
+        if (clustersContainer.getChainProviders().getCluster().size() > 0)
+        {
+            clustersContainer.getChainProviders().getCluster().forEach((uuid, node) -> {
+                try
+                {
+                    System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
 
-                // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
-                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-            }
-            catch (IOException Ex) {
-                clustersContainer.getChainProviders().removeNode(uuid);
-                logger.error(Ex.getMessage());
-            }
-        });
-        clustersContainer.getChainConsumers().getCluster().forEach((uuid, node) -> {
-            try
-            {
-                node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-            }
-            catch (IOException Ex) {
-                clustersContainer.getChainConsumers().removeNode(uuid);
-                logger.error(Ex.getMessage());
-            }
-        });
+                    // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
+                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+                }
+                catch (IOException Ex) {
+                    clustersContainer.getChainProviders().removeNode(uuid);
+                    logger.error(Ex.getMessage());
+                }
+            });
+        }
+
+        if (clustersContainer.getChainConsumers().getCluster().size() > 0)
+        {
+            clustersContainer.getChainConsumers().getCluster().forEach((uuid, node) -> {
+                try
+                {
+                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+                }
+                catch (IOException Ex) {
+                    clustersContainer.getChainConsumers().removeNode(uuid);
+                    logger.error(Ex.getMessage());
+                }
+            });
+        }
+
+
     }
 }
