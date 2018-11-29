@@ -40,6 +40,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @RestController
@@ -194,17 +197,43 @@ public class TransactionController
     //@PreAuthorize("hasRole('USER')")
     public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception
     {
+        Block block;
+
+        try {
+            // Get Block from SerializableBlock
+            block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
+        }
+        catch (BadRequestException Ex) { // Catch mapping errors due to absence of any field
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+
+        // Validate Consent Response.
+        if (!isConsentResponseValid(consentResponse))
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Provider has not made a consent request for this response"),
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+
         // Sign the block.
-        SerializableBlock signedBlock = signBlock(consentResponse);
-
-        // check if the provider has sent such a block to the user before or not, by checking
-        // the consent requests on DB and validating it.
+        SerializableBlock signedBlock = signBlock(consentResponse, block);
 
 
-        // Broadcast the block to the other provider nodes.
+        // 3. Broadcast the block to the other provider nodes.
 
 
-        return null;
+
+
+        return new ResponseEntity<>(
+            new ApiResponse(true, "Block has been signed and Broad-casted successfully"),
+            HttpStatus.ACCEPTED
+        );
     }
 
     @EventListener
@@ -266,11 +295,8 @@ public class TransactionController
         }
     }
 
-    private SerializableBlock signBlock(UserConsentResponse consentResponse) throws Exception
+    private SerializableBlock signBlock(UserConsentResponse consentResponse, Block block) throws Exception
     {
-        // Get Block from SerializableBlock
-        Block block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
-
         // Get Transaction from Block
         Transaction transaction = block.getTransaction();
 
@@ -290,5 +316,43 @@ public class TransactionController
         SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
 
         return serializableBlock;
+    }
+
+    private boolean isConsentResponseValid(UserConsentResponse consentResponse)
+    {
+        // check if the provider has sent such a block to the user before
+        // or not, by checking the consent requests on DB made by the
+        // provider to validate the response.
+
+        boolean isResponseValid = false;
+
+        // Provider UUID from consent response
+        String responseProviderUUID = consentResponse.getProviderUUID();
+
+        // Get the list of Consent requests made by that provider UUID
+        List<ConsentRequestBlock> providerConsentRequestsList = consentRequestService.findRequestsByProvider(responseProviderUUID);
+
+        // If the provider has any open(unanswered) consent requests
+        if (providerConsentRequestsList != null)
+        {
+            ArrayList<ConsentRequestBlock> providerConsentRequests = new ArrayList<>(
+                    providerConsentRequestsList
+            );
+
+            // Go through the provider consent requests and check if the hash of the transaction(transactionID)
+            // in the consent response equals any of the hashes of the provider requests to validate if the
+            // consent request that the user responded to is valid and was made by the provider or not.
+
+            String responseTransactionId = consentResponse.getBlock().getTransaction().getTransactionId();
+
+            for (ConsentRequestBlock request : providerConsentRequests) {
+                if (request.getTransactionId().equals(responseTransactionId)) {
+                    isResponseValid = true;
+                }
+            }
+
+        }
+
+        return isResponseValid;
     }
 }

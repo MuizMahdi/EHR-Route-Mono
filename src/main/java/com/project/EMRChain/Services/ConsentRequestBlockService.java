@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.project.EMRChain.Repositories.ConsentRequestBlockRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class ConsentRequestBlockService
@@ -20,5 +23,17 @@ public class ConsentRequestBlockService
     public void saveConsentRequest(ConsentRequestBlock block)
     {
         consentRequestRepository.save(block);
+    }
+
+    @Transactional
+    public List<ConsentRequestBlock> findRequestsByProvider(String providerUUID)
+    {
+        List<ConsentRequestBlock> providerRequests = consentRequestRepository.findByProviderUUID(providerUUID);
+
+        if (providerRequests.isEmpty() || providerRequests.size() < 1) {
+            return null;
+        }
+
+        return providerRequests;
     }
 }
