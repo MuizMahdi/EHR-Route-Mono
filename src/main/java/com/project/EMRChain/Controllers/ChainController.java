@@ -1,5 +1,6 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Node;
+import com.project.EMRChain.Core.NodeCluster;
 import com.project.EMRChain.Events.GetChainFromProviderEvent;
 import com.project.EMRChain.Events.SendChainToConsumerEvent;
 import com.project.EMRChain.Events.SseKeepAliveEvent;
@@ -259,9 +260,11 @@ public class ChainController
     {
         event.setKeepAliveData("0"); // Keep-Alive fake data
 
-        if (clustersContainer.getChainProviders().getCluster().size() > 0)
+        NodeCluster chainProviders = clustersContainer.getChainProviders();
+
+        if ((chainProviders.getCluster() != null) && (chainProviders.getCluster().size() > 0))
         {
-            clustersContainer.getChainProviders().getCluster().forEach((uuid, node) -> {
+            chainProviders.getCluster().forEach((uuid, node) -> {
                 try
                 {
                     System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
@@ -276,9 +279,11 @@ public class ChainController
             });
         }
 
-        if (clustersContainer.getChainConsumers().getCluster().size() > 0)
+        NodeCluster chainConsumers = clustersContainer.getChainConsumers();
+
+        if ((chainConsumers.getCluster() != null) && (chainConsumers.getCluster().size() > 0))
         {
-            clustersContainer.getChainConsumers().getCluster().forEach((uuid, node) -> {
+            chainConsumers.getCluster().forEach((uuid, node) -> {
                 try
                 {
                     node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);

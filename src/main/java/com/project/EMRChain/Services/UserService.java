@@ -1,14 +1,12 @@
 package com.project.EMRChain.Services;
 import com.project.EMRChain.Entities.Auth.Role;
 import com.project.EMRChain.Entities.Auth.User;
-import com.project.EMRChain.Events.RoleChangeEvent;
-import com.project.EMRChain.Exceptions.InternalErrorExcpetion;
+import com.project.EMRChain.Exceptions.InternalErrorException;
 import com.project.EMRChain.Models.RoleName;
 import com.project.EMRChain.Payload.Auth.SignUpRequest;
 import com.project.EMRChain.Repositories.RoleRepository;
 import com.project.EMRChain.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +49,7 @@ public class UserService
 
         // Get the 'User' role
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() ->
-                new InternalErrorExcpetion("User Role not set")
+                new InternalErrorException("User Role not set")
         );
 
         // Set the user role to 'User'

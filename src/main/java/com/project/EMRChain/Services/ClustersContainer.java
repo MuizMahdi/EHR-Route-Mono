@@ -1,5 +1,6 @@
 package com.project.EMRChain.Services;
 import com.project.EMRChain.Core.NodeCluster;
+import com.project.EMRChain.Exceptions.ResourceEmptyException;
 import org.springframework.stereotype.Component;
 
 /*
@@ -13,6 +14,31 @@ public class ClustersContainer
     private NodeCluster chainProviders = new NodeCluster();
     private NodeCluster chainConsumers = new NodeCluster();
     private NodeCluster appUsers = new NodeCluster();
+
+
+    public NodeCluster getConsumersByNetwork(String networkUUID)
+    {
+        NodeCluster nodeCluster = new NodeCluster();
+
+        if ((chainConsumers.getCluster() == null) && (chainConsumers.getCluster().size() < 1))
+        {
+            throw new ResourceEmptyException("No consumers in chainConsumers cluster");
+        }
+
+        chainConsumers.getCluster().forEach((nodeUUID, Node) -> {
+            if (Node.getNetworkUUID().equals(networkUUID)) {
+                nodeCluster.addNode(nodeUUID, Node);
+            }
+        });
+
+        if (nodeCluster.getCluster().size() < 1)
+        {
+            throw new ResourceEmptyException("No consumer in network");
+        }
+
+        return nodeCluster;
+    }
+
 
     public NodeCluster getAppUsers() {
         return appUsers;

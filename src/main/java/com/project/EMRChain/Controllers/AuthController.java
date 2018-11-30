@@ -4,7 +4,7 @@ import com.project.EMRChain.Entities.Auth.User;
 import com.project.EMRChain.Entities.Auth.VerificationToken;
 import com.project.EMRChain.Events.RegistrationCompleteEvent;
 import com.project.EMRChain.Events.RoleChangeEvent;
-import com.project.EMRChain.Exceptions.InternalErrorExcpetion;
+import com.project.EMRChain.Exceptions.InternalErrorException;
 import com.project.EMRChain.Models.RoleName;
 import com.project.EMRChain.Payload.Auth.*;
 import com.project.EMRChain.Repositories.RoleRepository;
@@ -25,8 +25,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -229,7 +227,7 @@ public class AuthController
 
         // Get the 'ADMIN' role
         Role userRole = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(() ->
-                new InternalErrorExcpetion("Invalid Role")
+                new InternalErrorException("Invalid Role")
         );
 
         // Update the user roles set

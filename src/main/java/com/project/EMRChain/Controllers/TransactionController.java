@@ -1,5 +1,6 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Block;
+import com.project.EMRChain.Core.BlockBroadcaster;
 import com.project.EMRChain.Core.Transaction;
 import com.project.EMRChain.Core.Utilities.KeyUtil;
 import com.project.EMRChain.Core.Utilities.RsaUtil;
@@ -7,6 +8,7 @@ import com.project.EMRChain.Events.GetUserConsentEvent;
 import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
 
 import com.project.EMRChain.Exceptions.BadRequestException;
+import com.project.EMRChain.Exceptions.ResourceEmptyException;
 import com.project.EMRChain.Exceptions.ResourceNotFoundException;
 
 import com.project.EMRChain.Payload.Auth.ApiResponse;
@@ -39,7 +41,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,9 +64,10 @@ public class TransactionController
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
     private SimpleStringUtil simpleStringUtil;
+    private BlockBroadcaster blockBroadcaster;
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
@@ -74,6 +79,7 @@ public class TransactionController
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
         this.simpleStringUtil = simpleStringUtil;
+        this.blockBroadcaster = blockBroadcaster;
     }
 
     @PostMapping("/getConsent")
@@ -226,8 +232,20 @@ public class TransactionController
 
 
         // 3. Broadcast the block to the other provider nodes.
+        try
+        {
+            blockBroadcaster.broadcast(signedBlock, consentResponse.getProviderUUID());
+        }
+        catch (ResourceEmptyException Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, Ex.getMessage()),
+                HttpStatus.NOT_FOUND
+            );
+        }
 
 
+
+        // 4. Delete the consent request from DB
 
 
         return new ResponseEntity<>(
@@ -339,20 +357,30 @@ public class TransactionController
                     providerConsentRequestsList
             );
 
-            // Go through the provider consent requests and check if the hash of the transaction(transactionID)
-            // in the consent response equals any of the hashes of the provider requests to validate if the
-            // consent request that the user responded to is valid and was made by the provider or not.
-
             String responseTransactionId = consentResponse.getBlock().getTransaction().getTransactionId();
 
-            for (ConsentRequestBlock request : providerConsentRequests) {
-                if (request.getTransactionId().equals(responseTransactionId)) {
-                    isResponseValid = true;
-                }
+            // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
+            if (findMatchingConsentRequest(providerConsentRequests, responseTransactionId) != null)
+            {
+                isResponseValid = true;
             }
-
         }
 
         return isResponseValid;
+    }
+
+    private ConsentRequestBlock findMatchingConsentRequest(List<ConsentRequestBlock> consentRequests, String transactionID)
+    {
+        // Go through the provider consent requests and check if the hash of the transaction(transactionID)
+        // in the consent response equals any of the hashes of the provider requests to validate if the
+        // consent request that the user responded to is valid and was made by the provider or not.
+
+        for (ConsentRequestBlock request : consentRequests) {
+            if (request.getTransactionId().equals(transactionID)) {
+               return request;
+            }
+        }
+
+        return null;
     }
 }

@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // The corresponding Response HTTP Status for the exception.
-public class InternalErrorExcpetion extends RuntimeException
+public class InternalErrorException extends RuntimeException
 {
-    public InternalErrorExcpetion(String message) {
+    public InternalErrorException(String message) {
         super(message); // Super calls the constructor of the extended class (RuntimeException's constructor).
     }
 
-    public InternalErrorExcpetion(String message, Throwable cause) {
+    public InternalErrorException(String message, Throwable cause) {
         super(message, cause); // Same as above, but with a Throwable cause.
     }
 }

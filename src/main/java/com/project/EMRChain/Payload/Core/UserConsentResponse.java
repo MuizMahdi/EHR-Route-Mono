@@ -8,6 +8,7 @@ public class UserConsentResponse
     private String providerUUID;
     private String userID;
 
+    public UserConsentResponse() { }
     public UserConsentResponse(SerializableBlock block, String userPrivateKey, String providerUUID, String userID) {
         this.block = block;
         this.userPrivateKey = userPrivateKey;
