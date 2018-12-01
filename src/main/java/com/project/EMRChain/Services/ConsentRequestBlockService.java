@@ -36,4 +36,10 @@ public class ConsentRequestBlockService
 
         return providerRequests;
     }
+
+    @Transactional
+    public void deleteRequest(ConsentRequestBlock consentRequest)
+    {
+        consentRequestRepository.delete(consentRequest);
+    }
 }

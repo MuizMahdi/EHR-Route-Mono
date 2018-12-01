@@ -216,7 +216,6 @@ public class TransactionController
             );
         }
 
-
         // Validate Consent Response.
         if (!isConsentResponseValid(consentResponse))
         {
@@ -226,12 +225,10 @@ public class TransactionController
             );
         }
 
-
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
-
-        // 3. Broadcast the block to the other provider nodes.
+        // Broadcast the block to the other provider nodes.
         try
         {
             blockBroadcaster.broadcast(signedBlock, consentResponse.getProviderUUID());
@@ -243,10 +240,8 @@ public class TransactionController
             );
         }
 
-
-
-        // 4. Delete the consent request from DB
-
+        // Delete the consent request that matches the response data from DB
+        deleteMatchingConsentRequest(consentResponse);
 
         return new ResponseEntity<>(
             new ApiResponse(true, "Block has been signed and Broad-casted successfully"),
@@ -344,6 +339,21 @@ public class TransactionController
 
         boolean isResponseValid = false;
 
+        // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
+        if (findMatchingConsentRequest(consentResponse) != null)
+        {
+            isResponseValid = true;
+        }
+
+        return isResponseValid;
+    }
+
+    private ConsentRequestBlock findMatchingConsentRequest(UserConsentResponse consentResponse)
+    {
+        // Goes through the provider consent requests and checks if the hash of the transaction(transactionID)
+        // in the consent response equals any of the hashes of the provider requests to validate if the
+        // consent request that the user responded to is valid and was made by the provider or not.
+
         // Provider UUID from consent response
         String responseProviderUUID = consentResponse.getProviderUUID();
 
@@ -360,27 +370,26 @@ public class TransactionController
             String responseTransactionId = consentResponse.getBlock().getTransaction().getTransactionId();
 
             // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
-            if (findMatchingConsentRequest(providerConsentRequests, responseTransactionId) != null)
-            {
-                isResponseValid = true;
-            }
-        }
-
-        return isResponseValid;
-    }
-
-    private ConsentRequestBlock findMatchingConsentRequest(List<ConsentRequestBlock> consentRequests, String transactionID)
-    {
-        // Go through the provider consent requests and check if the hash of the transaction(transactionID)
-        // in the consent response equals any of the hashes of the provider requests to validate if the
-        // consent request that the user responded to is valid and was made by the provider or not.
-
-        for (ConsentRequestBlock request : consentRequests) {
-            if (request.getTransactionId().equals(transactionID)) {
-               return request;
+            for (ConsentRequestBlock request : providerConsentRequests) {
+                if (request.getTransactionId().equals(responseTransactionId)) {
+                    // return that request
+                    return request;
+                }
             }
         }
 
         return null;
+    }
+
+    private void deleteMatchingConsentRequest(UserConsentResponse consentResponse)
+    {
+        ConsentRequestBlock consentRequest = findMatchingConsentRequest(consentResponse);
+
+        if (consentRequest != null)
+        {
+            // delete consentRequest from DB
+            consentRequestService.deleteRequest(consentRequest);
+        }
+
     }
 }
