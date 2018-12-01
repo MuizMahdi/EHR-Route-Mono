@@ -2,20 +2,18 @@ package com.project.EMRChain.Services;
 import com.project.EMRChain.Entities.Core.ChainRoot;
 import com.project.EMRChain.Entities.Core.Network;
 import com.project.EMRChain.Exceptions.BadRequestException;
-import com.project.EMRChain.Repositories.ChainRootRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class ChainRootService
+
+@Component
+public class ChainRootUtil
 {
-    private ChainRootRepository chainRootRepository;
     private NetworkService networkService;
 
     @Autowired
-    public ChainRootService(NetworkService networkService, ChainRootRepository chainRootRepository) {
+    public ChainRootUtil(NetworkService networkService) {
         this.networkService = networkService;
-        this.chainRootRepository = chainRootRepository;
     }
 
 
@@ -49,6 +47,25 @@ public class ChainRootService
         }
 
         return true;
+    }
+
+    public void changeNetworkChainRoot(String networkUUID, String chainRoot)
+    {
+        Network network = networkService.findByNetUUID(networkUUID);
+
+        if (network == null) {
+            throw new BadRequestException("Invalid Network");
+        }
+
+        if (chainRoot.isEmpty()) {
+            throw new BadRequestException("Invalid Chain Root");
+        }
+
+        ChainRoot newChainRoot = new ChainRoot(chainRoot);
+
+       network.setChainRoot(newChainRoot);
+
+       networkService.saveNetwork(network);
     }
 
 }

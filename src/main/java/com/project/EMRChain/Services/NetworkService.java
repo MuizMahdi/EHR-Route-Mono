@@ -18,4 +18,8 @@ public class NetworkService
     public Network findByNetUUID(String netUUID) {
         return networkRepository.findByNetworkUUID(netUUID).orElse(null);
     }
+
+    public void saveNetwork(Network network) {
+        networkRepository.save(network);
+    }
 }

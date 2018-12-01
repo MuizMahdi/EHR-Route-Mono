@@ -113,12 +113,13 @@ public class ModelMapper
         return block;
     }
 
-    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, SerializableBlock block)
+    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, SerializableBlock block, String chainRootWithBlock)
     {
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
 
         consentRequest.setUserID(userID);
         consentRequest.setProviderUUID(providerUUID);
+        consentRequest.setChainRootWithBlock(chainRootWithBlock);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
         consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());

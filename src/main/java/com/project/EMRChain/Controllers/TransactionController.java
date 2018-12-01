@@ -1,6 +1,7 @@
 package com.project.EMRChain.Controllers;
 import com.project.EMRChain.Core.Block;
 import com.project.EMRChain.Core.BlockBroadcaster;
+import com.project.EMRChain.Core.Node;
 import com.project.EMRChain.Core.Transaction;
 import com.project.EMRChain.Core.Utilities.KeyUtil;
 import com.project.EMRChain.Core.Utilities.RsaUtil;
@@ -11,6 +12,7 @@ import com.project.EMRChain.Exceptions.BadRequestException;
 import com.project.EMRChain.Exceptions.ResourceEmptyException;
 import com.project.EMRChain.Exceptions.ResourceNotFoundException;
 
+import com.project.EMRChain.Exceptions.UnavailableNodeException;
 import com.project.EMRChain.Payload.Auth.ApiResponse;
 import com.project.EMRChain.Payload.Core.BlockAddition;
 import com.project.EMRChain.Payload.Core.SerializableBlock;
@@ -18,7 +20,7 @@ import com.project.EMRChain.Payload.Core.UserConsentRequest;
 
 import com.project.EMRChain.Payload.Core.UserConsentResponse;
 import com.project.EMRChain.Services.UserService;
-import com.project.EMRChain.Services.ChainRootService;
+import com.project.EMRChain.Services.ChainRootUtil;
 import com.project.EMRChain.Services.ClustersContainer;
 import com.project.EMRChain.Services.ConsentRequestBlockService;
 
@@ -36,16 +38,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -56,7 +53,7 @@ public class TransactionController
     private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
     private UserService userService;
-    private ChainRootService chainRootService;
+    private ChainRootUtil chainRootUtil;
     private ConsentRequestBlockService consentRequestService;
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
@@ -67,11 +64,11 @@ public class TransactionController
     private BlockBroadcaster blockBroadcaster;
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
-        this.chainRootService = chainRootService;
+        this.chainRootUtil = chainRootUtil;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
@@ -131,7 +128,7 @@ public class TransactionController
         // Check if sent root is valid
         try
         {
-            isValidNetworkChainRoot = chainRootService.checkNetworkChainRoot(providerNetworkUUID, chainRoot);
+            isValidNetworkChainRoot = chainRootUtil.checkNetworkChainRoot(providerNetworkUUID, chainRoot);
         }
         catch (Exception Ex)
         {
@@ -169,6 +166,7 @@ public class TransactionController
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
                     this,
                     blockAddition.getBlock(),
+                    blockAddition.getChainRootWithBlock(),
                     providerUUID,
                     userID
             );
@@ -243,6 +241,9 @@ public class TransactionController
         // Delete the consent request that matches the response data from DB
         deleteMatchingConsentRequest(consentResponse);
 
+        // Change provider's network ChainRoot to the new sent chainRootWithBlock.
+        changeNetworkChainRoot(consentResponse.getProviderUUID(), consentResponse.getChainRootWithBlock());
+
         return new ResponseEntity<>(
             new ApiResponse(true, "Block has been signed and Broad-casted successfully"),
             HttpStatus.ACCEPTED
@@ -278,7 +279,8 @@ public class TransactionController
             ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(
                     userID,
                     event.getProviderUUID(),
-                    event.getBlock()
+                    event.getBlock(),
+                    event.getChainRootWithBlock()
             );
 
             // Persist the consent request
@@ -291,6 +293,7 @@ public class TransactionController
 
         UserConsentRequest userConsentRequest = new UserConsentRequest(
                 event.getBlock(),
+                event.getChainRootWithBlock(),
                 event.getProviderUUID(),
                 stringUserID
         );
@@ -391,5 +394,28 @@ public class TransactionController
             consentRequestService.deleteRequest(consentRequest);
         }
 
+    }
+
+    private void changeNetworkChainRoot(String providerUUID, String chainRootWithBlock)
+    {
+        if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
+            throw new UnavailableNodeException("Provider with providerUUID: " + providerUUID + " was was not found");
+        }
+
+        /*
+        Todo------------------------------------------------------------------|
+            Get networkUUID from NetworkService in DB by a query that finds
+            networkUUID of a provider since providersUUIDs are going to be
+            saved in networks in DB.
+        Todo------------------------------------------------------------------|
+        */
+
+        // Get provider's network UUID from provider node
+        Node providerNode = clustersContainer.getChainProviders().getCluster().get(providerUUID);
+
+        String providerNetworkUUID = providerNode.getNetworkUUID();
+
+        // Change the provider's network chain root
+        chainRootUtil.changeNetworkChainRoot(providerNetworkUUID, chainRootWithBlock);
     }
 }
