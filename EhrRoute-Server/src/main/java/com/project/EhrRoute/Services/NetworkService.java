@@ -1,6 +1,6 @@
-package com.project.EMRChain.Services;
-import com.project.EMRChain.Entities.Core.Network;
-import com.project.EMRChain.Repositories.NetworkRepository;
+package com.project.EhrRoute.Services;
+import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Repositories.NetworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

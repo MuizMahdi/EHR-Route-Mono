@@ -1,5 +1,5 @@
-package com.project.EMRChain.Core.Utilities;
-import com.project.EMRChain.Core.Transaction;
+package com.project.EhrRoute.Core.Utilities;
+import com.project.EhrRoute.Core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

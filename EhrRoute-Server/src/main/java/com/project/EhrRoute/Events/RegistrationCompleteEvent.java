@@ -1,5 +1,5 @@
-package com.project.EMRChain.Events;
-import com.project.EMRChain.Entities.Auth.User;
+package com.project.EhrRoute.Events;
+import com.project.EhrRoute.Entities.Auth.User;
 import org.springframework.context.ApplicationEvent;
 import java.util.Locale;
 

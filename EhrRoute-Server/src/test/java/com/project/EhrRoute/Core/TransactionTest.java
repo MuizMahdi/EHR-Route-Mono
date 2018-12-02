@@ -1,6 +1,4 @@
-package com.project.EMRChain.Core;
-import com.project.EhrRoute.Core.Address;
-import com.project.EhrRoute.Core.Transaction;
+package com.project.EhrRoute.Core;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 import com.project.EhrRoute.Utilities.JsonUtil;

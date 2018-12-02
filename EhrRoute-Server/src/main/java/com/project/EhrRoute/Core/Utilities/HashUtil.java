@@ -1,6 +1,6 @@
-package com.project.EMRChain.Core.Utilities;
-import com.project.EMRChain.Core.Transaction;
-import com.project.EMRChain.Entities.EHR.MedicalRecord;
+package com.project.EhrRoute.Core.Utilities;
+import com.project.EhrRoute.Core.Transaction;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

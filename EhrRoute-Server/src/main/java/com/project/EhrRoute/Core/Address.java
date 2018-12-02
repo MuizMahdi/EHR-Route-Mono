@@ -1,5 +1,5 @@
-package com.project.EMRChain.Core;
-import com.project.EMRChain.Core.Utilities.AddressUtil;
+package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

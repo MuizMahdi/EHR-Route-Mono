@@ -1,12 +1,12 @@
-package com.project.EMRChain.Utilities;
-import com.project.EMRChain.Core.*;
-import com.project.EMRChain.Core.Utilities.KeyUtil;
-import com.project.EMRChain.Core.Utilities.StringUtil;
-import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+package com.project.EhrRoute.Utilities;
+import com.project.EhrRoute.Core.*;
+import com.project.EhrRoute.Core.Utilities.KeyUtil;
+import com.project.EhrRoute.Core.Utilities.StringUtil;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 
-import com.project.EMRChain.Payload.Core.SerializableBlock;
-import com.project.EMRChain.Payload.Core.SerializableBlockHeader;
-import com.project.EMRChain.Payload.Core.SerializableTransaction;
+import com.project.EhrRoute.Payload.Core.SerializableBlock;
+import com.project.EhrRoute.Payload.Core.SerializableBlockHeader;
+import com.project.EhrRoute.Payload.Core.SerializableTransaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.project.EMRChain.Security;
+package com.project.EhrRoute.Security;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

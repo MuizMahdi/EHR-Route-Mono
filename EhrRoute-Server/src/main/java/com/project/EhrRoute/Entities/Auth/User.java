@@ -1,6 +1,6 @@
-package com.project.EMRChain.Entities.Auth;
-import com.project.EMRChain.Audits.DateAudit;
-import com.project.EMRChain.Entities.Core.Network;
+package com.project.EhrRoute.Entities.Auth;
+import com.project.EhrRoute.Audits.DateAudit;
+import com.project.EhrRoute.Entities.Core.Network;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.Email;

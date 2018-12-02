@@ -1,4 +1,4 @@
-package com.project.EMRChain.Payload.Core;
+package com.project.EhrRoute.Payload.Core;
 import java.util.List;
 
 public class SerializableChain

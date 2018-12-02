@@ -1,5 +1,5 @@
-package com.project.EMRChain.Core.Utilities;
-import com.project.EMRChain.Core.Transaction;
+package com.project.EhrRoute.Core.Utilities;
+import com.project.EhrRoute.Core.Transaction;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
-package com.project.EMRChain.Security;
+package com.project.EhrRoute.Security;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.EMRChain.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Auth.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

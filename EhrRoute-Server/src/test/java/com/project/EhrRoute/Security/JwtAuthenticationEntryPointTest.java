@@ -1,5 +1,4 @@
-package com.project.EMRChain.Security;
-import com.project.EhrRoute.Security.JwtAuthenticationEntryPoint;
+package com.project.EhrRoute.Security;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

@@ -1,4 +1,4 @@
-package com.project.EMRChain.Payload.Auth;
+package com.project.EhrRoute.Payload.Auth;
 import javax.validation.constraints.NotBlank;
 
 public class RoleChangeRequest

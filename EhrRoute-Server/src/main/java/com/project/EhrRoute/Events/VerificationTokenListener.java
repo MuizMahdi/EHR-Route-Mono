@@ -1,6 +1,6 @@
-package com.project.EMRChain.Events;
-import com.project.EMRChain.Entities.Auth.User;
-import com.project.EMRChain.Services.VerificationTokenService;
+package com.project.EhrRoute.Events;
+import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Services.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.mail.SimpleMailMessage;

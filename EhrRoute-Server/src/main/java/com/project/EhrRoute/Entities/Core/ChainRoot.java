@@ -1,4 +1,4 @@
-package com.project.EMRChain.Entities.Core;
+package com.project.EhrRoute.Entities.Core;
 import javax.persistence.*;
 
 @Entity

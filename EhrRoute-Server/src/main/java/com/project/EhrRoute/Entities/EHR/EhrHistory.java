@@ -1,5 +1,5 @@
-package com.project.EMRChain.Entities.EHR;
-import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+package com.project.EhrRoute.Entities.EHR;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

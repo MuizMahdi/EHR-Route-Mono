@@ -1,7 +1,7 @@
-package com.project.EMRChain.Core;
-import com.project.EMRChain.Core.Utilities.StringUtil;
-import com.project.EMRChain.Entities.EHR.MedicalRecord;
-import com.project.EMRChain.Utilities.JsonUtil;
+package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Core.Utilities.StringUtil;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Utilities.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.security.PublicKey;

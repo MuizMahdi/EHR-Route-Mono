@@ -1,6 +1,4 @@
-package com.project.EMRChain.Core.Utilities;
-import com.project.EhrRoute.Core.Utilities.KeyUtil;
-import com.project.EhrRoute.Core.Utilities.StringUtil;
+package com.project.EhrRoute.Core.Utilities;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

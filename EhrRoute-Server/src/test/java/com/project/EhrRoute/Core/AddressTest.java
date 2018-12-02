@@ -1,5 +1,4 @@
-package com.project.EMRChain.Core;
-import com.project.EhrRoute.Core.Address;
+package com.project.EhrRoute.Core;
 import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;

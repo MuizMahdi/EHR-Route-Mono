@@ -1,4 +1,4 @@
-package com.project.EMRChain.Models;
+package com.project.EhrRoute.Models;
 
 public enum RoleName {
     ROLE_USER,

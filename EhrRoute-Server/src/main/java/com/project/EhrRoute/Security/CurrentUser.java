@@ -1,4 +1,4 @@
-package com.project.EMRChain.Security;
+package com.project.EhrRoute.Security;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.lang.annotation.*;
 

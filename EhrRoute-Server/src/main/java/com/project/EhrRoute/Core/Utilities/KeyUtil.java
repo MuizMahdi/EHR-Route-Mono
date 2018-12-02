@@ -1,4 +1,4 @@
-package com.project.EMRChain.Core.Utilities;
+package com.project.EhrRoute.Core.Utilities;
 import org.springframework.stereotype.Component;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;

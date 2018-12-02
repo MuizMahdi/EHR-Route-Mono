@@ -1,7 +1,7 @@
-package com.project.EMRChain.Configuration;
-import com.project.EMRChain.Security.AppUserDetailsService;
-import com.project.EMRChain.Security.JwtAuthenticationEntryPoint;
-import com.project.EMRChain.Security.JwtAuthenticationFilter;
+package com.project.EhrRoute.Configuration;
+import com.project.EhrRoute.Security.AppUserDetailsService;
+import com.project.EhrRoute.Security.JwtAuthenticationEntryPoint;
+import com.project.EhrRoute.Security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

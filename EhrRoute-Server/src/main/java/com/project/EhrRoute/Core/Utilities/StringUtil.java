@@ -1,4 +1,4 @@
-package com.project.EMRChain.Core.Utilities;
+package com.project.EhrRoute.Core.Utilities;
 import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.*;

@@ -1,7 +1,7 @@
-package com.project.EMRChain.Entities.Core;
-import com.project.EMRChain.Entities.EHR.EhrHistory;
-import com.project.EMRChain.Entities.EHR.EhrProblems;
-import com.project.EMRChain.Entities.EHR.EhrAllergies;
+package com.project.EhrRoute.Entities.Core;
+import com.project.EhrRoute.Entities.EHR.EhrHistory;
+import com.project.EhrRoute.Entities.EHR.EhrProblems;
+import com.project.EhrRoute.Entities.EHR.EhrAllergies;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

@@ -1,6 +1,6 @@
-package com.project.EMRChain.Security;
-import com.project.EMRChain.Entities.Auth.User;
-import com.project.EMRChain.Repositories.UserRepository;
+package com.project.EhrRoute.Security;
+import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

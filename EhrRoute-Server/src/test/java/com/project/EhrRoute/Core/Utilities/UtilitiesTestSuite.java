@@ -1,4 +1,4 @@
-package com.project.EMRChain.Core.Utilities;
+package com.project.EhrRoute.Core.Utilities;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

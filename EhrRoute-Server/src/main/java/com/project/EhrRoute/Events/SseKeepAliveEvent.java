@@ -1,4 +1,4 @@
-package com.project.EMRChain.Events;
+package com.project.EhrRoute.Events;
 import org.springframework.context.ApplicationEvent;
 
 public class SseKeepAliveEvent extends ApplicationEvent

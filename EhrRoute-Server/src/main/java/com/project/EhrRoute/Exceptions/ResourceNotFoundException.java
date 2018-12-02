@@ -1,4 +1,4 @@
-package com.project.EMRChain.Exceptions;
+package com.project.EhrRoute.Exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

@@ -1,5 +1,5 @@
-package com.project.EMRChain.Payload.Core;
-import com.project.EMRChain.Entities.EHR.MedicalRecord;
+package com.project.EhrRoute.Payload.Core;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 
 public class SerializableTransaction
 {

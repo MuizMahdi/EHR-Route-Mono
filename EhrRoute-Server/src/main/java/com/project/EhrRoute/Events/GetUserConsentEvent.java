@@ -1,5 +1,5 @@
-package com.project.EMRChain.Events;
-import com.project.EMRChain.Payload.Core.SerializableBlock;
+package com.project.EhrRoute.Events;
+import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import org.springframework.context.ApplicationEvent;
 
 public class GetUserConsentEvent extends ApplicationEvent

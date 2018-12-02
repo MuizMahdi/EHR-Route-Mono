@@ -1,5 +1,5 @@
-package com.project.EMRChain.Events;
-import com.project.EMRChain.Payload.Core.SerializableChain;
+package com.project.EhrRoute.Events;
+import com.project.EhrRoute.Payload.Core.SerializableChain;
 import org.springframework.context.ApplicationEvent;
 
 public class SendChainToConsumerEvent extends ApplicationEvent

@@ -1,4 +1,4 @@
-package com.project.EMRChain.Entities.Auth;
+package com.project.EhrRoute.Entities.Auth;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Calendar;

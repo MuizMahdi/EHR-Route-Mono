@@ -1,9 +1,8 @@
-package com.project.EMRChain.Core;
-import com.project.EMRChain.Exceptions.ResourceEmptyException;
-import com.project.EMRChain.Exceptions.ResourceNotFoundException;
-import com.project.EMRChain.Exceptions.UnavailableNodeException;
-import com.project.EMRChain.Payload.Core.SerializableBlock;
-import com.project.EMRChain.Services.ClustersContainer;
+package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Payload.Core.SerializableBlock;
+import com.project.EhrRoute.Services.ClustersContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

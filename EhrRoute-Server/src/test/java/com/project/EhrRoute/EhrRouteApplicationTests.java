@@ -1,4 +1,4 @@
-package com.project.EMRChain;
+package com.project.EhrRoute;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,34 +1,34 @@
-package com.project.EMRChain.Controllers;
-import com.project.EMRChain.Core.Block;
-import com.project.EMRChain.Core.BlockBroadcaster;
-import com.project.EMRChain.Core.Node;
-import com.project.EMRChain.Core.Transaction;
-import com.project.EMRChain.Core.Utilities.KeyUtil;
-import com.project.EMRChain.Core.Utilities.RsaUtil;
-import com.project.EMRChain.Events.GetUserConsentEvent;
-import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+package com.project.EhrRoute.Controllers;
+import com.project.EhrRoute.Core.Block;
+import com.project.EhrRoute.Core.BlockBroadcaster;
+import com.project.EhrRoute.Core.Node;
+import com.project.EhrRoute.Core.Transaction;
+import com.project.EhrRoute.Core.Utilities.KeyUtil;
+import com.project.EhrRoute.Core.Utilities.RsaUtil;
+import com.project.EhrRoute.Events.GetUserConsentEvent;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 
-import com.project.EMRChain.Exceptions.BadRequestException;
-import com.project.EMRChain.Exceptions.ResourceEmptyException;
-import com.project.EMRChain.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Exceptions.BadRequestException;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 
-import com.project.EMRChain.Exceptions.UnavailableNodeException;
-import com.project.EMRChain.Payload.Auth.ApiResponse;
-import com.project.EMRChain.Payload.Core.BlockAddition;
-import com.project.EMRChain.Payload.Core.SerializableBlock;
-import com.project.EMRChain.Payload.Core.UserConsentRequest;
+import com.project.EhrRoute.Exceptions.UnavailableNodeException;
+import com.project.EhrRoute.Payload.Auth.ApiResponse;
+import com.project.EhrRoute.Payload.Core.BlockAddition;
+import com.project.EhrRoute.Payload.Core.UserConsentRequest;
 
-import com.project.EMRChain.Payload.Core.UserConsentResponse;
-import com.project.EMRChain.Services.UserService;
-import com.project.EMRChain.Services.ChainRootUtil;
-import com.project.EMRChain.Services.ClustersContainer;
-import com.project.EMRChain.Services.ConsentRequestBlockService;
+import com.project.EhrRoute.Payload.Core.UserConsentResponse;
+import com.project.EhrRoute.Services.ConsentRequestBlockService;
+import com.project.EhrRoute.Services.UserService;
+import com.project.EhrRoute.Services.ChainRootUtil;
+import com.project.EhrRoute.Services.ClustersContainer;
 
-import com.project.EMRChain.Utilities.ModelMapper;
-import com.project.EMRChain.Utilities.UuidUtil;
-import com.project.EMRChain.Utilities.ChainUtil;
-import com.project.EMRChain.Utilities.SimpleStringUtil;
+import com.project.EhrRoute.Utilities.ModelMapper;
+import com.project.EhrRoute.Utilities.UuidUtil;
+import com.project.EhrRoute.Utilities.ChainUtil;
+import com.project.EhrRoute.Utilities.SimpleStringUtil;
 
+import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;

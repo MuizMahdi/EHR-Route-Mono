@@ -1,5 +1,5 @@
-package com.project.EMRChain.Controllers;
-import com.project.EMRChain.Payload.Auth.ApiResponse;
+package com.project.EhrRoute.Controllers;
+import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,4 +1,4 @@
-package com.project.EMRChain.Utilities;
+package com.project.EhrRoute.Utilities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Component;

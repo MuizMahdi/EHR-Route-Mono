@@ -1,8 +1,6 @@
-package com.project.EMRChain.Security;
+package com.project.EhrRoute.Security;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Repositories.UserRepository;
-import com.project.EhrRoute.Security.AppUserDetailsService;
-import com.project.EhrRoute.Security.UserPrincipal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

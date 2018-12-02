@@ -1,6 +1,6 @@
-package com.project.EMRChain.Services;
-import com.project.EMRChain.Core.NodeCluster;
-import com.project.EMRChain.Exceptions.ResourceEmptyException;
+package com.project.EhrRoute.Services;
+import com.project.EhrRoute.Core.NodeCluster;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import org.springframework.stereotype.Component;
 
 /*

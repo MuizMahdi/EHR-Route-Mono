@@ -1,4 +1,4 @@
-package com.project.EMRChain.Utilities;
+package com.project.EhrRoute.Utilities;
 import org.springframework.stereotype.Component;
 
 @Component

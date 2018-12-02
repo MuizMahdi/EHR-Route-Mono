@@ -1,4 +1,4 @@
-package com.project.EMRChain.Entities.EHR;
+package com.project.EhrRoute.Entities.EHR;
 
 
 public class PatientInfo

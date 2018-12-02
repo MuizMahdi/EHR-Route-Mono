@@ -1,5 +1,5 @@
-package com.project.EMRChain.Entities.Auth;
-import com.project.EMRChain.Models.RoleName;
+package com.project.EhrRoute.Entities.Auth;
+import com.project.EhrRoute.Models.RoleName;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 

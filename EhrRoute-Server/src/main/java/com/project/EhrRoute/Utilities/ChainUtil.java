@@ -1,13 +1,10 @@
-package com.project.EMRChain.Utilities;
-import com.project.EMRChain.Core.Node;
-import com.project.EMRChain.Events.GetChainFromProviderEvent;
-import com.project.EMRChain.Exceptions.BadRequestException;
-import com.project.EMRChain.Payload.Auth.ApiResponse;
-import com.project.EMRChain.Services.ClustersContainer;
+package com.project.EhrRoute.Utilities;
+import com.project.EhrRoute.Core.Node;
+import com.project.EhrRoute.Events.GetChainFromProviderEvent;
+import com.project.EhrRoute.Exceptions.BadRequestException;
+import com.project.EhrRoute.Services.ClustersContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

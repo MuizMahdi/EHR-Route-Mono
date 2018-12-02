@@ -1,4 +1,4 @@
-package com.project.EMRChain.Configuration;
+package com.project.EhrRoute.Configuration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 

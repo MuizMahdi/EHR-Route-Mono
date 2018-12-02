@@ -1,5 +1,5 @@
-package com.project.EMRChain.Repositories;
-import com.project.EMRChain.Entities.Core.ConsentRequestBlock;
+package com.project.EhrRoute.Repositories;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

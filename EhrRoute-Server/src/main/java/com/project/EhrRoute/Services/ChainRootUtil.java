@@ -1,7 +1,7 @@
-package com.project.EMRChain.Services;
-import com.project.EMRChain.Entities.Core.ChainRoot;
-import com.project.EMRChain.Entities.Core.Network;
-import com.project.EMRChain.Exceptions.BadRequestException;
+package com.project.EhrRoute.Services;
+import com.project.EhrRoute.Entities.Core.ChainRoot;
+import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

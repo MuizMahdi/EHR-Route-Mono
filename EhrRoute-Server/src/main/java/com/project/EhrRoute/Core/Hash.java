@@ -1,6 +1,6 @@
-package com.project.EMRChain.Core;
-import com.project.EMRChain.Core.Utilities.HashUtil;
-import com.project.EMRChain.Core.Utilities.StringUtil;
+package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Core.Utilities.HashUtil;
+import com.project.EhrRoute.Core.Utilities.StringUtil;
 
 
 public class Hash

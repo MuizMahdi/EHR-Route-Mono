@@ -1,4 +1,4 @@
-package com.project.EMRChain.Core;
+package com.project.EhrRoute.Core;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.HashMap;
 import java.util.Map;
