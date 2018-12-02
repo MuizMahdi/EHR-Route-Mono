@@ -1,5 +1,6 @@
 package com.project.EMRChain.Security;
-import com.project.EMRChain.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Security.UserPrincipal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;

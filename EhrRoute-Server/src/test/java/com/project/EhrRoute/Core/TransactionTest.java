@@ -1,7 +1,9 @@
 package com.project.EMRChain.Core;
-import com.project.EMRChain.Core.Utilities.StringUtil;
-import com.project.EMRChain.Entities.EHR.MedicalRecord;
-import com.project.EMRChain.Utilities.JsonUtil;
+import com.project.EhrRoute.Core.Address;
+import com.project.EhrRoute.Core.Transaction;
+import com.project.EhrRoute.Core.Utilities.StringUtil;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Utilities.JsonUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

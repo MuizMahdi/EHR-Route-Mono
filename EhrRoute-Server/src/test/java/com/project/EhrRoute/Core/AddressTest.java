@@ -1,5 +1,6 @@
 package com.project.EMRChain.Core;
-import com.project.EMRChain.Core.Utilities.AddressUtil;
+import com.project.EhrRoute.Core.Address;
+import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

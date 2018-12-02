@@ -7,7 +7,7 @@ import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableScheduling
-public class EmrChainApplication
+public class EhrRouteApplication
 {
     @PostConstruct
     void onInit()
@@ -30,7 +30,7 @@ public class EmrChainApplication
 
 
     public static void main(String[] args) {
-        SpringApplication.run(EmrChainApplication.class, args);
+        SpringApplication.run(EhrRouteApplication.class, args);
     }
 
 }
