@@ -1,0 +1,23 @@
+<div class="container" style="width: 50%">
+
+   <form [formGroup]="loginFormGroup" (submit)="onLogin()" style="margin-top:20%" novalidate>
+
+      <!-- Username or Email Input -->
+      <div class="form-group">
+         <label for="usernameOrEmail">Username or Email</label>
+         <input formControlName="usernameOrEmailCtrl" type="text" class="form-control" placeholder="Username or Email..." required>
+      </div>
+
+      <!-- Password Input -->
+      <div class="form-group">
+         <label for="password">Password</label>
+         <input formControlName="passwordCtrl" type="password" class="form-control" placeholder="Password..." required>
+      </div>
+
+      <!-- Form Buttons -->
+      <input (click)="onRegisterClick" type="button" class="btn btn-primary" value="Register">
+      <input type="submit" value="Login" class="btn btn-primary" style="margin-left:10px">
+
+   </form>
+
+</div>

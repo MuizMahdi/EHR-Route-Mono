@@ -1,14 +1,12 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
-# compiled output
+### compiled output ###
 /dist
 /tmp
 /out-tsc
 
-# dependencies
+### dependencies ###
 /node_modules
 
-# IDEs and editors
+### IDEs and editors ###
 /.idea
 .project
 .classpath
@@ -17,14 +15,14 @@
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
+### IDE - VSCode ###
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# misc
+### misc ###
 /.sass-cache
 /connect.lock
 /coverage
@@ -34,12 +32,11 @@ yarn-error.log
 testem.log
 /typings
 
-# System Files
+### System Files ###
 .DS_Store
 Thumbs.db
 
-
-
+### Gradle ###
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -73,12 +70,9 @@ application.properties
 application.properties
 
 ### NodeModules ###
-/node_modules/
-/node_modules
 node_modules/
 
 ### Production ###
-/build/
-/build
 build/
+classes/
 
