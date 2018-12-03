@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 
@@ -17,7 +17,7 @@ export class LoginComponent
    loginUsernameOrEmail: string;
    loginPassword: string;
 
-  constructor(private formBuilder:FormBuilder, private router:Router) { 
+  constructor(private router:Router) { 
       this.buildForm();
   }
 
@@ -30,11 +30,6 @@ export class LoginComponent
   }
 
   onLogin() 
-  {
-      
-  }
-
-  onRegisterClick() 
   {
 
   }

@@ -6,11 +6,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/Auth/login/login.component';
+import { RegistrationComponent } from './Components/Auth/registration/registration.component';
+import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    RegistrationComponent,
+    AuthMainComponent
   ],
 
   imports: [
