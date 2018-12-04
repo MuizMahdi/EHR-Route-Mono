@@ -24,7 +24,13 @@ export class AuthService
 
    register(userInfo: UserRegistrationRequest) 
    {
-      return this.http.post(this.registrationUrl, userInfo);
+      return this.http.post(this.registrationUrl, userInfo).pipe(
+
+         catchError(error => { // Catch error
+            return throwError(error); // Rethrow the error
+         })
+         
+      );
    }
 
 

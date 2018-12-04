@@ -1,8 +1,8 @@
 
 export interface UserRegistrationRequest
 {
-   registrationName:string;
-   registrationEmail:string;
-   registrationUsername:string;
-   registrationPassword:string;
+   name:string;
+   username:string;
+   email:string;
+   password:string;
 }

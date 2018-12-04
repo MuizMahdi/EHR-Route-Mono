@@ -45,19 +45,25 @@ export class LoginComponent
       };
 
       this.authService.login(userInfo).pipe( // Login and get response
+
          first(), // Get first value in stream (The Token)
+
          catchError(response => { // In case an error occurs
             return throwError(response) // Re-Throw the error to be handled on subscription
          })
+
       ).subscribe(
+
          response => {
             // TODO: Navigate to main after login page
             console.log("Logged In");
          },
+         
          errorResponse => {
             // TODO: Handle error by showing a flash message to user
             console.log(errorResponse.error.message);
          }
+
       );
   }
 
