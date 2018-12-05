@@ -11,9 +11,9 @@ export class ErrorInterceptor implements HttpInterceptor
    constructor(private authService:AuthService)
    { }
 
-   intercept(request:HttpRequest<any>, next:HttpHandler): Observable<HttpEvent<any>>
+   intercept(request:HttpRequest<any>, handler:HttpHandler): Observable<HttpEvent<any>>
    {
-      return next.handle(request).pipe(
+      return handler.handle(request).pipe(
 
          // Catch Http errors
          catchError(error => {
