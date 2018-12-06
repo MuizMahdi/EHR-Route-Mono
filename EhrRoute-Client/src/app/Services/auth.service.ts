@@ -44,7 +44,7 @@ export class AuthService
 
          tap(tokenResponse => {
 
-            this.saveJwtSession(tokenResponse),
+            this.saveSession(tokenResponse),
             shareReplay()
 
          }),

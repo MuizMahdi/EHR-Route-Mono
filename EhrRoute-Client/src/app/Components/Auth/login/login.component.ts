@@ -44,7 +44,8 @@ export class LoginComponent
          password: this.loginPassword
       };
 
-      this.authService.login(userInfo).pipe( // Login and get response
+      this.authService.login(userInfo)
+      .pipe( // Login and get response
 
          first(), // Get first value in stream (The Token)
 
@@ -56,12 +57,13 @@ export class LoginComponent
 
          response => {
             // TODO: Navigate to main after login page
+            this.router.navigate(['/main']);
             console.log("Logged In");
          },
          
          errorResponse => {
             // TODO: Handle error by showing a flash message to user
-            console.log(errorResponse.error.message);
+            console.log(errorResponse);
          }
 
       );
