@@ -75,4 +75,5 @@ node_modules/
 ### Production ###
 build/
 classes/
+dist/
 
