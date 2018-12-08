@@ -1,0 +1,54 @@
+.fa-2x
+{
+   font-size: 2em;
+}
+
+.fa
+{
+   position: relative;
+   display: table-cell;
+   width: 60px;
+   height: 36px;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 20px;
+}
+
+.navbar
+{
+   z-index: 1001;
+   height: 4em;
+   background-color: #ffffff;
+   border-bottom: 1px solid rgb(233, 233, 233);
+}
+
+.nav-logo img
+{
+   width: 160px;
+   height: 25px;
+   margin-top: 0.5em;
+}
+
+.navbar ul
+{
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+}
+
+.navbar li
+{
+   float: left;
+   text-align: center;
+   text-decoration: none;
+}
+
+
+@media screen and (max-width: 600px)
+{
+   .navbar
+   {
+      height: 5em;
+   }
+}

@@ -1,0 +1,19 @@
+<nav class="navbar">
+
+   <ul>
+
+      <li *ngIf="innerWidth>600" class="nav-logo">
+         <a href="javascript:void(0)">
+            <img src="https://i.imgur.com/DaYJqrs.png" alt="BrandLogo">
+         </a>
+      </li>
+
+      <li>
+         <app-nav-search></app-nav-search>
+      </li>    
+
+   </ul>
+
+   <app-nav-user-menu></app-nav-user-menu>
+
+</nav>

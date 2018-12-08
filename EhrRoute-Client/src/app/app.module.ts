@@ -18,7 +18,11 @@ import { MainComponent } from './Components/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-
+import {SuiModule} from 'ng2-semantic-ui';
+import { SideBarComponent } from './Components/MainLayout/side-bar/side-bar.component';
+import { NavBarComponent } from './Components/MainLayout/nav-bar/nav-bar.component';
+import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-user-menu.component';
+import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-search.component';
 
 
 @NgModule({
@@ -27,7 +31,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     LoginComponent,
     RegistrationComponent,
     AuthMainComponent,
-    MainComponent
+    MainComponent,
+    SideBarComponent,
+    NavBarComponent,
+    NavUserMenuComponent,
+    NavSearchComponent
   ],
 
   imports: [
@@ -37,7 +45,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     ReactiveFormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    NgbModule
+    NgbModule,
+    SuiModule
   ],
 
   providers: [
