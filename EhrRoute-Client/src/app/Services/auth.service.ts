@@ -40,6 +40,7 @@ export class AuthService
 
    login(userLoginInfo: UserLoginRequest)
    {
+
       return this.http.post(this.loginUrl, userLoginInfo).pipe(
 
          tap(tokenResponse => {
@@ -61,6 +62,11 @@ export class AuthService
    {
       // Get user info from local storage
       return JSON.parse(localStorage.getItem('currentUser')) as UserInfo;
+   }
+
+   getAccessToken():any
+   {
+      return localStorage.getItem('accessToken');
    }
 
 

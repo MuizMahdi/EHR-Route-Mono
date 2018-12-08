@@ -1,7 +1,8 @@
+import { UserInfo } from './../Models/UserInfo';
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from './../Services/auth.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 
 
@@ -17,10 +18,9 @@ export class AuthGuard implements CanActivate
 
    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
    {
-      
-      const currentUser = this.authService.getCurrentUser;
+      const accessToken = this.authService.getAccessToken();
 
-      if (currentUser) {
+      if (accessToken) {
          // Return true if user is logged in
          return true;
       }

@@ -56,8 +56,8 @@ export class LoginComponent
       ).subscribe(
 
          response => {
-            // TODO: Navigate to main after login page
-            this.router.navigate(['/main']);
+            // TODO: Navigate to main page after login
+            this.router.navigate(['']);
             console.log("Logged In");
          },
          

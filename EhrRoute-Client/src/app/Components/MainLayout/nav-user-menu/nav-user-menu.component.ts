@@ -23,4 +23,9 @@ export class NavUserMenuComponent
       this.router.navigate(['login']);
    }
 
+   onClickedOutside(e: Event) 
+   {
+      this.navUserMenu = false;
+   }
+
 }

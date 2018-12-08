@@ -1,4 +1,4 @@
-<div id="nav-user">
+<div id="nav-user" (clickOutside)="onClickedOutside($event)">
    <a (click)="navUserMenu=!navUserMenu" href="javascript:void(0)">
       <i class="fa fa-user fa-2x"></i>
    </a>
@@ -6,6 +6,6 @@
    <div *ngIf="navUserMenu" class="nav-user-menu">
       <a href="javascript:void(0)" class="nav-user-menu-item">Item 1</a>
       <a href="javascript:void(0)" class="nav-user-menu-item">Item 2</a>
-      <a href="javascript:void(0)" class="nav-user-menu-item">Logout</a>
+      <a (click)="logout()" href="javascript:void(0)" class="nav-user-menu-item">Logout</a>
    </div>
 </div>

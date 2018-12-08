@@ -14,15 +14,17 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/Auth/login/login.component';
 import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { RegistrationComponent } from './Components/Auth/registration/registration.component';
-import { MainComponent } from './Components/main/main.component';
+import { MainComponent } from './Components/MainLayout/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {SuiModule} from 'ng2-semantic-ui';
 import { SideBarComponent } from './Components/MainLayout/side-bar/side-bar.component';
 import { NavBarComponent } from './Components/MainLayout/nav-bar/nav-bar.component';
 import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-user-menu.component';
 import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-search.component';
+
+// External Modules
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { ClickOutsideModule } from 'ng-click-outside';
+
 
 
 @NgModule({
@@ -46,7 +48,7 @@ import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-searc
     HttpClientModule,
     BrowserAnimationsModule,
     NgbModule,
-    SuiModule
+    ClickOutsideModule
   ],
 
   providers: [
