@@ -48,7 +48,7 @@ public class UserController
 
 
     @GetMapping("/current")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getCurrentUser(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -79,7 +79,7 @@ public class UserController
 
 
     @GetMapping("/current/roles")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -120,7 +120,7 @@ public class UserController
 
 
     @GetMapping("/get-notifications")
-    //@PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public SseEmitter streamUserNotifications(@RequestParam("userid") String userID , @CurrentUser UserPrincipal currentUser) throws IOException
     {
         /*
