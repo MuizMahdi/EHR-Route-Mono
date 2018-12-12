@@ -60,6 +60,7 @@ export class LoginComponent
          response => {
             // TODO: Navigate to main page after login
             this.router.navigate(['']);
+            this.checkIfUserIsAdmin();
          },
          
          errorResponse => {
@@ -71,6 +72,35 @@ export class LoginComponent
    }
 
 
-   
+   checkIfUserIsAdmin()
+   {
+      // Get user roles
+      this.authService.getCurrentUserRoles().subscribe(
+         
+         (response:UserRole[]) => {
+
+            // Go through roles and create EHRs chain databse if user has ADMIN role
+            response.forEach((role:UserRole) => {
+               
+               if (role.roleName.trim() === 'ROLE_ADMIN') {
+                  // Initialize the node_ehr_chain DB
+                  this.createNodeChainDB();
+               }
+
+            });
+
+         },
+
+         errorResponse => {
+            console.log(errorResponse);
+         }
+      );
+   }
+
+   createNodeChainDB(): void
+   {
+      // Call electron's ipc renderer to create chain table
+
+   }
 
 }

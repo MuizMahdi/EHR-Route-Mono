@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -83,5 +81,20 @@ public class UserService
     public User findUserById(Long id) {
         User user = userRepository.findById(id).orElse(null);
         return user;
+    }
+
+    @Transactional
+    public Set<Role> findUserRoles(String username) throws ResourceNotFoundException
+    {
+        // Find user by username
+        User user = userRepository.findByUsername(username).orElse(null);
+
+        // If invalid username
+        if (user == null) {
+            throw new ResourceNotFoundException("User", "username", username);
+        }
+
+        // Return user roles
+        return user.getRoles();
     }
 }

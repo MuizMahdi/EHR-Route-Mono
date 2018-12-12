@@ -65,9 +65,20 @@ export class AuthService
       return JSON.parse(localStorage.getItem('currentUser')) as UserInfo;
    }
 
+
    getAccessToken():any
    {
       return localStorage.getItem('accessToken');
+   }
+
+   
+   getCurrentUserRoles()
+   {
+      return this.http.get(this.userRolesUrl).pipe(first(),
+         catchError(error => {
+            return throwError(error);
+         })
+      );
    }
 
 

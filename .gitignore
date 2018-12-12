@@ -72,6 +72,9 @@ application.properties
 ### NodeModules ###
 node_modules/
 
+### bin ###
+bin/
+
 ### Production ###
 build/
 classes/

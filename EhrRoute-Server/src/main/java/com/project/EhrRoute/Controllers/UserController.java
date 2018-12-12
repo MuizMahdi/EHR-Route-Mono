@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,6 +78,47 @@ public class UserController
     }
 
 
+    @GetMapping("/current/roles")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser)
+    {
+        if (currentUser == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        Set<Role> userRoles = new HashSet<>();
+
+        try {
+            // Get the user's set of Role
+            userRoles = userService.findUserRoles(currentUser.getUsername());
+        }
+        catch(ResourceNotFoundException Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Create a set of UserRoleResponse 
+        Set<UserRoleResponse> userRolesNames = new HashSet<>();
+
+        // Map each user Role's rolename to value in userRoleNames set 
+        for (Role role : userRoles) {
+            UserRoleResponse userRole = new UserRoleResponse(role.getName().toString());
+            userRolesNames.add(userRole);
+        }
+
+        // Return the userRoleNames set
+        return new ResponseEntity<>(
+            userRolesNames,
+            HttpStatus.OK
+        );
+    }
+
+
     @GetMapping("/get-notifications")
     //@PreAuthorize("hasRole('USER')")
     public SseEmitter streamUserNotifications(@RequestParam("userid") String userID , @CurrentUser UserPrincipal currentUser) throws IOException
@@ -111,6 +151,7 @@ public class UserController
 
         return userNotificationEmitter;
     }
+
 
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
