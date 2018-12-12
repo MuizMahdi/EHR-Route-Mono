@@ -5,6 +5,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { ElectronService } from 'ngx-electron';
+import { UserRole } from 'src/app/Models/UserRole';
 
 
 @Component({
@@ -14,32 +16,32 @@ import { throwError } from 'rxjs';
 })
 
 
-export class LoginComponent 
+export class LoginComponent
 {
    loginFormGroup: FormGroup;
 
    loginUsernameOrEmail: string;
    loginPassword: string;
 
-  constructor(private router:Router, private authService:AuthService) { 
+   constructor(private router: Router, private authService: AuthService, private electron: ElectronService) {
       this.buildForm();
-  }
+   }
 
-  buildForm(): void 
-  {
+   buildForm(): void
+   {
       this.loginFormGroup = new FormGroup({
          usernameOrEmailCtrl: new FormControl(null, [Validators.required]),
          passwordCtrl: new FormControl(null, Validators.required)
       });
-  }
+   }
 
-  onLogin() 
-  {
+   onLogin()
+   {
       // LoginFormGroup values
       this.loginUsernameOrEmail = this.loginFormGroup.get("usernameOrEmailCtrl").value;
       this.loginPassword = this.loginFormGroup.get("passwordCtrl").value;
-      
-      let userInfo: UserLoginRequest = {
+
+      const userInfo: UserLoginRequest = {
          usernameOrEmail: this.loginUsernameOrEmail,
          password: this.loginPassword
       };
@@ -58,7 +60,6 @@ export class LoginComponent
          response => {
             // TODO: Navigate to main page after login
             this.router.navigate(['']);
-            console.log("Logged In");
          },
          
          errorResponse => {
@@ -67,6 +68,9 @@ export class LoginComponent
          }
 
       );
-  }
+   }
+
+
+   
 
 }

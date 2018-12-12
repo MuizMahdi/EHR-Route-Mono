@@ -1,9 +1,12 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Node;
+import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Events.SseKeepAliveEvent;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
+import com.project.EhrRoute.Payload.Auth.UserRoleResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ClustersContainer;
@@ -17,16 +20,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @RestController
-    @RequestMapping("/users")
+@RequestMapping("/users")
 public class UserController
 {
     private UserService userService;
@@ -43,14 +48,14 @@ public class UserController
     }
 
 
-    @GetMapping("/me")
+    @GetMapping("/current")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getCurrentUser(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
             return new ResponseEntity<>(
-                    new ApiResponse(false, "User not logged in"),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
             );
         }
 

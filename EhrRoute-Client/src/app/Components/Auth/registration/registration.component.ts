@@ -67,7 +67,7 @@ export class RegistrationComponent
 
          errorResponse => {
             // TODO: Handle error by showing a flash message to user
-            console.log(errorResponse.error.message);
+            console.log(errorResponse);
          }
 
       );

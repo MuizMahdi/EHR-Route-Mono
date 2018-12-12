@@ -2,6 +2,7 @@ package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Exceptions.InternalErrorException;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Auth.SignUpRequest;
 import com.project.EhrRoute.Repositories.RoleRepository;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class UserService
@@ -49,7 +52,7 @@ public class UserService
 
         // Get the 'User' role
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER).orElseThrow(() ->
-                new InternalErrorException("User Role not set")
+            new InternalErrorException("User Role not set")
         );
 
         // Set the user role to 'User'

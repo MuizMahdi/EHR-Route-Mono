@@ -24,6 +24,7 @@ import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-searc
 // External Modules
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
+import { NgxElectronModule } from 'ngx-electron';
 
 
 
@@ -48,7 +49,8 @@ import { ClickOutsideModule } from 'ng-click-outside';
     HttpClientModule,
     BrowserAnimationsModule,
     NgbModule,
-    ClickOutsideModule
+    ClickOutsideModule,
+    NgxElectronModule
   ],
 
   providers: [
