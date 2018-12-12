@@ -1,17 +1,17 @@
 const { app, BrowserWindow } = require("electron");
-const {ipcMain} = require('electron');
+const { ipcMain } = require('electron');
+
 const path = require("path");
 const url = require("url");
+
+const keyService = require('./Electron/Services/AddressKeyService');
+const ehrService = require('./Electron/Services/EhrChainService');
+
 let win;
 
 
-ipcMain.on('testMessage', (event, arg) => {
-   console.log("Message received on main with argument: " + arg);
-   event.sender.send('testMessage2', 'sending back to renderer');
-});
-
 // Create window on electron initialization
-app.on("ready", createWindow)
+app.on("ready", createWindow);
 
 
 // Quit when all windows are closed
@@ -21,7 +21,7 @@ app.on("window-all-closed", function () {
       app.quit()
    }
 
-})
+});
 
 
 app.on("activate", function() {
@@ -30,8 +30,7 @@ app.on("activate", function() {
       createWindow()
    }
 
-})
-
+});
 
 function createWindow()
 {
@@ -42,53 +41,33 @@ function createWindow()
    });
 
 
-   //win.loadURL(`file://${__dirname}/dist/EhrRoute-Client/index.html`);
-
    win.loadURL(
       url.format({
          pathname: path.join(__dirname, 'dist/index.html'),
          protocol: 'file:',
          slashes: true
       })
-   )
+   );
 
 
-   // Chrome DevTools.
-   win.webContents.openDevTools()
+   // Open Chrome DevTools.
+   win.webContents.openDevTools();
 
 
-   initializeDatabase();
+   // Create address table. All users with all roles must have it
+   keyService.initializeAddressKeys();
 
 
    // On window closing set win to null
    win.on("closed", function() {
       win = null
-   })
-}
-
-
-function initializeDatabase()
-{
-   var sqlite3 = require('sqlite3');
-   var db = new sqlite3.Database('./database.sqlite3');
-
-   //var db = new sqlite3.Database(app.getPath('userData')); // Stores database in application's data directory, commented for dev.
-  
-   db.serialize(function() {
-
-      initAddress(db);
-
    });
-
-   // Get USER ROLE on login
-   // IF user role is [Admin] then create node_ehr_chain table if not exists
-
-   db.close();
 }
+ 
 
 
-function initAddress(db)
-{
-   // Create address table if not exists all users with no matter what role must have it.
-   db.run("CREATE TABLE IF NOT EXISTS address (address TEXT, public_key TEXT, private_key TEXT)");
-}
+ipcMain.on('Create_Node_EHR_Chain_DB', (event, arg) => {
+
+   ehrService.initializeNodeEhrChain();
+   
+});

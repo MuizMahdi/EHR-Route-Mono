@@ -82,9 +82,10 @@ export class LoginComponent
             // Go through roles and create EHRs chain databse if user has ADMIN role
             response.forEach((role:UserRole) => {
                
-               if (role.roleName.trim() === 'ROLE_ADMIN') {
-                  // Initialize the node_ehr_chain DB
-                  this.createNodeChainDB();
+               if (role.roleName.trim() === 'ROLE_ADMIN') 
+               {
+                  // Call electron's ipc renderer to create chain table
+                  this.electron.ipcRenderer.send('Create_Node_EHR_Chain_DB', '');
                }
 
             });
@@ -95,12 +96,6 @@ export class LoginComponent
             console.log(errorResponse);
          }
       );
-   }
-
-   createNodeChainDB(): void
-   {
-      // Call electron's ipc renderer to create chain table
-
    }
 
 }
