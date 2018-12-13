@@ -21,7 +21,7 @@ export class AuthService
    userRolesUrl: string = environment.apiUrl + '/users/current/roles'
 
    currentUser: Subject<UserInfo> = new Subject<UserInfo>();
-
+   isLoggedIn:boolean = false;
 
    constructor(private http:HttpClient) 
    { }
@@ -47,6 +47,7 @@ export class AuthService
          tap(tokenResponse => {
 
             this.saveSession(tokenResponse),
+            this.isLoggedIn = true;
             shareReplay()
 
          }),

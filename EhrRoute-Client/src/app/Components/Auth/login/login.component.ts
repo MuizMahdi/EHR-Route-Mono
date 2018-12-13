@@ -59,7 +59,7 @@ export class LoginComponent
 
          response => {
             // TODO: Navigate to main page after login
-            this.router.navigate(['']);
+            this.router.navigate(['main']);
             this.checkIfUserIsAdmin();
          },
          

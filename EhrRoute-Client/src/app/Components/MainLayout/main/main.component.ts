@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { MainLayoutService } from './../../../Services/main-layout.service';
+import { Component, OnInit } from '@angular/core';
 
 
 @Component({
@@ -8,6 +9,12 @@ import { Component } from '@angular/core';
 })
 
 
-export class MainComponent{
-   constructor() { }
+export class MainComponent implements OnInit
+{
+   constructor(public mainLayout:MainLayoutService) { }
+
+   ngOnInit() {
+      this.mainLayout.show();
+   }
+
 }

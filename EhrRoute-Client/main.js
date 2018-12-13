@@ -4,14 +4,24 @@ const { ipcMain } = require('electron');
 const path = require("path");
 const url = require("url");
 
-const keyService = require('./Electron/Services/AddressKeyService');
-const ehrService = require('./Electron/Services/EhrChainService');
+//const keyService = require('./Electron/Services/AddressKeyService');
+//const ehrService = require('./Electron/Services/EhrChainService');
 
-let win;
+let win; // Window object
 
 
 // Create window on electron initialization
 app.on("ready", createWindow);
+
+
+// Initialize window and its properties on startup
+app.on("activate", function() {
+   
+   if (win === null) {
+      createWindow()
+   }
+
+});
 
 
 // Quit when all windows are closed
@@ -23,14 +33,6 @@ app.on("window-all-closed", function () {
 
 });
 
-
-app.on("activate", function() {
-   
-   if (win === null) {
-      createWindow()
-   }
-
-});
 
 function createWindow()
 {
@@ -55,7 +57,7 @@ function createWindow()
 
 
    // Create address table. All users with all roles must have it
-   keyService.initializeAddressKeys();
+   //keyService.initializeAddressKeys();
 
 
    // On window closing set win to null
@@ -63,11 +65,10 @@ function createWindow()
       win = null
    });
 }
- 
 
 
 ipcMain.on('Create_Node_EHR_Chain_DB', (event, arg) => {
 
-   ehrService.initializeNodeEhrChain();
-   
+   //ehrService.initializeNodeEhrChain();
+
 });

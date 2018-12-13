@@ -1,13 +1,16 @@
+import { AppComponent } from './app.component';
 import { AuthGuard } from './Guards/AuthGuard';
 import { MainComponent } from './Components/MainLayout/main/main.component';
 import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
 
 
 const routes: Routes = [
-   {path:"", component:MainComponent, canActivate:[AuthGuard]},
+   {path:"main", component:MainComponent, canActivate:[AuthGuard]},
    {path:'login', component:AuthMainComponent},
+   {path:'network', component:NetworkManagerComponent, canActivate:[AuthGuard]}
 ];
 
 

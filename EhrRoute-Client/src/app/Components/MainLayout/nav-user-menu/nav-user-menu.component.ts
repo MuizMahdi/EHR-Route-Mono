@@ -1,3 +1,4 @@
+import { MainLayoutService } from './../../../Services/main-layout.service';
 import { AuthService } from './../../../Services/auth.service';
 import { Component} from '@angular/core';
 import { Router } from '@angular/router';
@@ -14,12 +15,13 @@ export class NavUserMenuComponent
 {
    navUserMenu: boolean = false;
 
-   constructor(private authService:AuthService, private router:Router) 
+   constructor(private authService:AuthService, private router:Router, public mainLayout:MainLayoutService) 
    { }
 
    logout():void
    {
       this.authService.logout();
+      this.mainLayout.hide();
       this.router.navigate(['login']);
    }
 

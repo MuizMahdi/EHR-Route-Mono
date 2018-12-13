@@ -1,3 +1,4 @@
+import { MainLayoutService } from './../../../Services/main-layout.service';
 import { Component, OnInit } from '@angular/core';
 
 
@@ -12,11 +13,13 @@ export class AuthMainComponent implements OnInit
 {
    isOnRegister:boolean;
 
-   constructor() 
+   constructor(public mainLayout:MainLayoutService) 
    { }
 
    ngOnInit() 
    {
+      console.log("AUTH COMPONENT");
+      this.mainLayout.hide();
       this.isOnRegister = false;
    }
 

@@ -25,6 +25,7 @@ import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-searc
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgxElectronModule } from 'ngx-electron';
+import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
 
 
 
@@ -38,7 +39,8 @@ import { NgxElectronModule } from 'ngx-electron';
     SideBarComponent,
     NavBarComponent,
     NavUserMenuComponent,
-    NavSearchComponent
+    NavSearchComponent,
+    NetworkManagerComponent
   ],
 
   imports: [
