@@ -16,10 +16,20 @@
 
 .navbar
 {
-   z-index: 1001;
    height: 4em;
+   z-index: 1001;
+   display: flex;
+   justify-content: flex-start;
    background-color: #ffffff;
    border-bottom: 1px solid rgb(233, 233, 233);
+}
+
+.navbar > div:nth-child(2){
+   margin-left: 2%;
+}
+
+.navbar > div:nth-child(3){
+   margin-left: auto;
 }
 
 .nav-logo img

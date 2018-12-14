@@ -1,15 +1,17 @@
-<app-login *ngIf="!isOnRegister"></app-login>
+<div class="container" style="width:100%">
+   <app-login *ngIf="!isOnRegister"></app-login>
 
-<br>
-
-<a *ngIf="!isOnRegister" (click)="isOnRegister=!isOnRegister" href="javascript:void(0)" style="margin-left:26%">
-   Create a new account
-</a>
-
-<app-registration *ngIf="isOnRegister"></app-registration>
-
-<br>
-
-<a *ngIf="isOnRegister" (click)="isOnRegister=!isOnRegister" href="javascript:void(0)" style="margin-left:26%"> 
-   Already have an account? 
-</a>
+   <br>
+   
+   <a *ngIf="!isOnRegister" (click)="isOnRegister=!isOnRegister" href="javascript:void(0)" style="margin-left:26%">
+      Create a new account
+   </a>
+   
+   <app-registration *ngIf="isOnRegister"></app-registration>
+   
+   <br>
+   
+   <a *ngIf="isOnRegister" (click)="isOnRegister=!isOnRegister" href="javascript:void(0)" style="margin-left:26%"> 
+      Already have an account? 
+   </a>
+</div>

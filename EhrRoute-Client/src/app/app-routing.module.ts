@@ -8,6 +8,7 @@ import { NetworkManagerComponent } from './Components/network-manager/network-ma
 
 
 const routes: Routes = [
+   {path:'', redirectTo:'main', pathMatch:'full' ,canActivate:[AuthGuard]},
    {path:"main", component:MainComponent, canActivate:[AuthGuard]},
    {path:'login', component:AuthMainComponent},
    {path:'network', component:NetworkManagerComponent, canActivate:[AuthGuard]}

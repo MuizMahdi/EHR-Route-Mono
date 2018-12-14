@@ -1,18 +1,18 @@
 <div class="main-container">
 
-   <div *ngIf="mainLayout.visible" class="header">
+   <header *ngIf="mainLayout.visible">
       <app-nav-bar></app-nav-bar>
-   </div>
+   </header>
 
-   <div class="content-container">
+   <div [class.content-container-main]="mainLayout.visible" [class.content-container-login]="!mainLayout.visible">
       
-      <div *ngIf="mainLayout.visible">
-         <app-side-bar ></app-side-bar>
-      </div>
+      <aside *ngIf="mainLayout.visible">
+         <app-side-bar></app-side-bar>
+      </aside>
 
-      <div class="content-area">
+      <main class="content-area">
          <router-outlet ></router-outlet>
-      </div>
+      </main>
 
    </div>
    

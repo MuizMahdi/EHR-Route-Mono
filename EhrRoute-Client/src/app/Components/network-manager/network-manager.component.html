@@ -1,1 +1,2 @@
-<h1>INSIDE NETWORK COMPONENT</h1>
+<h1 *ngIf="isAdmin">ADMIN</h1>
+<h1 *ngIf="!isAdmin && !isProvider">USER</h1>

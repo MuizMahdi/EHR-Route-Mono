@@ -26,6 +26,11 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgxElectronModule } from 'ngx-electron';
 import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
+import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
+import { registerLocaleData } from '@angular/common';
+import en from '@angular/common/locales/en';
+
+registerLocaleData(en);
 
 
 
@@ -52,12 +57,13 @@ import { NetworkManagerComponent } from './Components/network-manager/network-ma
     BrowserAnimationsModule,
     NgbModule,
     ClickOutsideModule,
-    NgxElectronModule
+    NgxElectronModule,
+    NgZorroAntdModule
   ],
 
   providers: [
    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-   { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+   { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true, providers: [{ provide: NZ_I18N, useValue: en_US }] }
   ],
 
   bootstrap: [AppComponent]

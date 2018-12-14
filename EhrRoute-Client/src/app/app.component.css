@@ -1,0 +1,17 @@
+.main-container {
+   display: grid;
+   row-gap: 1em;
+}
+
+.content-container-main {
+   display: grid;
+   grid-template-columns: 6em auto;
+   transition: all 1s;
+}
+
+.content-container-login {
+   width: 100%;
+   background: rgb(231, 231, 255);
+   padding-bottom: 30em;
+   transition: all 1s;
+}
