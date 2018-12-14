@@ -4,6 +4,10 @@ import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 
+import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Exceptions.NullUserNetworkException;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Payload.Core.NetworkResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Payload.Core.SerializableBlockHeader;
 import com.project.EhrRoute.Payload.Core.SerializableTransaction;
@@ -131,5 +135,21 @@ public class ModelMapper
         consentRequest.setHash(block.getBlockHeader().getHash());
 
         return consentRequest;
+    }
+
+    public NetworkResponse mapNetworkToNetworkPayload(Network network)
+    {
+        if (network == null) {
+            throw new ResourceEmptyException("Invalid Network");
+        }
+
+        if (network.getChainRoot() == null) {
+            throw new ResourceEmptyException("Invalid network chain root");
+        }
+
+        String networkUUID = network.getNetworkUUID();
+        String networkChainRoot = network.getChainRoot().getRoot();
+
+        return new NetworkResponse(networkUUID, networkChainRoot);
     }
 }
