@@ -2,7 +2,9 @@ package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Events.SseKeepAliveEvent;
+import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
@@ -89,7 +91,7 @@ public class UserController
             );
         }
 
-        Set<Role> userRoles = new HashSet<>();
+        Set<Role> userRoles;
 
         try {
             // Get the user's set of Role
@@ -105,7 +107,7 @@ public class UserController
         // Create a set of UserRoleResponse 
         Set<UserRoleResponse> userRolesNames = new HashSet<>();
 
-        // Map each user Role's rolename to value in userRoleNames set 
+        // Map each user Role's role name to value in userRoleNames set
         for (Role role : userRoles) {
             UserRoleResponse userRole = new UserRoleResponse(role.getName().toString());
             userRolesNames.add(userRole);
@@ -114,6 +116,45 @@ public class UserController
         // Return the userRoleNames set
         return new ResponseEntity<>(
             userRolesNames,
+            HttpStatus.OK
+        );
+    }
+
+
+    @GetMapping("/current/network")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
+    {
+        if (currentUser == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
+
+        if (user == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not found on DB"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        Network userNetwork;
+
+        try {
+            userNetwork = userService.findUserNetwork(user);
+        }
+        catch (NullUserNetworkException Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, Ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        return new ResponseEntity<>(
+            userNetwork,
             HttpStatus.OK
         );
     }

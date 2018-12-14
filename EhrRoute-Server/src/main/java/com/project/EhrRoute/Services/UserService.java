@@ -1,7 +1,9 @@
 package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.InternalErrorException;
+import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Auth.SignUpRequest;
@@ -84,8 +86,7 @@ public class UserService
     }
 
     @Transactional
-    public Set<Role> findUserRoles(String username) throws ResourceNotFoundException
-    {
+    public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
         // Find user by username
         User user = userRepository.findByUsername(username).orElse(null);
 
@@ -96,5 +97,21 @@ public class UserService
 
         // Return user roles
         return user.getRoles();
+    }
+
+    @Transactional
+    public Network findUserNetwork(User user) throws NullUserNetworkException
+    {
+        Network userNetwork = user.getNetwork();
+
+        if (userNetwork == null) {
+            throw new NullUserNetworkException(
+                "User with username: [" +
+                user.getUsername() +
+                "] is not registered in a network."
+            );
+        }
+
+        return userNetwork;
     }
 }
