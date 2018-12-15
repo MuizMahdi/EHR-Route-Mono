@@ -51,14 +51,13 @@ public class User extends DateAudit
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_network",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "network_id")
     )
-    private Network network;
-
+    private Set<Network> networks;
 
     public User() { }
     public User(@NotBlank @Size(max = 40) String name, @NotBlank @Size(max = 15) String username, @NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
@@ -68,6 +67,13 @@ public class User extends DateAudit
         this.password = password;
         this.isEnabled = false;
         this.isNonFirstLogin = false;
+    }
+
+    public void addNetwork(Network network) {
+        this.networks.add(network);
+    }
+    public void removeNetwork(Network network) {
+        this.networks.remove(network);
     }
 
     public Long getId() {
@@ -82,9 +88,6 @@ public class User extends DateAudit
     public Set<Role> getRoles() {
         return roles;
     }
-    public Network getNetwork() {
-        return network;
-    }
     public String getUsername() {
         return username;
     }
@@ -93,6 +96,9 @@ public class User extends DateAudit
     }
     public boolean isEnabled() {
         return isEnabled;
+    }
+    public Set<Network> getNetworks() {
+        return networks;
     }
     public boolean isNonFirstLogin() {
         return isNonFirstLogin;
@@ -113,14 +119,14 @@ public class User extends DateAudit
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
     }
-    public void setNetwork(Network network) {
-        this.network = network;
-    }
     public void setUsername(String username) {
         this.username = username;
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public void setNetworks(Set<Network> networks) {
+        this.networks = networks;
     }
     public void setNonFirstLogin(boolean firstLogin) {
         isNonFirstLogin = firstLogin;

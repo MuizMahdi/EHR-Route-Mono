@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class NullUserNetworkException extends Exception
+public class NullUserNetworkException extends RuntimeException
 {
     public NullUserNetworkException(String message) {
         super(message);

@@ -9,10 +9,13 @@ import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
 import com.project.EhrRoute.Payload.Auth.UserRoleResponse;
+import com.project.EhrRoute.Payload.Core.NetworkResponse;
+import com.project.EhrRoute.Payload.Core.UserNetworksResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Services.UserService;
+import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.SimpleStringUtil;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +41,14 @@ public class UserController
     private UserService userService;
     private ClustersContainer clustersContainer;
     private SimpleStringUtil simpleStringUtil;
-    private UuidUtil uuidUtil;
+    private ModelMapper modelMapper;
 
     @Autowired
-    public UserController(SimpleStringUtil simpleStringUtil, ClustersContainer clustersContainer, UserService userService, UuidUtil uuidUtil) {
+    public UserController(SimpleStringUtil simpleStringUtil, ClustersContainer clustersContainer, UserService userService, ModelMapper modelMapper) {
         this.simpleStringUtil = simpleStringUtil;
         this.userService = userService;
         this.clustersContainer = clustersContainer;
-        this.uuidUtil = uuidUtil;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -121,7 +124,7 @@ public class UserController
     }
 
 
-    @GetMapping("/current/network")
+    @GetMapping("/current/networks")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
     {
@@ -141,10 +144,10 @@ public class UserController
             );
         }
 
-        Network userNetwork;
+        Set<Network> userNetworks;
 
         try {
-            userNetwork = userService.findUserNetwork(user);
+            userNetworks = userService.findUserNetworks(user);
         }
         catch (NullUserNetworkException Ex) {
             return new ResponseEntity<>(
@@ -153,8 +156,11 @@ public class UserController
             );
         }
 
+        // Map Networks set to UserNetworksResponse payload
+        UserNetworksResponse userNetworksResponse = modelMapper.mapNetworksToUserNetworksResponse(userNetworks);
+
         return new ResponseEntity<>(
-            userNetwork,
+            userNetworksResponse,
             HttpStatus.OK
         );
     }

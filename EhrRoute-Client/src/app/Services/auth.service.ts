@@ -5,7 +5,7 @@ import { UserRegistrationRequest } from './../Models/UserRegistrationRequest';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap, shareReplay, catchError, first } from 'rxjs/operators';
-import { throwError, Subject } from 'rxjs';
+import { throwError, Subject, Observable } from 'rxjs';
 
 
 @Injectable({
@@ -39,7 +39,7 @@ export class AuthService
    }
 
 
-   login(userLoginInfo: UserLoginRequest)
+   login(userLoginInfo: UserLoginRequest): Observable<any>
    {
 
       return this.http.post(this.loginUrl, userLoginInfo).pipe(

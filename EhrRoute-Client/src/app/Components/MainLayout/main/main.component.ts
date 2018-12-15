@@ -11,10 +11,12 @@ import { Component, OnInit } from '@angular/core';
 
 export class MainComponent implements OnInit
 {
-   constructor(public mainLayout:MainLayoutService) { }
+   constructor(public mainLayout:MainLayoutService) { 
+      this.mainLayout.show();
+   }
 
    ngOnInit() {
-      this.mainLayout.show();
+ 
    }
 
 }

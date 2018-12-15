@@ -12,6 +12,6 @@ export class AppComponent implements OnInit
    constructor(public mainLayout:MainLayoutService) { }
 
    ngOnInit() {
-      this.mainLayout.show();
+      //this.mainLayout.hide();
    }
 }

@@ -3,20 +3,15 @@ import com.project.EhrRoute.Core.*;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
-
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
-import com.project.EhrRoute.Exceptions.ResourceEmptyException;
-import com.project.EhrRoute.Payload.Core.NetworkResponse;
-import com.project.EhrRoute.Payload.Core.SerializableBlock;
-import com.project.EhrRoute.Payload.Core.SerializableBlockHeader;
-import com.project.EhrRoute.Payload.Core.SerializableTransaction;
-
+import com.project.EhrRoute.Payload.Core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -137,19 +132,32 @@ public class ModelMapper
         return consentRequest;
     }
 
-    public NetworkResponse mapNetworkToNetworkPayload(Network network)
+    public NetworkResponse mapNetworkToNetworkPayload(Network network) throws NullUserNetworkException
     {
         if (network == null) {
-            throw new ResourceEmptyException("Invalid Network");
+            throw new NullUserNetworkException("Invalid Network");
         }
 
         if (network.getChainRoot() == null) {
-            throw new ResourceEmptyException("Invalid network chain root");
+            throw new NullUserNetworkException("Invalid network chain root");
         }
 
         String networkUUID = network.getNetworkUUID();
         String networkChainRoot = network.getChainRoot().getRoot();
 
         return new NetworkResponse(networkUUID, networkChainRoot);
+    }
+
+    public UserNetworksResponse mapNetworksToUserNetworksResponse(Set<Network> networks) throws NullUserNetworkException
+    {
+        UserNetworksResponse userNetworksResponse = new UserNetworksResponse();
+
+        Set<NetworkResponse> networkResponseSet = networks.stream().map(
+                this::mapNetworkToNetworkPayload
+        ).collect(Collectors.toSet());
+
+        userNetworksResponse.setUserNetworks(networkResponseSet);
+
+        return userNetworksResponse;
     }
 }

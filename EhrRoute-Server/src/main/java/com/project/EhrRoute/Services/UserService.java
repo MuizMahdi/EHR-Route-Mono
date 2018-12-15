@@ -2,6 +2,7 @@ package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.InternalErrorException;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
@@ -65,8 +66,7 @@ public class UserService
     }
 
     @Transactional
-    public void saveUser(User user)
-    {
+    public void saveUser(User user) {
         userRepository.save(user);
     }
 
@@ -87,6 +87,7 @@ public class UserService
 
     @Transactional
     public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
+
         // Find user by username
         User user = userRepository.findByUsername(username).orElse(null);
 
@@ -100,18 +101,19 @@ public class UserService
     }
 
     @Transactional
-    public Network findUserNetwork(User user) throws NullUserNetworkException
-    {
-        Network userNetwork = user.getNetwork();
+    public Set<Network> findUserNetworks(User user) throws NullUserNetworkException {
+        //Network userNetwork = user.getNetwork();
 
-        if (userNetwork == null) {
+        Set<Network> userNetworks = user.getNetworks();
+
+        if (userNetworks == null || userNetworks.isEmpty()) {
             throw new NullUserNetworkException(
                 "User with username: [" +
                 user.getUsername() +
-                "] is not registered in a network."
+                "] is not registered in any network."
             );
         }
 
-        return userNetwork;
+        return userNetworks;
     }
 }

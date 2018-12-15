@@ -1,2 +1,7 @@
-<h1 *ngIf="isAdmin">ADMIN</h1>
-<h1 *ngIf="!isAdmin && !isProvider">USER</h1>
+<button (click)="showNetworkGenerationConfirm()" nz-button [nzSize]="large" nzType="default" nzBlock>Create Network</button>
+
+<h1>networkUUID:</h1>
+<h1>chainRoot:</h1>
+
+<h3 *ngIf="isAdmin">ADMIN</h3>
+<h3 *ngIf="!isAdmin && !isProvider">USER</h3>

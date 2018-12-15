@@ -6,6 +6,11 @@ import java.util.UUID;
 @Component
 public class UuidUtil
 {
+    public String generateUUID()
+    {
+        return UUID.randomUUID().toString();
+    }
+
     public boolean isValidUUID(String uuid)
     {
         if (uuid.isEmpty()) {

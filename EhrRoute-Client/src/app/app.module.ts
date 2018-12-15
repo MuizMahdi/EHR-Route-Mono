@@ -63,7 +63,8 @@ registerLocaleData(en);
 
   providers: [
    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-   { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true, providers: [{ provide: NZ_I18N, useValue: en_US }] }
+   { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+   { provide: NZ_I18N, useValue: en_US }
   ],
 
   bootstrap: [AppComponent]
