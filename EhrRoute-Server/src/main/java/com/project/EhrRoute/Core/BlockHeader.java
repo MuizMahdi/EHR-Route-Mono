@@ -1,5 +1,6 @@
 package com.project.EhrRoute.Core;
 import com.project.EhrRoute.Core.Utilities.HashUtil;
+import com.project.EhrRoute.Core.Utilities.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.Date;
 public class BlockHeader
 {
     private HashUtil hashUtil;
+    private StringUtil stringUtil;
 
     // Hash of the block header
     private byte[] hash;
@@ -26,14 +28,17 @@ public class BlockHeader
     private byte[] merkleRoot;
 
     @Autowired
-    public BlockHeader(HashUtil hashUtil) {
+    public BlockHeader(HashUtil hashUtil, StringUtil stringUtil) {
         this.hashUtil = hashUtil;
+        this.stringUtil = stringUtil;
     }
+
+
     public BlockHeader() {
         this.timeStamp = new Date().getTime();
     }
-    public BlockHeader(byte[] hash, byte[] previousHash, byte[] merkleRoot) {
-        this.hash = hash;
+    public BlockHeader(long index, byte[] previousHash, byte[] merkleRoot) {
+        this.index = index;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.merkleRoot = merkleRoot;
@@ -46,7 +51,21 @@ public class BlockHeader
         this.merkleRoot = merkleRoot;
     }
 
-    
+    public void generateHeaderHash() {
+        // Get Long objects in order to convert the values to string
+        Long TimeStamp = timeStamp;
+        Long Index = index;
+
+        // Add up all of the data
+        String stringHeaderData =
+        stringUtil.getStringFromBytes(previousHash) +
+        stringUtil.getStringFromBytes(merkleRoot) +
+        TimeStamp.toString() + Index.toString();
+
+        // Block hash is the hash of the header data
+        hash = hashUtil.SHA256(stringHeaderData.getBytes());
+    }
+
     public byte[] getHash() {
         return hash;
     }

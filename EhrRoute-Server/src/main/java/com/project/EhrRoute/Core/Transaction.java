@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
+
 @Component
 public class Transaction
 {
     private JsonUtil jsonUtil;
     private KeyUtil keyUtil;
 
-    private String transactionId; // Hash of transaction
+    private byte[] transactionId; // Hash of transaction
     private MedicalRecord record;
     private PublicKey senderPubKey; // Sender's public key.
     private Address senderAddress;
@@ -24,16 +25,13 @@ public class Transaction
 
 
     @Autowired
-    public Transaction(JsonUtil jsonUtil, KeyUtil keyUtil)
-    {
+    public Transaction(JsonUtil jsonUtil, KeyUtil keyUtil) {
         this.keyUtil = keyUtil;
         this.jsonUtil = jsonUtil;
     }
 
     public Transaction() { }
-
-    public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) throws GeneralSecurityException
-    {
+    public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) throws GeneralSecurityException {
         this.record = record;
         this.senderPubKey = senderPubKey;
         this.recipientAddress = recipientAddress;
@@ -67,13 +65,13 @@ public class Transaction
     public void setRecord(MedicalRecord record) {
         this.record = record;
     }
-    public void setTransactionId(String transactionId) {
+    public void setTransactionId(byte[] transactionId) {
         this.transactionId = transactionId;
     }
     public void setSenderPubKey(PublicKey senderPubKey) {
         this.senderPubKey = senderPubKey;
     }
-    public String getTransactionId() {
+    public byte[] getTransactionId() {
         return transactionId;
     }
     public Address getSenderAddress() {

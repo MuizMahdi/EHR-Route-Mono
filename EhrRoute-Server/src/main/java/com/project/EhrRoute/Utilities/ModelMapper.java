@@ -45,7 +45,8 @@ public class ModelMapper
 
         serializableBlock.setBlockHeader(serializableBlockHeader);
 
-        serializableTransaction.setTransactionId(block.getTransaction().getTransactionId());
+        byte[] blockTxID = block.getTransaction().getTransactionId();
+        serializableTransaction.setTransactionId(stringUtil.getStringFromBytes(blockTxID));
         serializableTransaction.setRecord(block.getTransaction().getRecord());
 
         PublicKey publicKey = block.getTransaction().getSenderPubKey();
@@ -88,7 +89,8 @@ public class ModelMapper
         String base64EncodedStringSignature = serializableBlock.getTransaction().getSignature();
         transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
 
-        transaction.setTransactionId(serializableBlock.getTransaction().getTransactionId());
+
+        transaction.setTransactionId(serializableBlock.getTransaction().getTransactionId().getBytes());
         transaction.setRecord(serializableBlock.getTransaction().getRecord());
 
         String stringRecipientAddress = serializableBlock.getTransaction().getRecipientAddress();
@@ -130,7 +132,7 @@ public class ModelMapper
         return consentRequest;
     }
 
-    public NetworkResponse mapNetworkToNetworkPayload(Network network) throws NullUserNetworkException
+    private NetworkResponse mapNetworkToNetworkPayload(Network network) throws NullUserNetworkException
     {
         if (network == null) {
             throw new NullUserNetworkException("Invalid Network");

@@ -20,6 +20,7 @@ public class Address
 
     public Address() {}
 
+    // Generates a Base58Check encoded address from public key
     public void generateAddress(PublicKey publicKey) throws GeneralSecurityException
     {
         this.address = addressUtil.generateAddress(publicKey);

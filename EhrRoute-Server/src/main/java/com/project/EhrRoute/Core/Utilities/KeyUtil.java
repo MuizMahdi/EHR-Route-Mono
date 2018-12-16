@@ -47,6 +47,5 @@ public class KeyUtil
         String key64 = Base64.getEncoder().encodeToString(packed);
         Arrays.fill(packed, (byte) 0);
         return key64;
-
     }
 }

@@ -1,12 +1,12 @@
 package com.project.EhrRoute.Core.Utilities;
 import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
 import java.util.Base64;
 
 @Component
 public class StringUtil
 {
+    // For converting hash bytes to String
     public String getStringFromBytes(byte[] bytes) {
         StringBuffer hexString = new StringBuffer();
 
@@ -20,12 +20,15 @@ public class StringUtil
         return hexString.toString();
     }
 
+    // For converting bytes of primitive types strings to String
     public String getUTF8StringFromBytes(byte[] bytes)
     {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    // For base64 encoding of bytes to string
     public String base64EncodeBytes(byte[] bytes) { return Base64.getEncoder().encodeToString(bytes); }
 
+    // For base64 decoding string to bytes
     public byte[] base64DecodeString(String string) { return Base64.getDecoder().decode(string); }
 }
