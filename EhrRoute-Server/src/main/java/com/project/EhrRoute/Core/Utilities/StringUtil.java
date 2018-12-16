@@ -7,13 +7,7 @@ import java.util.Base64;
 @Component
 public class StringUtil
 {
-    public String getStringFromKey(Key key)
-    {
-        return Base64.getEncoder().encodeToString(key.getEncoded());
-    }
-
-    public String getStringFromBytes(byte[] bytes)
-    {
+    public String getStringFromBytes(byte[] bytes) {
         StringBuffer hexString = new StringBuffer();
 
         for (byte b: bytes)

@@ -3,27 +3,29 @@ import com.project.EhrRoute.Core.Transaction;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 @Component
 public class AddressUtil
 {
-    private StringUtil stringUtil;
+    private KeyUtil keyUtil;
     private HashUtil hashUtil;
     private Base58 base58;
 
     @Autowired
-    public AddressUtil(StringUtil stringUtil, HashUtil hashUtil ,Base58 base58) {
-        this.stringUtil = stringUtil;
+    public AddressUtil(HashUtil hashUtil ,Base58 base58, KeyUtil keyUtil) {
         this.hashUtil = hashUtil;
         this.base58 = base58;
+        this.keyUtil = keyUtil;
     }
 
 
-    public String generateAddress(PublicKey publicKey)
+    public String generateAddress(PublicKey publicKey) throws GeneralSecurityException
     {
         // Perform SHA-256 hashing on the public key
-        byte[] hash = hashUtil.SHA256(stringUtil.getStringFromKey(publicKey).getBytes());
+        byte[] hash = hashUtil.SHA256(keyUtil.getStringFromPublicKey(publicKey).getBytes());
 
         // Perform RIPEMD-160 hashing on the result of SHA-256
         RIPEMD160Digest digest = new RIPEMD160Digest();
@@ -41,7 +43,7 @@ public class AddressUtil
         return address;
     }
 
-    public boolean confirmTransactionSenderAddress(Transaction transaction)
+    public boolean confirmTransactionSenderAddress(Transaction transaction) throws GeneralSecurityException
     {
         String senderAddress = transaction.getSenderAddress().getAddress();
         PublicKey senderPubKey = transaction.getSenderPubKey();

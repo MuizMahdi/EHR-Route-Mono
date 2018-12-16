@@ -1,18 +1,34 @@
 package com.project.EhrRoute.Core;
-
+import com.project.EhrRoute.Core.Utilities.HashUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import java.util.Date;
 
+@Component
 public class BlockHeader
 {
-    private Hash hash; // Hash of the block
-    private Hash previousHash; // Hash of previous block
-    private long timeStamp; // Block timestamp
-    private long index; // Index number of the block in the chain
+    private HashUtil hashUtil;
+
+    // Hash of the block header
+    private Hash hash;
+
+    // Hash of previous block's header
+    private Hash previousHash;
+
+    // Block timestamp
+    private long timeStamp;
+
+    // Index number of the block in the chain
+    private long index;
 
     // Hash of transaction in this block, used for calculating merkleRoot of
     // the whole Blockchain tree to validate the whole chain.
     private byte[] merkleRoot;
 
+    @Autowired
+    public BlockHeader(HashUtil hashUtil) {
+        this.hashUtil = hashUtil;
+    }
     public BlockHeader() {
         this.timeStamp = new Date().getTime();
     }
@@ -31,22 +47,21 @@ public class BlockHeader
     }
 
 
-    public long getIndex() {
-        return index;
-    }
     public Hash getHash() {
         return hash;
+    }
+    public long getIndex() {
+        return index;
     }
     public long getTimeStamp() {
         return timeStamp;
     }
-    public Hash getPreviousHash() {
-        return previousHash;
-    }
     public byte[] getMerkleRoot() {
         return merkleRoot;
     }
-
+    public Hash getPreviousHash() {
+        return previousHash;
+    }
     public void setHash(Hash hash) {
         this.hash = hash;
     }

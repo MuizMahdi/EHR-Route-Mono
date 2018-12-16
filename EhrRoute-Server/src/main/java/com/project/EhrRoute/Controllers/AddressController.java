@@ -1,5 +1,6 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Utilities.AddressUtil;
+import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Auth.User;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -22,21 +25,21 @@ public class AddressController
 {
     private UserService userService;
     private RsaUtil rsaUtil;
-    private StringUtil stringUtil;
+    private KeyUtil keyUtil;
     private AddressUtil addressUtil;
 
     @Autowired
-    public AddressController(UserService userService, RsaUtil rsaUtil, StringUtil stringUtil, AddressUtil addressUtil) {
+    public AddressController(UserService userService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
         this.userService = userService;
         this.rsaUtil = rsaUtil;
-        this.stringUtil = stringUtil;
+        this.keyUtil = keyUtil;
         this.addressUtil = addressUtil;
     }
 
 
     @GetMapping("/generate")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> generateUserAddress(@RequestParam("username") String username)
+    public ResponseEntity<?> generateUserAddress(@RequestParam("username") String username) throws GeneralSecurityException
     {
         User user = userService.findUserByUsernameOrEmail(username);
 
@@ -67,8 +70,8 @@ public class AddressController
         PrivateKey privKey = keyPair.getPrivate();
 
         String address = addressUtil.generateAddress(pubKey);
-        String publicKey = stringUtil.getStringFromKey(pubKey);
-        String privateKey = stringUtil.getStringFromKey(privKey);
+        String publicKey = keyUtil.getStringFromPublicKey(pubKey);
+        String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
         // Return address
         return new ResponseEntity<>(

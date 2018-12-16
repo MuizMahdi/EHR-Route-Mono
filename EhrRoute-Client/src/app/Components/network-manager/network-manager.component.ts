@@ -102,5 +102,5 @@ export class NetworkManagerComponent implements OnInit
       // TODO: Add this network to current user networks
 
       // TODO: Save network chain to local DB
-   }
+   }  
 }

@@ -1,16 +1,19 @@
 package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 import com.project.EhrRoute.Utilities.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 @Component
 public class Transaction
 {
-    private StringUtil stringUtil;
     private JsonUtil jsonUtil;
+    private KeyUtil keyUtil;
 
     private String transactionId; // Hash of transaction
     private MedicalRecord record;
@@ -21,9 +24,9 @@ public class Transaction
 
 
     @Autowired
-    public Transaction(StringUtil stringUtil, JsonUtil jsonUtil)
+    public Transaction(JsonUtil jsonUtil, KeyUtil keyUtil)
     {
-        this.stringUtil = stringUtil;
+        this.keyUtil = keyUtil;
         this.jsonUtil = jsonUtil;
     }
 
@@ -37,16 +40,14 @@ public class Transaction
         this.senderAddress.generateAddress(senderPubKey);
     }
 
-    public String getTransactionData()
+    public String getTransactionData() throws GeneralSecurityException
     {
-        JsonUtil jsonUtil1 = new JsonUtil();
-        StringUtil stringUtil1 = new StringUtil();
-
         String data =
-        jsonUtil1.createJson(record) +
-        stringUtil1.getStringFromKey(senderPubKey) +
+        jsonUtil.createJson(record) +
+        keyUtil.getStringFromPublicKey(senderPubKey) +
         senderAddress.getAddress() +
         recipientAddress.getAddress();
+
         return data;
     }
 

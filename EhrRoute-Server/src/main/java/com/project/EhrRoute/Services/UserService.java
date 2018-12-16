@@ -116,4 +116,16 @@ public class UserService
 
         return userNetworks;
     }
+
+    @Transactional
+    public void addUserNetwork(User user, Network network) throws BadRequestException {
+
+        if (user == null || network == null) {
+            throw new BadRequestException("Invalid network or user");
+        }
+
+        user.addNetwork(network);
+
+        userRepository.save(user);
+    }
 }
