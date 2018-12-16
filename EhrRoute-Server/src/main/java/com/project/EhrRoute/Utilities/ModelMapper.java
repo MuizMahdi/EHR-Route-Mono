@@ -37,8 +37,8 @@ public class ModelMapper
         SerializableBlockHeader serializableBlockHeader = new SerializableBlockHeader();
         SerializableTransaction serializableTransaction = new SerializableTransaction();
 
-        serializableBlockHeader.setHash(block.getBlockHeader().getHash().getString());
-        serializableBlockHeader.setPreviousHash(block.getBlockHeader().getPreviousHash().getString());
+        serializableBlockHeader.setHash(stringUtil.getStringFromBytes(block.getBlockHeader().getHash()));
+        serializableBlockHeader.setPreviousHash(stringUtil.getStringFromBytes(block.getBlockHeader().getPreviousHash()));
         serializableBlockHeader.setTimeStamp(block.getBlockHeader().getTimeStamp());
         serializableBlockHeader.setIndex(block.getBlockHeader().getIndex());
         serializableBlockHeader.setMerkleRoot(stringUtil.getStringFromBytes(block.getBlockHeader().getMerkleRoot()));
@@ -73,12 +73,10 @@ public class ModelMapper
         blockHeader.setTimeStamp(serializableBlock.getBlockHeader().getTimeStamp());
 
         String stringHash = serializableBlock.getBlockHeader().getHash();
-        Hash hash = new Hash(stringHash.getBytes());
-        blockHeader.setHash(hash);
+        blockHeader.setHash(stringHash.getBytes());
 
         String stringPreviousHash = serializableBlock.getBlockHeader().getPreviousHash();
-        Hash previousHash = new Hash(stringPreviousHash.getBytes());
-        blockHeader.setPreviousHash(previousHash);
+        blockHeader.setPreviousHash(stringPreviousHash.getBytes());
 
         String stringMerkleRoot = serializableBlock.getBlockHeader().getMerkleRoot();
         blockHeader.setMerkleRoot(stringMerkleRoot.getBytes());

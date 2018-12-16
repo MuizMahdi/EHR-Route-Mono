@@ -32,7 +32,8 @@ public class Transaction
 
     public Transaction() { }
 
-    public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) {
+    public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) throws GeneralSecurityException
+    {
         this.record = record;
         this.senderPubKey = senderPubKey;
         this.recipientAddress = recipientAddress;

@@ -3,6 +3,7 @@ import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 @Component
@@ -19,7 +20,7 @@ public class Address
 
     public Address() {}
 
-    public void generateAddress(PublicKey publicKey)
+    public void generateAddress(PublicKey publicKey) throws GeneralSecurityException
     {
         this.address = addressUtil.generateAddress(publicKey);
     }

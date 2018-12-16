@@ -10,10 +10,10 @@ public class BlockHeader
     private HashUtil hashUtil;
 
     // Hash of the block header
-    private Hash hash;
+    private byte[] hash;
 
     // Hash of previous block's header
-    private Hash previousHash;
+    private byte[] previousHash;
 
     // Block timestamp
     private long timeStamp;
@@ -32,13 +32,13 @@ public class BlockHeader
     public BlockHeader() {
         this.timeStamp = new Date().getTime();
     }
-    public BlockHeader(Hash hash, Hash previousHash, byte[] merkleRoot) {
+    public BlockHeader(byte[] hash, byte[] previousHash, byte[] merkleRoot) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.merkleRoot = merkleRoot;
     }
-    public BlockHeader(Hash hash, Hash previousHash, long index, byte[] merkleRoot) {
+    public BlockHeader(byte[] hash, byte[] previousHash, long index, byte[] merkleRoot) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
@@ -46,8 +46,8 @@ public class BlockHeader
         this.merkleRoot = merkleRoot;
     }
 
-
-    public Hash getHash() {
+    
+    public byte[] getHash() {
         return hash;
     }
     public long getIndex() {
@@ -59,10 +59,10 @@ public class BlockHeader
     public byte[] getMerkleRoot() {
         return merkleRoot;
     }
-    public Hash getPreviousHash() {
+    public byte[] getPreviousHash() {
         return previousHash;
     }
-    public void setHash(Hash hash) {
+    public void setHash(byte[] hash) {
         this.hash = hash;
     }
     public void setIndex(long index) {
@@ -74,7 +74,7 @@ public class BlockHeader
     public void setMerkleRoot(byte[] merkleRoot) {
         this.merkleRoot = merkleRoot;
     }
-    public void setPreviousHash(Hash previousHash) {
+    public void setPreviousHash(byte[] previousHash) {
         this.previousHash = previousHash;
     }
 }

@@ -27,7 +27,7 @@ public class RsaUtil
     }
 
     // Verifies whether the Transaction belongs to sender or not
-    public boolean rsaVerifyTransactionSignature(PublicKey publicKey, Transaction transaction)
+    public boolean rsaVerifyTransactionSignature(PublicKey publicKey, Transaction transaction) throws GeneralSecurityException
     {
         String data = transaction.getTransactionData();
 
