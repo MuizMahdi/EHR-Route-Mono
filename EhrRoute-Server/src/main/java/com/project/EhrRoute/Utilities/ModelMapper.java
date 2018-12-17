@@ -42,6 +42,7 @@ public class ModelMapper
         serializableBlockHeader.setTimeStamp(block.getBlockHeader().getTimeStamp());
         serializableBlockHeader.setIndex(block.getBlockHeader().getIndex());
         serializableBlockHeader.setMerkleRoot(stringUtil.getStringFromBytes(block.getBlockHeader().getMerkleRoot()));
+        serializableBlockHeader.setNetworkUUID(block.getBlockHeader().getNetworkUUID());
 
         serializableBlock.setBlockHeader(serializableBlockHeader);
 
@@ -81,6 +82,9 @@ public class ModelMapper
 
         String stringMerkleRoot = serializableBlock.getBlockHeader().getMerkleRoot();
         blockHeader.setMerkleRoot(stringMerkleRoot.getBytes());
+
+        String networkUUID = serializableBlock.getBlockHeader().getNetworkUUID();
+        blockHeader.setNetworkUUID(networkUUID);
 
         block.setBlockHeader(blockHeader);
 
@@ -126,6 +130,7 @@ public class ModelMapper
         consentRequest.setMerkleRoot(block.getBlockHeader().getMerkleRoot());
         consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
         consentRequest.setTimeStamp(block.getBlockHeader().getTimeStamp());
+        consentRequest.setNetworkUUID(block.getBlockHeader().getNetworkUUID());
         consentRequest.setPreviousHash(block.getBlockHeader().getPreviousHash());
         consentRequest.setHash(block.getBlockHeader().getHash());
 

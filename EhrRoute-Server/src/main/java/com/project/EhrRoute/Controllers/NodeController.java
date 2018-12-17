@@ -1,9 +1,5 @@
 package com.project.EhrRoute.Controllers;
-import com.project.EhrRoute.Core.GenesisBlock;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
-import com.project.EhrRoute.Utilities.JsonUtil;
-import com.project.EhrRoute.Utilities.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +10,6 @@ import java.util.UUID;
 @RequestMapping("/node")
 public class NodeController
 {
-
     @GetMapping("/validate/{nodeuuid}/{netuuid}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity validateNode(@PathVariable("nodeuuid") String nodeUUID, @PathVariable("netuuid") String networkUUID)

@@ -27,6 +27,9 @@ public class BlockHeader
     // the whole Blockchain tree to validate the whole chain.
     private byte[] merkleRoot;
 
+    // NetworkUUID of the network in which the chain is in
+    private String networkUUID;
+
     @Autowired
     public BlockHeader(HashUtil hashUtil, StringUtil stringUtil) {
         this.hashUtil = hashUtil;
@@ -60,11 +63,12 @@ public class BlockHeader
         String stringHeaderData =
         stringUtil.getStringFromBytes(previousHash) +
         stringUtil.getStringFromBytes(merkleRoot) +
-        TimeStamp.toString() + Index.toString();
+        TimeStamp.toString() + Index.toString() + networkUUID;
 
         // Block hash is the hash of the header data
         hash = hashUtil.SHA256(stringHeaderData.getBytes());
     }
+
 
     public byte[] getHash() {
         return hash;
@@ -77,6 +81,9 @@ public class BlockHeader
     }
     public byte[] getMerkleRoot() {
         return merkleRoot;
+    }
+    public String getNetworkUUID() {
+        return networkUUID;
     }
     public byte[] getPreviousHash() {
         return previousHash;
@@ -92,6 +99,9 @@ public class BlockHeader
     }
     public void setMerkleRoot(byte[] merkleRoot) {
         this.merkleRoot = merkleRoot;
+    }
+    public void setNetworkUUID(String networkUUID) {
+        this.networkUUID = networkUUID;
     }
     public void setPreviousHash(byte[] previousHash) {
         this.previousHash = previousHash;

@@ -26,6 +26,7 @@ public class ConsentRequestBlock
     @NotNull @NotBlank private String senderPubKey;
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;
+    @NotNull @NotBlank private String networkUUID;
     @NotNull @NotBlank private String providerUUID;
     @NotNull @NotBlank private String chainRootWithBlock;
     @NotNull private Long userID;
@@ -47,7 +48,7 @@ public class ConsentRequestBlock
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String signature, @NotBlank Long userID, @NotBlank String providerUUID, @NotBlank String chainRootWithBlock) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID, @NotBlank String chainRootWithBlock) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
@@ -57,6 +58,7 @@ public class ConsentRequestBlock
         this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
+        this.networkUUID = networkUUID;
         this.signature = signature;
         this.userID = userID;
         this.providerUUID = providerUUID;
@@ -106,6 +108,9 @@ public class ConsentRequestBlock
     }
     public String getMerkleRoot() {
         return merkleRoot;
+    }
+    public String getNetworkUUID() {
+        return networkUUID;
     }
     public Set<EhrHistory> getHistory() {
         return history;
@@ -164,6 +169,9 @@ public class ConsentRequestBlock
     }
     public void setProblems(Set<EhrProblems> problems) {
         this.problems = problems;
+    }
+    public void setNetworkUUID(String networkUUID) {
+        this.networkUUID = networkUUID;
     }
     public void setAllergies(Set<EhrAllergies> allergies) {
         this.allergies = allergies;

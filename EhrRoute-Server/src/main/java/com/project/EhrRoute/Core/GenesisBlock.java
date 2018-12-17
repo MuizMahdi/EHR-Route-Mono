@@ -16,11 +16,11 @@ public class GenesisBlock
 {
     private HashUtil hashUtil;
     private RsaUtil rsaUtil;
-    private Transaction transaction;
-    private BlockHeader blockHeader;
 
     // Genesis block contains a Block so that it could be mapped directly to SerializableBlock in the ModelMapper
     private Block block;
+    private Transaction transaction;
+    private BlockHeader blockHeader;
 
     @Autowired
     public GenesisBlock(HashUtil hashUtil, RsaUtil rsaUtil, Transaction transaction, BlockHeader blockHeader) throws Exception {

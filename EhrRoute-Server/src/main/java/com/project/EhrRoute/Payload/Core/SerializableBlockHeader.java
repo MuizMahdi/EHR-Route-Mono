@@ -7,14 +7,16 @@ public class SerializableBlockHeader
     private long timeStamp;
     private long index;
     private String merkleRoot;
+    private String networkUUID;
 
     public SerializableBlockHeader() { }
-    public SerializableBlockHeader(String hash, String previousHash, long timeStamp, long index, String merkleRoot) {
+    public SerializableBlockHeader(String hash, String previousHash, long timeStamp, long index, String merkleRoot, String networkUUID) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
         this.index = index;
         this.merkleRoot = merkleRoot;
+        this.networkUUID = networkUUID;
     }
 
     public long getIndex() {
@@ -28,6 +30,9 @@ public class SerializableBlockHeader
     }
     public String getMerkleRoot() {
         return merkleRoot;
+    }
+    public String getNetworkUUID() {
+        return networkUUID;
     }
     public String getPreviousHash() {
         return previousHash;
@@ -44,6 +49,9 @@ public class SerializableBlockHeader
     }
     public void setMerkleRoot(String merkleRoot) {
         this.merkleRoot = merkleRoot;
+    }
+    public void setNetworkUUID(String networkUUID) {
+        this.networkUUID = networkUUID;
     }
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;
