@@ -1,7 +1,6 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.GenesisBlock;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
-import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Utilities.JsonUtil;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,6 @@ import java.util.UUID;
 @RequestMapping("/node")
 public class NodeController
 {
-    @Autowired
-    ModelMapper modelMapper;
-    @Autowired
-    JsonUtil jsonUtil;
-    @Autowired
-    GenesisBlock genesisBlock;
 
     @GetMapping("/validate/{nodeuuid}/{netuuid}")
     @PreAuthorize("hasRole('ADMIN')")

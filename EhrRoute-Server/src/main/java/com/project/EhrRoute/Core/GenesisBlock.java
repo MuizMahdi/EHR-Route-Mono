@@ -32,7 +32,7 @@ public class GenesisBlock
     }
 
 
-    private void initializeBlock() throws Exception
+    public void initializeBlock() throws Exception
     {
         // Initialize genesis block data
 

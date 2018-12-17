@@ -1,3 +1,4 @@
+import { UserInfo } from './../../Models/UserInfo';
 import { NodeNetworkService } from './../../Services/node-network.service';
 import { UserRole } from './../../Models/UserRole';
 import { MainLayoutService } from './../../Services/main-layout.service';
@@ -96,8 +97,10 @@ export class NetworkManagerComponent implements OnInit
 
    onNetworkGenerationSubmit():void
    {
-      console.log('OK');
-      // TODO: Send a network
+      let user:UserInfo = this.authService.getCurrentUser();
+      console.log(user);
+
+      // TODO: Send a network creation request
 
       // TODO: Add this network to current user networks
 
