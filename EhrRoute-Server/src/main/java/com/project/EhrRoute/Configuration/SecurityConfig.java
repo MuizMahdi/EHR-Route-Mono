@@ -73,7 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             "/chain/**",
             "/node/**",
             "/transaction/**",
-            "/users/**"
+            "/users/**",
+            "/network/**"
     };
 
     // Matchers available for public via HTTP GET
@@ -82,7 +83,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             "/chain/**",
             "/node/**",
             "/transaction/**",
-            "/users/**"
+            "/users/**",
+            "/network/**"
     };
 
 

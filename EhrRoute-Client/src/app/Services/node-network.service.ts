@@ -13,13 +13,14 @@ import { throwError, Observable } from 'rxjs';
 export class NodeNetworkService 
 {
    userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
+   createNetworkUrl:string = environment.apiUrl + '/network/create'
 
    
    constructor(private http:HttpClient) { }
 
 
-   getUserNetworks(): Observable<any>
-   {
+   getUserNetworks(): Observable<any> {
+      
       return this.http.get(this.userNetworkUrl).pipe(first(),
 
          catchError( error => {
@@ -27,6 +28,19 @@ export class NodeNetworkService
          })
 
       );
+
+   }
+
+   generateNetwork(): Observable<any> {
+
+      return this.http.get(this.createNetworkUrl).pipe(first(),
+         
+      catchError( error => {
+         return throwError(error);
+      })
+
+      );
+
    }
 
 }

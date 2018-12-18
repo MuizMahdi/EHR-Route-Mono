@@ -1,4 +1,3 @@
-import { UserInfo } from './../../Models/UserInfo';
 import { NodeNetworkService } from './../../Services/node-network.service';
 import { UserRole } from './../../Models/UserRole';
 import { MainLayoutService } from './../../Services/main-layout.service';
@@ -84,7 +83,7 @@ export class NetworkManagerComponent implements OnInit
       this.modalService.confirm({
          
          nzTitle  : '<i>Create a new network?</i>',
-         nzContent: '<b>A network will not be active unless it has more than two nodes</b>',
+         nzContent: '<b>A network will not be active unless it has two or more nodes</b>',
          nzOkText: 'Create',
 
          nzOnOk   : () => { 
@@ -97,13 +96,18 @@ export class NetworkManagerComponent implements OnInit
 
    onNetworkGenerationSubmit():void
    {
-      let user:UserInfo = this.authService.getCurrentUser();
-      console.log(user);
+      this.nodeNetworkService.generateNetwork().subscribe(
 
-      // TODO: Send a network creation request
+         response => {
+            console.log(response);
+         },
 
-      // TODO: Add this network to current user networks
+         error => {
+            console.log(error);
+         }
 
-      // TODO: Save network chain to local DB
+      );
+
+      // TODO: Save received GenesisBlock and save network chain to local DB file
    }  
 }
