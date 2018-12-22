@@ -20,9 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -46,7 +44,7 @@ public class ChainController
 
     // Subscribes a node to the chain providers cluster (used to receive a ChainSend SSE)
     @GetMapping("/chainprovider")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
         // Create an emitter for the subscribed client node
@@ -59,12 +57,15 @@ public class ChainController
         else
         {
             // Create a node which has the emitter and the client's networkUUID
-            Node node = new Node(emitter, networkUUID);
+            Set<String> networksUUIDs = new HashSet<>();
+            networksUUIDs.add(networkUUID);
+
+            Node node = new Node(emitter, networksUUIDs);
 
             // Add the node to providers list
             clustersContainer.getChainProviders().addNode(nodeUUID, node);
 
-            System.out.println("Node with netUUID: " + clustersContainer.getChainProviders().getNode(nodeUUID).getNetworkUUID() + " Was added to ChainProviders");
+            System.out.println("Node with netUUID: " + networkUUID + " Was added to ChainProviders");
         }
 
 
@@ -79,7 +80,7 @@ public class ChainController
 
     // Subscribes a node to the chain consumers cluster (used to receive the chain from a provider)
     @GetMapping("/chainconsumer")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public SseEmitter chainConsumers(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
     {
         SseEmitter emitter = new SseEmitter(2592000000L);
@@ -88,7 +89,10 @@ public class ChainController
             emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
         }
         else {
-            Node node = new Node(emitter, networkUUID);
+            Set<String> networksUUIDs = new HashSet<>();
+            networksUUIDs.add(networkUUID);
+
+            Node node = new Node(emitter, networksUUIDs);
             clustersContainer.getChainConsumers().addNode(nodeUUID, node);
         }
 
@@ -103,7 +107,7 @@ public class ChainController
 
     // Publishes a SendChainToConsumerEvent with the chain to the node that needs it
     @PostMapping("/chaingive")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity chainGive(@RequestBody SerializableChain chain, @RequestParam("consumer") String consumerUUID)
     {
         if (!uuidUtil.isValidUUID(consumerUUID)) {
@@ -136,10 +140,10 @@ public class ChainController
         );
     }
 
-    // Publishes a GetChainFromProviderEvent with the node uuid that needs chain
+    // Publishes a GetChainFromProviderEvent with the node uuid that needs chain from a certain network
     @GetMapping("/chainget")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID)
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
         if (!uuidUtil.isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID))
@@ -156,7 +160,7 @@ public class ChainController
         try
         {
             // Get chain from a provider
-            GetChainFromProviderEvent chainFromProviderEvent = new GetChainFromProviderEvent(consumerUUID);
+            GetChainFromProviderEvent chainFromProviderEvent = new GetChainFromProviderEvent(consumerUUID, networkUUID);
             eventPublisher.publishEvent(chainFromProviderEvent);
         }
         catch (Exception Ex)
@@ -176,7 +180,7 @@ public class ChainController
 
     // Called when client closes app (ngOnDestroy) to remove node from clusters
     @GetMapping("/close")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
     {
         // Remove the client from clusters
@@ -201,19 +205,20 @@ public class ChainController
     {
         // The passed on consumer UUID from chainGet() where the event is published
         String consumerUUID = event.getConsumerUUID();
+        String consumerNetworkUUID = event.getNetworkUUID();
 
         SseEmitter consumerEmitter = clustersContainer.getChainConsumers().getNodeEmitter(consumerUUID);
-        String consumerNetworkUUID = clustersContainer.getChainConsumers().getNode(consumerUUID).getNetworkUUID();
+        //String consumerNetworkUUID = clustersContainer.getChainConsumers().getNode(consumerUUID).getNetworkUUID();
+
         List<String> consumerNetworkProviders = new ArrayList<>();
 
-        // Find a provider in the same network as the consumer
-        for (Map.Entry<String, Node> nodeEntry : clustersContainer.getChainProviders().getCluster().entrySet())
+        // Go through the providers cluster and find providers in the same network as the consumer
+        for (Map.Entry<String, Node> providerNode : clustersContainer.getChainProviders().getCluster().entrySet())
         {
-            // If a provider is found with the same NetworkUUID as the consumer NetworkUUID (so both are in same network)
-            if (nodeEntry.getValue().getNetworkUUID().equals(consumerNetworkUUID))
-            {
+            // if the provider is in the same network as consumer
+            if (providerNode.getValue().getNetworksUUIDs().contains(consumerNetworkUUID)) {
                 // Add the provider UUID to the consumerNetworkProviders List
-                consumerNetworkProviders.add(nodeEntry.getKey());
+                consumerNetworkProviders.add(providerNode.getKey());
             }
         }
 
@@ -244,7 +249,7 @@ public class ChainController
         SerializableChain chain = event.getChain();
         String consumerUUID = event.getConsumerUUID();
 
-        // Get consumer with consumerUUID from consumers
+        // Get consumer node with consumerUUID from consumers
         Node consumerNode = clustersContainer.getChainConsumers().getCluster().get(consumerUUID);
 
         SseEmitter consumerEmitter = consumerNode.getEmitter();

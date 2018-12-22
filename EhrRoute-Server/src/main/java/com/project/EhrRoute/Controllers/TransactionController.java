@@ -84,6 +84,7 @@ public class TransactionController
     public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition)
     {
         String providerUUID = blockAddition.getProviderUUID();
+        String networkUUID = blockAddition.getNetworkUUID();
         String userID = blockAddition.getEhrUserID();
 
         // Check if Provider UUID and User ID are valid
@@ -104,10 +105,10 @@ public class TransactionController
         }
 
         // Get provider network uuid
-        String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
+        //String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
 
         // Check if provider's network uuid is valid
-        if (providerNetworkUUID == null || providerNetworkUUID.isEmpty() || !uuidUtil.isValidUUID(providerUUID)) {
+        if (networkUUID == null || networkUUID.isEmpty() || !uuidUtil.isValidUUID(providerUUID)) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Invalid provider network or doesn't exist"),
                 HttpStatus.BAD_REQUEST
@@ -128,7 +129,7 @@ public class TransactionController
         // Check if sent root is valid
         try
         {
-            isValidNetworkChainRoot = chainRootUtil.checkNetworkChainRoot(providerNetworkUUID, chainRoot);
+            isValidNetworkChainRoot = chainRootUtil.checkNetworkChainRoot(networkUUID, chainRoot);
         }
         catch (Exception Ex)
         {
@@ -139,15 +140,14 @@ public class TransactionController
         }
 
         // If not valid
-        if (!isValidNetworkChainRoot)
-        {
-            // Fetch the chain from another provider and send it to this node with invalid chain
-            try
-            {
-                chainUtil.fetchChainForNode(providerUUID);
+        if (!isValidNetworkChainRoot) {
+            // Fetch the chain from another provider in network the specified network in the BlockAddition request
+            // and send it to this node with invalid chain.
+
+            try {
+                chainUtil.fetchChainForNode(providerUUID, networkUUID);
             }
-            catch (BadRequestException Ex)
-            {
+            catch (BadRequestException Ex) {
                 return new ResponseEntity<>(
                     new ApiResponse(false, "Invalid Chain Root or Bad Chain. Chain fetching failed, caused by: " + Ex.getMessage()),
                     HttpStatus.BAD_REQUEST
@@ -168,6 +168,7 @@ public class TransactionController
                     blockAddition.getBlock(),
                     blockAddition.getChainRootWithBlock(),
                     providerUUID,
+                    blockAddition.getNetworkUUID(),
                     userID
             );
 
@@ -226,10 +227,11 @@ public class TransactionController
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
-        // Broadcast the block to the other provider nodes.
+
         try
         {
-            blockBroadcaster.broadcast(signedBlock, consentResponse.getProviderUUID());
+            // Broadcast the signed block to the other provider nodes in network.
+            blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
         }
         catch (ResourceEmptyException Ex) {
             return new ResponseEntity<>(
@@ -242,7 +244,7 @@ public class TransactionController
         deleteMatchingConsentRequest(consentResponse);
 
         // Change provider's network ChainRoot to the new sent chainRootWithBlock.
-        changeNetworkChainRoot(consentResponse.getProviderUUID(), consentResponse.getChainRootWithBlock());
+        changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
 
         return new ResponseEntity<>(
             new ApiResponse(true, "Block has been signed and Broad-casted successfully"),
@@ -279,6 +281,7 @@ public class TransactionController
             ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(
                     userID,
                     event.getProviderUUID(),
+                    event.getNetworkUUID(), // NetworkUUID of the provider
                     event.getBlock(),
                     event.getChainRootWithBlock()
             );
@@ -295,6 +298,7 @@ public class TransactionController
                 event.getBlock(),
                 event.getChainRootWithBlock(),
                 event.getProviderUUID(),
+                event.getNetworkUUID(),
                 stringUserID
         );
 
@@ -396,11 +400,8 @@ public class TransactionController
 
     }
 
-    private void changeNetworkChainRoot(String providerUUID, String chainRootWithBlock)
+    private void changeNetworkChainRoot(String networkUUID, String chainRootWithBlock)
     {
-        if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
-            throw new UnavailableNodeException("Provider with providerUUID: " + providerUUID + " was was not found");
-        }
 
         /*
         Todo------------------------------------------------------------------|
@@ -410,12 +411,7 @@ public class TransactionController
         Todo------------------------------------------------------------------|
         */
 
-        // Get provider's network UUID from provider node
-        Node providerNode = clustersContainer.getChainProviders().getCluster().get(providerUUID);
-
-        String providerNetworkUUID = providerNode.getNetworkUUID();
-
         // Change the provider's network chain root
-        chainRootUtil.changeNetworkChainRoot(providerNetworkUUID, chainRootWithBlock);
+        chainRootUtil.changeNetworkChainRoot(networkUUID, chainRootWithBlock);
     }
 }

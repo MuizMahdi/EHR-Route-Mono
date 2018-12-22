@@ -17,25 +17,16 @@ public class BlockBroadcaster
         this.clustersContainer = clustersContainer;
     }
 
-
-    public void broadcast(SerializableBlock block, String nodeUUID) throws ResourceEmptyException
+    // Broadcasts a block to all consumers in a network
+    public void broadcast(SerializableBlock block, String networkUUID) throws ResourceEmptyException
     {
-        // Get the node of the node UUID
-        Node node = clustersContainer.getChainConsumers().getNode(nodeUUID);
-
-        if (node == null) {
-            throw new ResourceNotFoundException("A Node","NodeUUID", nodeUUID);
-        }
-
-        // Get node network
-        String nodeNetworkUUID = node.getNetworkUUID();
-
-        // Get NodeCluster of consumers in network
-        NodeCluster networkChainConsumers = clustersContainer.getConsumersByNetwork(nodeNetworkUUID);
+        // Get NodeCluster of consumers in network, throws ResourceEmptyException if no consumers found
+        NodeCluster networkChainConsumers = clustersContainer.getConsumersByNetwork(networkUUID);
 
         // Send SSEs with block to all consumers in the node's network
         networkChainConsumers.getCluster().forEach((consumerUUID, consumerNode) -> {
             try {
+                // Send block through a SSE
                 consumerNode.getEmitter().send(block);
             }
             catch (Exception Ex) {
@@ -43,6 +34,5 @@ public class BlockBroadcaster
                 networkChainConsumers.removeNode(consumerUUID);
             }
         });
-
     }
 }

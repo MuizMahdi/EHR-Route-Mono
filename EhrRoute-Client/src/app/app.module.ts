@@ -22,7 +22,7 @@ import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-
 import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-search.component';
 
 // External Modules
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgxElectronModule } from 'ngx-electron';
 import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';

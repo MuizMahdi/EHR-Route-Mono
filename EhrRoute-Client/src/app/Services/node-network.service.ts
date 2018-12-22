@@ -1,3 +1,4 @@
+import { NodeClustersService } from './node-clusters.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
@@ -10,13 +11,15 @@ import { throwError, Observable } from 'rxjs';
 })
 
 
-export class NodeNetworkService 
+export class NodeNetworkService
 {
    userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
    createNetworkUrl:string = environment.apiUrl + '/network/create'
 
    
-   constructor(private http:HttpClient) { }
+   constructor(private http:HttpClient, private clustersService:NodeClustersService) {
+      clustersService.subscribeProvider();
+   }
 
 
    getUserNetworks(): Observable<any> {

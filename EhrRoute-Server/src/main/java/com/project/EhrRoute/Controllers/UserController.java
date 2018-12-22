@@ -181,7 +181,10 @@ public class UserController
             userNotificationEmitter.send("Invalid user ID", MediaType.APPLICATION_JSON);
         }
 
-        Node userNode = new Node(userNotificationEmitter, "");
+        // Empty set for node networks since a user cannot be in a network.
+        Set<String> nodeNetworks = new HashSet<>();
+
+        Node userNode = new Node(userNotificationEmitter, nodeNetworks);
         clustersContainer.getAppUsers().addNode(userID, userNode);
 
         /*

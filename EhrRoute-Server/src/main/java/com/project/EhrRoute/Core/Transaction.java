@@ -1,11 +1,9 @@
 package com.project.EhrRoute.Core;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
-import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 import com.project.EhrRoute.Utilities.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
@@ -26,8 +24,8 @@ public class Transaction
 
     @Autowired
     public Transaction(JsonUtil jsonUtil, KeyUtil keyUtil) {
-        this.keyUtil = keyUtil;
         this.jsonUtil = jsonUtil;
+        this.keyUtil = keyUtil;
     }
 
     public Transaction() { }

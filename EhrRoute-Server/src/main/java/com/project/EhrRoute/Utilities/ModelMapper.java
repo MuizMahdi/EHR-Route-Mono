@@ -19,11 +19,15 @@ public class ModelMapper
 {
     private StringUtil stringUtil;
     private KeyUtil keyUtil;
+    private BlockHeader blockHeader;
+    private Transaction transaction;
 
     @Autowired
-    public ModelMapper(StringUtil stringUtil, KeyUtil keyUtil) {
+    public ModelMapper(StringUtil stringUtil, KeyUtil keyUtil, BlockHeader blockHeader, Transaction transaction) {
         this.stringUtil = stringUtil;
         this.keyUtil = keyUtil;
+        this.blockHeader = blockHeader;
+        this.transaction = transaction;
     }
 
     public SerializableBlock mapBlockToSerializableBlock(Block block) throws GeneralSecurityException
@@ -69,7 +73,7 @@ public class ModelMapper
     {
         Block block = new Block();
 
-        BlockHeader blockHeader = new BlockHeader();
+        //BlockHeader blockHeader = new BlockHeader();
 
         blockHeader.setIndex(serializableBlock.getBlockHeader().getIndex());
         blockHeader.setTimeStamp(serializableBlock.getBlockHeader().getTimeStamp());
@@ -88,7 +92,7 @@ public class ModelMapper
 
         block.setBlockHeader(blockHeader);
 
-        Transaction transaction = new Transaction();
+        //Transaction transaction = new Transaction();
 
         String base64EncodedStringSignature = serializableBlock.getTransaction().getSignature();
         transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
@@ -116,12 +120,13 @@ public class ModelMapper
         return block;
     }
 
-    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, SerializableBlock block, String chainRootWithBlock)
+    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, String networkUUID, SerializableBlock block, String chainRootWithBlock)
     {
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
 
         consentRequest.setUserID(userID);
         consentRequest.setProviderUUID(providerUUID);
+        consentRequest.setNetworkUUID(networkUUID);
         consentRequest.setChainRootWithBlock(chainRootWithBlock);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
@@ -130,7 +135,6 @@ public class ModelMapper
         consentRequest.setMerkleRoot(block.getBlockHeader().getMerkleRoot());
         consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
         consentRequest.setTimeStamp(block.getBlockHeader().getTimeStamp());
-        consentRequest.setNetworkUUID(block.getBlockHeader().getNetworkUUID());
         consentRequest.setPreviousHash(block.getBlockHeader().getPreviousHash());
         consentRequest.setHash(block.getBlockHeader().getHash());
 
