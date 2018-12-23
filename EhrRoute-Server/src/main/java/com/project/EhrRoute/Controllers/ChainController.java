@@ -27,6 +27,8 @@ import java.util.*;
 @RequestMapping("/chain")
 public class ChainController
 {
+    private final Logger logger = LoggerFactory.getLogger(ChainController.class);
+
     private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
     private UuidUtil uuidUtil;
@@ -38,72 +40,6 @@ public class ChainController
         this.clustersContainer = clustersContainer;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(ChainController.class);
-    //private ExecutorService executorService = Executors.newCachedThreadPool();
-
-
-    // Subscribes a node to the chain providers cluster (used to receive a ChainSend SSE)
-    @GetMapping("/chainprovider")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
-    {
-        // Create an emitter for the subscribed client node
-        SseEmitter emitter = new SseEmitter(2592000000L); // An extremely long timeout
-
-        if (!uuidUtil.isValidUUID(nodeUUID) || !uuidUtil.isValidUUID(networkUUID))
-        {
-            emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
-        }
-        else
-        {
-            // Create a node which has the emitter and the client's networkUUID
-            Set<String> networksUUIDs = new HashSet<>();
-            networksUUIDs.add(networkUUID);
-
-            Node node = new Node(emitter, networksUUIDs);
-
-            // Add the node to providers list
-            clustersContainer.getChainProviders().addNode(nodeUUID, node);
-
-            System.out.println("Node with netUUID: " + networkUUID + " Was added to ChainProviders");
-        }
-
-
-        // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onError(error -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onCompletion(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-
-        // Returns the GetChainFromProviderEvent notification SSE
-        return emitter;
-    }
-
-    // Subscribes a node to the chain consumers cluster (used to receive the chain from a provider)
-    @GetMapping("/chainconsumer")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public SseEmitter chainConsumers(@RequestParam("nodeuuid") String nodeUUID, @RequestParam("netuuid") String networkUUID) throws IOException
-    {
-        SseEmitter emitter = new SseEmitter(2592000000L);
-
-        if (!uuidUtil.isValidUUID(nodeUUID) || !uuidUtil.isValidUUID(networkUUID)) {
-            emitter.send("Invalid node or network UUID", MediaType.APPLICATION_JSON);
-        }
-        else {
-            Set<String> networksUUIDs = new HashSet<>();
-            networksUUIDs.add(networkUUID);
-
-            Node node = new Node(emitter, networksUUIDs);
-            clustersContainer.getChainConsumers().addNode(nodeUUID, node);
-        }
-
-        // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
-        emitter.onError(error -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
-        emitter.onCompletion(() -> clustersContainer.getChainConsumers().removeNode(nodeUUID));
-
-        // Returns the ChainSend and BlockSend SSE
-        return emitter;
-    }
 
     // Publishes a SendChainToConsumerEvent with the chain to the node that needs it
     @PostMapping("/chaingive")
@@ -199,7 +135,6 @@ public class ChainController
     }
 
 
-
     @EventListener
     protected void getChainFromProvider(GetChainFromProviderEvent event) throws IOException
     {
@@ -243,6 +178,7 @@ public class ChainController
         }
     }
 
+
     @EventListener
     protected void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
     {
@@ -257,6 +193,7 @@ public class ChainController
         // Send the chain through the ChainConsumers SSE stream to the consumer with the consumerUUID
         consumerEmitter.send(chain, MediaType.APPLICATION_JSON);
     }
+
 
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
