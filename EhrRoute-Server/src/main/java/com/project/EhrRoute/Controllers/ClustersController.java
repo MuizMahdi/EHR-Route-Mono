@@ -2,13 +2,16 @@ package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,6 +96,27 @@ public class ClustersController
 
         // Returns the ChainSend and BlockSend SSE
         return emitter;
+    }
+
+
+    // Called when client closes app (ngOnDestroy) to remove node from clusters
+    @GetMapping("/close")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
+    {
+        // Remove the client from clusters
+        if(clustersContainer.getChainConsumers().existsInCluster(uuid)) {
+            clustersContainer.getChainConsumers().removeNode(uuid);
+        }
+
+        if (clustersContainer.getChainProviders().existsInCluster(uuid)) {
+            clustersContainer.getChainProviders().removeNode(uuid);
+        }
+
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Connection closed"),
+                HttpStatus.OK
+        );
     }
 
 

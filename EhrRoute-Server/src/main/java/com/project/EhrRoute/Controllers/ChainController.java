@@ -114,26 +114,6 @@ public class ChainController
         );
     }
 
-    // Called when client closes app (ngOnDestroy) to remove node from clusters
-    @GetMapping("/close")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
-    {
-        // Remove the client from clusters
-        if(clustersContainer.getChainConsumers().existsInCluster(uuid)) {
-            clustersContainer.getChainConsumers().removeNode(uuid);
-        }
-
-        if (clustersContainer.getChainProviders().existsInCluster(uuid)) {
-            clustersContainer.getChainProviders().removeNode(uuid);
-        }
-
-        return new ResponseEntity<>(
-                new ApiResponse(true, "Connection closed"),
-                HttpStatus.OK
-        );
-    }
-
 
     @EventListener
     protected void getChainFromProvider(GetChainFromProviderEvent event) throws IOException
