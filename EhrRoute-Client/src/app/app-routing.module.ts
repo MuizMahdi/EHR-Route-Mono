@@ -1,6 +1,5 @@
-import { AppComponent } from './app.component';
+import { MainComponent } from './Components/main/main.component';
 import { AuthGuard } from './Guards/AuthGuard';
-import { MainComponent } from './Components/MainLayout/main/main.component';
 import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';

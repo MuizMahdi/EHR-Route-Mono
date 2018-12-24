@@ -76,6 +76,7 @@ public class ChainController
         );
     }
 
+
     // Publishes a GetChainFromProviderEvent with the node uuid that needs chain from a certain network
     @GetMapping("/chainget")
     //@PreAuthorize("hasRole('ADMIN')")
@@ -172,49 +173,5 @@ public class ChainController
 
         // Send the chain through the ChainConsumers SSE stream to the consumer with the consumerUUID
         consumerEmitter.send(chain, MediaType.APPLICATION_JSON);
-    }
-
-
-    @EventListener
-    protected void SseKeepAlive(SseKeepAliveEvent event)
-    {
-        event.setKeepAliveData("0"); // Keep-Alive fake data
-
-        NodeCluster chainProviders = clustersContainer.getChainProviders();
-
-        if ((chainProviders.getCluster() != null) && (chainProviders.getCluster().size() > 0))
-        {
-            chainProviders.getCluster().forEach((uuid, node) -> {
-                try
-                {
-                    System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
-
-                    // Send fake data every 4 minutes to keep the connection alive and check whether the user disconnected or not
-                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-                }
-                catch (IOException Ex) {
-                    clustersContainer.getChainProviders().removeNode(uuid);
-                    logger.error(Ex.getMessage());
-                }
-            });
-        }
-
-        NodeCluster chainConsumers = clustersContainer.getChainConsumers();
-
-        if ((chainConsumers.getCluster() != null) && (chainConsumers.getCluster().size() > 0))
-        {
-            chainConsumers.getCluster().forEach((uuid, node) -> {
-                try
-                {
-                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-                }
-                catch (IOException Ex) {
-                    clustersContainer.getChainConsumers().removeNode(uuid);
-                    logger.error(Ex.getMessage());
-                }
-            });
-        }
-
-
     }
 }

@@ -1,14 +1,19 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Node;
+import com.project.EhrRoute.Core.NodeCluster;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Events.SseKeepAliveEvent;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.UuidUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +32,7 @@ import java.util.Set;
 @RequestMapping("/cluster")
 public class ClustersController
 {
+    private final Logger logger = LoggerFactory.getLogger(ClustersController.class);
     private ClustersContainer clustersContainer;
     private UserService userService;
     private UuidUtil uuidUtil;
@@ -137,5 +143,49 @@ public class ClustersController
         Node node = new Node(emitter, networkUUIDs);
 
         return node;
+    }
+
+
+    @EventListener
+    protected void SseKeepAlive(SseKeepAliveEvent event)
+    {
+        event.setKeepAliveData("0"); // Keep-Alive fake data
+
+        NodeCluster chainProviders = clustersContainer.getChainProviders();
+
+        if ((chainProviders.getCluster() != null) && (chainProviders.getCluster().size() > 0) && (!chainProviders.getCluster().isEmpty()))
+        {
+            chainProviders.getCluster().forEach((uuid, node) -> {
+                try
+                {
+                    System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
+
+                    // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
+                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+                }
+                catch (IOException Ex) {
+                    clustersContainer.getChainProviders().removeNode(uuid);
+                    logger.error(Ex.getMessage());
+                }
+            });
+        }
+
+        NodeCluster chainConsumers = clustersContainer.getChainConsumers();
+
+        if ((chainConsumers.getCluster() != null) && (chainConsumers.getCluster().size() > 0) && (!chainConsumers.getCluster().isEmpty()))
+        {
+            chainConsumers.getCluster().forEach((uuid, node) -> {
+                try
+                {
+                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
+                }
+                catch (IOException Ex) {
+                    clustersContainer.getChainConsumers().removeNode(uuid);
+                    logger.error(Ex.getMessage());
+                }
+            });
+        }
+
+
     }
 }

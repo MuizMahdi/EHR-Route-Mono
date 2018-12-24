@@ -40,5 +40,22 @@ export class NodeClustersService implements OnInit
       });
    }
 
+   
+   subscribeConsumer()
+   {
+      let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
+      let url:string = "http://localhost:8080/cluster/chainconsumer?nodeuuid=" + nodeUUID;
+
+      let Jwt = localStorage.getItem('accessToken');
+
+      let eventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+
+      eventSource.onmessage = ((event:any) => {
+
+         console.log(event.data);
+
+      });
+   }
+
 
 }

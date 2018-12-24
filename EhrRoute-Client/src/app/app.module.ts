@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/Auth/login/login.component';
 import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { RegistrationComponent } from './Components/Auth/registration/registration.component';
-import { MainComponent } from './Components/MainLayout/main/main.component';
+import { MainComponent } from './Components/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SideBarComponent } from './Components/MainLayout/side-bar/side-bar.component';
 import { NavBarComponent } from './Components/MainLayout/nav-bar/nav-bar.component';
