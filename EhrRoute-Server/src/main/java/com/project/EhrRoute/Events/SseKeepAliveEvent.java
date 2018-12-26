@@ -7,6 +7,7 @@ public class SseKeepAliveEvent extends ApplicationEvent
 
     public SseKeepAliveEvent(String keepAliveData) {
         super(keepAliveData);
+        this.keepAliveData = keepAliveData;
     }
 
     public String getKeepAliveData() {

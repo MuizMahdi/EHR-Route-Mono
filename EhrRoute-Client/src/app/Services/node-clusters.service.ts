@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
-import {EventSourcePolyfill} from 'ng-event-source';
+import { EventSourcePolyfill } from 'ng-event-source';
+import { environment } from 'src/environments/environment';
+import { catchError, first } from 'rxjs/operators';
+import { throwError, Observable } from 'rxjs';
 
 
 
@@ -17,24 +20,49 @@ import {EventSourcePolyfill} from 'ng-event-source';
 
 export class NodeClustersService implements OnInit
 {
+   providerSubscriptionUrl:string = environment.apiUrl + "/cluster/chainprovider?nodeuuid=";
+   consumerSubscriptionUrl:string = environment.apiUrl + "/cluster/chainconsumer?nodeuuid=";
+   clustersUnsubscripeUrl:string = environment.apiUrl + "/cluster/close?nodeuuid=";
+
+   providersEventSource:EventSourcePolyfill;
+   consumersEventSource:EventSourcePolyfill;
    
+
    constructor(private http:HttpClient) { }
 
    ngOnInit() {
-     
+     this.unsubscribeClusters();
    }
 
 
-   subscribeProvider() 
+   subscribeProvider(): void
    {
       let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
-      let url:string = "http://localhost:8080/cluster/chainprovider?nodeuuid=" + nodeUUID;
+      let url:string = this.providerSubscriptionUrl + nodeUUID;
 
       let Jwt = localStorage.getItem('accessToken');
 
-      let eventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+      this.providersEventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
 
-      eventSource.onmessage = ((event:any) => {
+      this.providersEventSource.onmessage = ((event:any) => {
+
+         console.log(event.data);
+
+      });
+
+   }
+
+   
+   subscribeConsumer(): void
+   {
+      let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
+      let url:string = this.consumerSubscriptionUrl + nodeUUID;
+
+      let Jwt = localStorage.getItem('accessToken');
+
+      this.consumersEventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+
+      this.consumersEventSource.onmessage = ((event:any) => {
 
          console.log(event.data);
 
@@ -42,20 +70,39 @@ export class NodeClustersService implements OnInit
    }
 
    
-   subscribeConsumer()
+   unsubscribeClusters(): void
    {
-      let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
-      let url:string = "http://localhost:8080/cluster/chainconsumer?nodeuuid=" + nodeUUID;
+      if (typeof this.providersEventSource !== "undefined") 
+      {
+         if (this.providersEventSource.OPEN || this.providersEventSource.CONNECTING) {
+            this.providersEventSource.close();
+         }
+      }
 
-      let Jwt = localStorage.getItem('accessToken');
+      if (typeof this.consumersEventSource !== "undefined") 
+      {
+         if (this.consumersEventSource.OPEN || this.consumersEventSource.CONNECTING) {
+            this.consumersEventSource.close();
+         }
+      }   
+      
+      let nodeUUID = "a906c224-f882-4cc7-bf48-31ece53765fa";
 
-      let eventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+      this.http.get(this.clustersUnsubscripeUrl + nodeUUID).pipe(first(),
+         
+         catchError(error => {
+            return throwError(error)
+         })
+         
+      ).subscribe(
+         res => {
+            console.log(res);
+         },
 
-      eventSource.onmessage = ((event:any) => {
-
-         console.log(event.data);
-
-      });
+         err => {
+            console.log(err);
+         }
+      );
    }
 
 

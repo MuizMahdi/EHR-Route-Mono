@@ -21,7 +21,7 @@ export class NetworkManagerComponent implements OnInit
    isAdmin:boolean = false;
    isProvider:boolean = false;
 
-   selectedNetwork:NetworkInfo;
+   selectedNetwork:any = {};
    selectedNetworkUUID:string;
    userNetworks:NetworkInfo[];
 
@@ -118,6 +118,6 @@ export class NetworkManagerComponent implements OnInit
 
    log(value:any): void 
    {
-      this.selectedNetwork.networkUUID = value;
+      console.log(value);
    }
 }

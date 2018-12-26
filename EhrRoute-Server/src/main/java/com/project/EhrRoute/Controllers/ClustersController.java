@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -108,20 +110,20 @@ public class ClustersController
     // Called when client closes app (ngOnDestroy) to remove node from clusters
     @GetMapping("/close")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity closeConnection(@RequestParam("uuid") String uuid)
+    public ResponseEntity closeConnection(@RequestParam("nodeuuid") String nodeUUID)
     {
         // Remove the client from clusters
-        if(clustersContainer.getChainConsumers().existsInCluster(uuid)) {
-            clustersContainer.getChainConsumers().removeNode(uuid);
+        if(clustersContainer.getChainConsumers().existsInCluster(nodeUUID)) {
+            clustersContainer.getChainConsumers().removeNode(nodeUUID);
         }
 
-        if (clustersContainer.getChainProviders().existsInCluster(uuid)) {
-            clustersContainer.getChainProviders().removeNode(uuid);
+        if (clustersContainer.getChainProviders().existsInCluster(nodeUUID)) {
+            clustersContainer.getChainProviders().removeNode(nodeUUID);
         }
 
         return new ResponseEntity<>(
-                new ApiResponse(true, "Connection closed"),
-                HttpStatus.OK
+            new ApiResponse(true, "Connection closed"),
+            HttpStatus.OK
         );
     }
 
@@ -149,39 +151,48 @@ public class ClustersController
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
     {
-        event.setKeepAliveData("0"); // Keep-Alive fake data
+        // Keep-Alive fake data
+        String keepAliveData = event.getKeepAliveData();
 
         NodeCluster chainProviders = clustersContainer.getChainProviders();
-
-        if ((chainProviders.getCluster() != null) && (chainProviders.getCluster().size() > 0) && (!chainProviders.getCluster().isEmpty()))
-        {
-            chainProviders.getCluster().forEach((uuid, node) -> {
-                try
-                {
-                    // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
-                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-                }
-                catch (Exception Ex) {
-                    clustersContainer.getChainProviders().removeNode(uuid);
-                }
-            });
-        }
+        broadcastKeepAliveEvent(chainProviders, keepAliveData);
 
         NodeCluster chainConsumers = clustersContainer.getChainConsumers();
-
-        if ((chainConsumers.getCluster() != null) && (chainConsumers.getCluster().size() > 0) && (!chainConsumers.getCluster().isEmpty()))
-        {
-            chainConsumers.getCluster().forEach((uuid, node) -> {
-                try
-                {
-                    node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
-                }
-                catch (Exception Ex) {
-                    clustersContainer.getChainConsumers().removeNode(uuid);
-                }
-            });
-        }
-
-
+        broadcastKeepAliveEvent(chainConsumers, keepAliveData);
     }
+
+
+    private void broadcastKeepAliveEvent(NodeCluster cluster, String keepAliveData)
+    {
+        if ((cluster.getCluster() != null) && (!cluster.getCluster().isEmpty()))
+        {
+            // Cluster iterator
+            Iterator clusterIterator = cluster.getCluster().entrySet().iterator();
+
+            // Iterate through the cluster
+            while (clusterIterator.hasNext())
+            {
+                // Get each member of cluster (HashMap entry of the cluster)
+                Map.Entry clusterEntry = (Map.Entry) clusterIterator.next();
+
+                // Get each member node and node UUID
+                Node node = (Node) clusterEntry.getValue();
+                String nodeUUID = (String) clusterEntry.getKey();
+
+                try {
+                    // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
+                    node.getEmitter().send(keepAliveData, MediaType.APPLICATION_JSON);
+                }
+                // In case an error occurs during event transmission
+                catch (Exception Ex) {
+                    // Remove provider map using iterator entry to avoid ConcurrentModificationException
+                    clusterIterator.remove();
+
+                    // Remove the provider from cluster
+                    cluster.removeNode(nodeUUID);
+                }
+            }
+        }
+    }
+
 }
