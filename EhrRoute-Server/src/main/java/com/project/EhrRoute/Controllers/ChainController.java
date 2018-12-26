@@ -1,9 +1,7 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Node;
-import com.project.EhrRoute.Core.NodeCluster;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
 import com.project.EhrRoute.Events.SendChainToConsumerEvent;
-import com.project.EhrRoute.Events.SseKeepAliveEvent;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableChain;
 import com.project.EhrRoute.Services.ClustersContainer;

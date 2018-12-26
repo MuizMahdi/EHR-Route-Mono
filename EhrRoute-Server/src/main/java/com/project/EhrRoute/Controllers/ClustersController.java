@@ -158,14 +158,11 @@ public class ClustersController
             chainProviders.getCluster().forEach((uuid, node) -> {
                 try
                 {
-                    System.out.println("Sending Keep-Alive Event to provider node: " + uuid);
-
                     // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
                     node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
                 }
-                catch (IOException Ex) {
+                catch (Exception Ex) {
                     clustersContainer.getChainProviders().removeNode(uuid);
-                    logger.error(Ex.getMessage());
                 }
             });
         }
@@ -179,9 +176,8 @@ public class ClustersController
                 {
                     node.getEmitter().send(event.getKeepAliveData(), MediaType.APPLICATION_JSON);
                 }
-                catch (IOException Ex) {
+                catch (Exception Ex) {
                     clustersContainer.getChainConsumers().removeNode(uuid);
-                    logger.error(Ex.getMessage());
                 }
             });
         }

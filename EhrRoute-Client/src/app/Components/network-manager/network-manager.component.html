@@ -1,7 +1,25 @@
-<button (click)="showNetworkGenerationConfirm()" nz-button [nzSize]="large" nzType="default" nzBlock>Create Network</button>
+<div class="network-header">
 
-<h1>networkUUID:</h1>
-<h1>chainRoot:</h1>
+   <div id="network-name">
+      <p>Network Name</p>
+   </div>
 
-<h3 *ngIf="isAdmin">ADMIN</h3>
-<h3 *ngIf="!isAdmin && !isProvider">USER</h3>
+   
+   <nz-select id="network-selector" style="width:200px;" nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetworkUUID" (ngModelChange)="log($event)">
+      <nz-option *ngFor="let n of userNetworks" [nzValue]="n.networkUUID" [nzLabel]="n.networkUUID"></nz-option>
+   </nz-select>
+
+</div>
+
+<div class="network-content">
+
+   <div>
+      <h1>Selected Network: {{selectedNetwork.networkUUID}}</h1>
+      <p style="padding-bottom:70em;">Network Status</p> 
+   </div>
+
+</div>
+
+<div class="network-content">
+   <button (click)="showNetworkGenerationConfirm()" nz-button [nzSize]="large" nzType="default" nzBlock>Create New Network</button>
+</div>

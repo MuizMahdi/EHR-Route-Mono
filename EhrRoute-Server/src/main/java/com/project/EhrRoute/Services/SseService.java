@@ -18,7 +18,7 @@ public class SseService
 
 
     // Send an event every minute to keep the connection alive
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 30000)
     public void SseKeepAlive()
     {
         SseKeepAliveEvent event = new SseKeepAliveEvent("0");

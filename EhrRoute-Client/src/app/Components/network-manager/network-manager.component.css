@@ -1,3 +1,34 @@
+.network-header {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+}
+
+.network-header > * {
+   background: white;
+   border: 2px solid rgb(233, 233, 233);
+   border-radius: 2px;
+   padding: 25px;
+   margin-top: 10px;
+}
+
+.network-content > * {
+   background: white;
+   border: 2px solid rgb(233, 233, 233);
+   border-radius: 2px;
+   padding: 25px;
+   margin-top: 10px;
+}
+
+.network-header #network-name {
+   flex-grow: 1;
+   text-align: center;
+}
+
+.network-header #network-selector {
+   margin-left: 10px;
+}
+
 ::ng-deep .network-creation-modal {
    display: grid;
    align-items: center;

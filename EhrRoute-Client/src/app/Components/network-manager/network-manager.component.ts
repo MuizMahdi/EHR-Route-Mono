@@ -1,3 +1,5 @@
+import { UserInfo } from './../../Models/UserInfo';
+import { UserNetworks } from './../../Models/UserNetworks';
 import { NodeNetworkService } from './../../Services/node-network.service';
 import { UserRole } from './../../Models/UserRole';
 import { MainLayoutService } from './../../Services/main-layout.service';
@@ -18,14 +20,16 @@ export class NetworkManagerComponent implements OnInit
 {
    isAdmin:boolean = false;
    isProvider:boolean = false;
-   networkInfo:NetworkInfo;
+
+   selectedNetwork:NetworkInfo;
+   selectedNetworkUUID:string;
+   userNetworks:NetworkInfo[];
 
 
    constructor(
       private nodeNetworkService:NodeNetworkService, private authService:AuthService, 
       public mainLayout:MainLayoutService, private modalService:NzModalService
-   ) 
-   { }
+   ) { }
 
 
    ngOnInit():void 
@@ -63,11 +67,11 @@ export class NetworkManagerComponent implements OnInit
    {
       this.nodeNetworkService.getUserNetworks().subscribe(
 
-         (response:NetworkInfo) => {
-
-            this.networkInfo = response;
-            console.log(response);
-            
+         (response:UserNetworks) => {
+            this.userNetworks = response.userNetworks;
+            console.log(this.userNetworks[0].networkUUID);
+            this.selectedNetwork = this.userNetworks[0];
+            this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
          },
 
          error => {
@@ -110,4 +114,10 @@ export class NetworkManagerComponent implements OnInit
 
       // TODO: Save received GenesisBlock and save network chain to local DB file
    }  
+
+
+   log(value:any): void 
+   {
+      this.selectedNetwork.networkUUID = value;
+   }
 }
