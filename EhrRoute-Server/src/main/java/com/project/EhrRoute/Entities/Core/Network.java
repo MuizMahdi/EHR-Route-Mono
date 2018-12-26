@@ -10,6 +10,8 @@ public class Network
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @NaturalId
     private String networkUUID;
 
@@ -26,16 +28,27 @@ public class Network
         this.networkUUID = networkUUID;
         this.chainRoot = chainRoot;
     }
+    public Network(String name, String networkUUID, ChainRoot chainRoot) {
+        this.name = name;
+        this.networkUUID = networkUUID;
+        this.chainRoot = chainRoot;
+    }
 
 
     public Long getId() {
         return id;
+    }
+    public String getName() {
+        return name;
     }
     public void setId(Long id) {
         this.id = id;
     }
     public ChainRoot getChainRoot() {
         return chainRoot;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
     public String getNetworkUUID() {
         return networkUUID;

@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.GeneralSecurityException;
 
@@ -43,10 +41,12 @@ public class NetworkController
         this.stringUtil = stringUtil;
     }
 
-    @GetMapping("/create")
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createNetwork(@CurrentUser UserPrincipal currentUser) throws Exception
+    public ResponseEntity<?> createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
+        System.out.println("A NETWORK CREATION REQUEST HAS BEEN MADE WITH NETWORK NAME: " + networkName);
+
         if (currentUser == null) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "User not logged in"),
@@ -77,6 +77,7 @@ public class NetworkController
         // Generate a new network using the genesis block data
         Network network = new Network();
         network.setNetworkUUID(networkUUID);
+        network.setName(networkName);
 
         ChainRoot networkChainRoot = new ChainRoot(chainRoot);
         network.setChainRoot(networkChainRoot);

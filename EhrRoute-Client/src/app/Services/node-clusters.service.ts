@@ -72,19 +72,7 @@ export class NodeClustersService implements OnInit
    
    unsubscribeClusters(): void
    {
-      if (typeof this.providersEventSource !== "undefined") 
-      {
-         if (this.providersEventSource.OPEN || this.providersEventSource.CONNECTING) {
-            this.providersEventSource.close();
-         }
-      }
-
-      if (typeof this.consumersEventSource !== "undefined") 
-      {
-         if (this.consumersEventSource.OPEN || this.consumersEventSource.CONNECTING) {
-            this.consumersEventSource.close();
-         }
-      }   
+      this.closeSseConnection();
       
       let nodeUUID = "a906c224-f882-4cc7-bf48-31ece53765fa";
 
@@ -103,6 +91,24 @@ export class NodeClustersService implements OnInit
             console.log(err);
          }
       );
+   }
+
+
+   closeSseConnection():void 
+   {
+      if (this.providersEventSource) 
+      {
+         if (this.providersEventSource.OPEN || this.providersEventSource.CONNECTING) {
+            this.providersEventSource.close();
+         }
+      }
+
+      if (this.consumersEventSource) 
+      {
+         if (this.consumersEventSource.OPEN || this.consumersEventSource.CONNECTING) {
+            this.consumersEventSource.close();
+         }
+      } 
    }
 
 

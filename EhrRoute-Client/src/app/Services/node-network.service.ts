@@ -31,9 +31,9 @@ export class NodeNetworkService
 
    }
 
-   generateNetwork(): Observable<any> {
+   generateNetwork(networkName:string): Observable<any> {
 
-      return this.http.get(this.createNetworkUrl).pipe(first(),
+      return this.http.post(this.createNetworkUrl, networkName).pipe(first(),
          
          catchError( error => {
             return throwError(error);

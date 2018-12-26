@@ -25,12 +25,15 @@ export class AppComponent implements OnInit, OnDestroy
 
       // Call ngOnDestroy before refreshing page if the user refreshes it
       window.onbeforeunload = () => this.ngOnDestroy();
+      window.addEventListener('beforeunload', function (e) {
+         // Chrome requires returnValue to be set
+         e.returnValue = '';
+      });
       
    }
 
 
    ngOnDestroy() {
-      console.log("[[[[[[[[ NG ON DESTROY ]]]]]]]]");
       // Unsubscribe for all clusters
       this.clustersService.unsubscribeClusters();
    }

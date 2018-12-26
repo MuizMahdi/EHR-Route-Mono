@@ -25,7 +25,9 @@ public class NodeCluster
     }
 
     public void removeNode(String uuid) {
-        this.cluster.remove(uuid);
+        if (existsInCluster(uuid)) {
+            this.cluster.remove(uuid);
+        }
     }
 
     public boolean existsInCluster(String nodeUUID) {

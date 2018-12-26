@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/Services/auth.service';
 import { NetworkInfo } from 'src/app/Models/NetworkInfo';
 import { NzModalService } from 'ng-zorro-antd';
+import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 
 
 @Component({
@@ -25,10 +26,14 @@ export class NetworkManagerComponent implements OnInit
    selectedNetworkUUID:string;
    userNetworks:NetworkInfo[];
 
+   isNetworkCreationModalVisible = false;
+   newNetworkName:string;
+
 
    constructor(
       private nodeNetworkService:NodeNetworkService, private authService:AuthService, 
-      public mainLayout:MainLayoutService, private modalService:NzModalService
+      public mainLayout:MainLayoutService, private modalService:NzModalService,
+      private nodeClusterService:NodeClustersService
    ) { }
 
 
@@ -82,25 +87,9 @@ export class NetworkManagerComponent implements OnInit
    }
 
 
-   showNetworkGenerationConfirm():void
+   generateNetwork(networkName:string):void
    {
-      this.modalService.confirm({
-         
-         nzTitle  : '<i>Create a new network?</i>',
-         nzContent: '<b>A network will not be active unless it has two or more nodes</b>',
-         nzOkText: 'Create',
-
-         nzOnOk   : () => { 
-            this.onNetworkGenerationSubmit();
-         }
-         
-      });
-   }
-
-
-   onNetworkGenerationSubmit():void
-   {
-      this.nodeNetworkService.generateNetwork().subscribe(
+      this.nodeNetworkService.generateNetwork(networkName).subscribe(
 
          response => {
             console.log(response);
@@ -119,5 +108,33 @@ export class NetworkManagerComponent implements OnInit
    log(value:any): void 
    {
       console.log(value);
+   }
+
+
+   closeSseConnection():void 
+   {
+      this.nodeClusterService.unsubscribeClusters();
+   }
+
+
+   showNetworkCreationModal(): void 
+   {
+      this.isNetworkCreationModalVisible = true;
+   }
+
+
+   onNetworkCreationSubmit(): void 
+   {
+      // Generate network using the network name input value
+      this.generateNetwork(this.newNetworkName);
+
+      // Close modal
+      this.isNetworkCreationModalVisible = false;
+   }
+
+  
+   onNetworkCreationCancel(): void 
+   {
+      this.isNetworkCreationModalVisible = false;
    }
 }

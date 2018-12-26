@@ -1,12 +1,12 @@
 <div class="network-header">
 
    <div id="network-name">
-      <p>Network Name</p>
+      <h1>{{selectedNetwork.name}}</h1>
    </div>
 
    
    <nz-select id="network-selector" style="width:200px;" nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetwork" (ngModelChange)="log($event)">
-      <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.networkUUID"></nz-option>
+      <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.name"></nz-option>
    </nz-select>
 
 </div>
@@ -14,12 +14,27 @@
 <div class="network-content">
 
    <div>
-      <h1>Selected Network: {{selectedNetwork.networkUUID}}</h1>
+      <h1>Network UUID:   {{selectedNetwork.networkUUID}}</h1>
       <p style="padding-bottom:70em;">Network Status</p> 
    </div>
 
 </div>
 
 <div class="network-content">
-   <button (click)="showNetworkGenerationConfirm()" nz-button [nzSize]="large" nzType="default" nzBlock>Create New Network</button>
+
+   <button nz-button [nzType]="'primary'" (click)="showNetworkCreationModal()">
+      <span>Create New Network</span>
+   </button>
+
+   <nz-modal [(nzVisible)]="isNetworkCreationModalVisible" nzTitle="Create a new network" (nzOnCancel)="onNetworkCreationCancel()" (nzOnOk)="onNetworkCreationSubmit()">
+
+      <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+            <input type="text" nz-input placeholder="Enter network name" [(ngModel)]="newNetworkName">
+      </nz-input-group>
+
+      <ng-template #prefixTemplate><i nz-icon type="share-alt"></i></ng-template>
+      <ng-template #suffixTemplate><i nz-icon type="close-circle" (click)="newNetworkName=null" *ngIf="newNetworkName"></i></ng-template>
+   
+   </nz-modal>
+   
 </div>

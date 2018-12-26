@@ -153,8 +153,9 @@ public class ModelMapper
 
         String networkUUID = network.getNetworkUUID();
         String networkChainRoot = network.getChainRoot().getRoot();
+        String networkName = network.getName();
 
-        return new NetworkResponse(networkUUID, networkChainRoot);
+        return new NetworkResponse(networkName, networkUUID, networkChainRoot);
     }
 
     public UserNetworksResponse mapNetworksToUserNetworksResponse(Set<Network> networks) throws NullUserNetworkException
