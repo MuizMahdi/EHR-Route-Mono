@@ -1,4 +1,3 @@
-import { UserInfo } from './../../Models/UserInfo';
 import { UserNetworks } from './../../Models/UserNetworks';
 import { NodeNetworkService } from './../../Services/node-network.service';
 import { UserRole } from './../../Models/UserRole';
@@ -8,6 +7,7 @@ import { AuthService } from 'src/app/Services/auth.service';
 import { NetworkInfo } from 'src/app/Models/NetworkInfo';
 import { NzModalService } from 'ng-zorro-antd';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
+import { ErrorResponse } from 'src/app/Models/ErrorResponse';
 
 
 @Component({
@@ -25,9 +25,10 @@ export class NetworkManagerComponent implements OnInit
    selectedNetwork:any = {};
    selectedNetworkUUID:string;
    userNetworks:NetworkInfo[];
+   userHasNetwork:boolean = false;
 
-   isNetworkCreationModalVisible = false;
    newNetworkName:string;
+   isNetworkCreationModalVisible:boolean = false;
 
 
    constructor(
@@ -73,13 +74,20 @@ export class NetworkManagerComponent implements OnInit
       this.nodeNetworkService.getUserNetworks().subscribe(
 
          (response:UserNetworks) => {
+            // If network response is received then user has a network or more.
+            this.userHasNetwork = true;
+
+            // Networks the user joined
             this.userNetworks = response.userNetworks;
-            console.log(this.userNetworks[0].networkUUID);
+
+            // Select the first network as default
             this.selectedNetwork = this.userNetworks[0];
+
+            // Currently selected network UUID
             this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
          },
 
-         error => {
+         (error:ErrorResponse) => {
             console.log(error);
          }
 

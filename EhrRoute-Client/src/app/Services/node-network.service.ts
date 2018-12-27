@@ -12,6 +12,7 @@ import { throwError, Observable } from 'rxjs';
 
 export class NodeNetworkService
 {
+   
    userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
    createNetworkUrl:string = environment.apiUrl + '/network/create';
 
@@ -23,19 +24,19 @@ export class NodeNetworkService
       
       return this.http.get(this.userNetworkUrl).pipe(first(),
 
-         catchError( error => {
+         catchError(error => {
             return throwError(error);
          })
-
+         
       );
-
    }
 
+   
    generateNetwork(networkName:string): Observable<any> {
 
       return this.http.post(this.createNetworkUrl, networkName).pipe(first(),
          
-         catchError( error => {
+         catchError(error => {
             return throwError(error);
          })
 

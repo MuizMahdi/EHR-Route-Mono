@@ -5,7 +5,7 @@
    </div>
 
    
-   <nz-select id="network-selector" style="width:200px;" nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetwork" (ngModelChange)="log($event)">
+   <nz-select id="network-selector" nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetwork" (ngModelChange)="log($event)">
       <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.name"></nz-option>
    </nz-select>
 

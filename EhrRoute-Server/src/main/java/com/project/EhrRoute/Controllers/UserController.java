@@ -9,7 +9,6 @@ import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
 import com.project.EhrRoute.Payload.Auth.UserRoleResponse;
-import com.project.EhrRoute.Payload.Core.NetworkResponse;
 import com.project.EhrRoute.Payload.Core.UserNetworksResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
@@ -17,7 +16,6 @@ import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.SimpleStringUtil;
-import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
@@ -126,7 +124,7 @@ public class UserController
 
     @GetMapping("/current/networks")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
+    public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
             return new ResponseEntity<>(
@@ -152,7 +150,7 @@ public class UserController
         catch (NullUserNetworkException Ex) {
             return new ResponseEntity<>(
                 new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
+                HttpStatus.NOT_FOUND
             );
         }
 
