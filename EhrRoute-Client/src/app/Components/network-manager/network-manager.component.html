@@ -1,4 +1,10 @@
-<div class="network-header">
+<div *ngIf="!userHasNetwork" class="network-content">
+   <h1> You have no network </h1>
+   <h4> Ask for a network invitation or create a new network </h4>
+</div>
+
+
+<div *ngIf="userHasNetwork" class="network-header">
 
    <div id="network-name">
       <h1>{{selectedNetwork.name}}</h1>
@@ -11,7 +17,8 @@
 
 </div>
 
-<div class="network-content">
+
+<div *ngIf="userHasNetwork" class="network-content">
 
    <div>
       <h1>Network UUID:   {{selectedNetwork.networkUUID}}</h1>
@@ -20,7 +27,8 @@
 
 </div>
 
-<div class="network-content">
+
+<div class="network-content" id="network-creation">
 
    <button nz-button [nzType]="'primary'" (click)="showNetworkCreationModal()">
       <span>Create New Network</span>

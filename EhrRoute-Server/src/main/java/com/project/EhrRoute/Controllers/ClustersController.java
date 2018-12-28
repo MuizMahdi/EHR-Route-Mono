@@ -65,6 +65,7 @@ public class ClustersController
 
             // Add the node to the providers cluster
             clustersContainer.getChainProviders().addNode(nodeUUID, node);
+            logger.info("Node [" + nodeUUID + "] has been added to the Providers cluster.");
         }
 
 
@@ -95,6 +96,7 @@ public class ClustersController
             Node node = generateUserNode(emitter, user);
 
             clustersContainer.getChainConsumers().addNode(nodeUUID, node);
+            logger.info("Node [" + nodeUUID + "] has been added to the Consumers cluster.");
         }
 
         // Remove the emitter on timeout/error/completion
@@ -115,10 +117,12 @@ public class ClustersController
         // Remove the client from clusters
         if(clustersContainer.getChainConsumers().existsInCluster(nodeUUID)) {
             clustersContainer.getChainConsumers().removeNode(nodeUUID);
+            logger.info("Node [" + nodeUUID + "] has been removed from Consumers.");
         }
 
         if (clustersContainer.getChainProviders().existsInCluster(nodeUUID)) {
             clustersContainer.getChainProviders().removeNode(nodeUUID);
+            logger.info("Node [" + nodeUUID + "] has been removed from Providers.");
         }
 
         return new ResponseEntity<>(
@@ -148,6 +152,7 @@ public class ClustersController
     }
 
 
+    // Sends an event every 30 seconds to keep the nodes connection alive and to filter out disconnected nodes
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
     {
@@ -164,6 +169,7 @@ public class ClustersController
 
     private void broadcastKeepAliveEvent(NodeCluster cluster, String keepAliveData)
     {
+        // Check nodes existence in cluster
         if ((cluster.getCluster() != null) && (!cluster.getCluster().isEmpty()))
         {
             // Cluster iterator
@@ -179,9 +185,14 @@ public class ClustersController
                 Node node = (Node) clusterEntry.getValue();
                 String nodeUUID = (String) clusterEntry.getKey();
 
-                try {
-                    // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
-                    node.getEmitter().send(keepAliveData, MediaType.APPLICATION_JSON);
+                try
+                {
+                    // Check node existence in cluster
+                    if (cluster.existsInCluster(nodeUUID)) {
+                        // Send fake data every minute to keep the connection alive and check whether the user disconnected or not
+                        node.getEmitter().send(keepAliveData, MediaType.APPLICATION_JSON);
+                        logger.info("Node [" + nodeUUID + "] has been received a Keep-Alive event.");
+                    }
                 }
                 // In case an error occurs during event transmission
                 catch (Exception Ex) {
@@ -190,6 +201,8 @@ public class ClustersController
 
                     // Remove the provider from cluster
                     cluster.removeNode(nodeUUID);
+
+                    logger.info("Node [" + nodeUUID + "] was not found, and has been removed from cluster.");
                 }
             }
         }

@@ -1,6 +1,7 @@
 import { MainLayoutService } from './Services/main-layout.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NodeClustersService } from './Services/node-clusters.service';
+
 
 @Component({
    selector: 'app-root',
@@ -8,33 +9,51 @@ import { NodeClustersService } from './Services/node-clusters.service';
    styleUrls: ['./app.component.css']
 })
 
-export class AppComponent implements OnInit, OnDestroy
+
+export class AppComponent implements OnInit
 {
+
    constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService) { }
 
 
-   ngOnInit() {
-      //this.mainLayout.hide();
-
-      // Make sure that user isn't subscribed to any cluster before subscribing
-      this.clustersService.unsubscribeClusters();
+   ngOnInit() 
+   {
+      // Handles when user reloads page
+      this.handleReloads();
 
       // Subscribe to providers and consumers cluster
       this.clustersService.subscribeProvider();
       this.clustersService.subscribeConsumer();
-
-      // Call ngOnDestroy before refreshing page if the user refreshes it
-      window.onbeforeunload = () => this.ngOnDestroy();
-      window.addEventListener('beforeunload', function (e) {
-         // Chrome requires returnValue to be set
-         e.returnValue = '';
-      });
-      
    }
 
+   
+   handleReloads(): void
+   {
+      var showMsgTimer;
+      var clusterService = this.clustersService;
 
-   ngOnDestroy() {
-      // Unsubscribe for all clusters
-      this.clustersService.unsubscribeClusters();
+      // Before user refreshes page, show a prompt asking for confirmation
+      window.onbeforeunload = function(evt) {       
+         
+         // Unsubscribe from clusters and close SSE http connections (EventSource connections)
+         clusterService.unsubscribeClusters();
+
+         showMsgTimer = window.setTimeout(showMessage, 500);
+ 
+         evt.returnValue = '';
+     
+         return '';
+      }
+     
+      window.onunload = function () {
+         clearTimeout(showMsgTimer);
+      }
+
+      // If user decides to stay on page
+      function showMessage() {
+         // Subscribe to clusters again
+         clusterService.subscribeClusters();
+      }
    }
+
 }

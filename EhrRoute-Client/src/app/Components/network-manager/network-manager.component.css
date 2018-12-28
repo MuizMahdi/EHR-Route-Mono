@@ -8,7 +8,7 @@
 .network-header > * {
    background: white;
    border: 2px solid rgb(233, 233, 233);
-   border-radius: 2px;
+   border-radius: 5px;
    padding: 25px;
    margin-top: 10px;
 }
@@ -17,7 +17,7 @@
 .network-content {
    background: white;
    border: 2px solid rgb(233, 233, 233);
-   border-radius: 2px;
+   border-radius: 5px;
    padding: 25px;
    margin-top: 10px;
 }
@@ -32,6 +32,10 @@
 .network-header #network-selector {
    margin-left: 10px;
    width: auto;
+}
+
+#network-creation {
+   width: fit-content;
 }
 
 

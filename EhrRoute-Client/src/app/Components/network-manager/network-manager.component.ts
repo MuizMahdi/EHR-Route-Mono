@@ -89,6 +89,11 @@ export class NetworkManagerComponent implements OnInit
 
          (error:ErrorResponse) => {
             console.log(error);
+
+            // If Http NOT_FOUND status is returned
+            if (error.httpStatus === 404) {
+               this.userHasNetwork = false;
+            }
          }
 
       );
@@ -101,6 +106,9 @@ export class NetworkManagerComponent implements OnInit
 
          response => {
             console.log(response);
+
+            // Update page contents with the newly added network
+            this.getUserNetworks();
          },
 
          error => {
@@ -116,12 +124,6 @@ export class NetworkManagerComponent implements OnInit
    log(value:any): void 
    {
       console.log(value);
-   }
-
-
-   closeSseConnection():void 
-   {
-      this.nodeClusterService.unsubscribeClusters();
    }
 
 

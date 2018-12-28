@@ -17,7 +17,7 @@ public class SseService
     }
 
 
-    // Send an event every 30 seconds to keep the connection alive
+    // Sends an event every 30 seconds to keep the connection alive and to filter out disconnected nodes
     @Scheduled(fixedRate = 30000)
     public void SseKeepAlive()
     {

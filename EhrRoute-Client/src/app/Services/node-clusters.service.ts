@@ -35,6 +35,15 @@ export class NodeClustersService implements OnInit
    }
 
 
+   subscribeClusters(): void
+   {
+      // Subscribe node as a provider
+      this.subscribeProvider();
+
+      // Subscribe node as a consumer
+      this.subscribeConsumer();
+   }
+
    subscribeProvider(): void
    {
       let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
@@ -72,10 +81,11 @@ export class NodeClustersService implements OnInit
    
    unsubscribeClusters(): void
    {
-      this.closeSseConnection();
-      
+      console.log("[ClusterService] Sending unsubscribe request...");
+
       let nodeUUID = "a906c224-f882-4cc7-bf48-31ece53765fa";
 
+      // Unsubscribe node from clusters
       this.http.get(this.clustersUnsubscripeUrl + nodeUUID).pipe(first(),
          
          catchError(error => {
@@ -84,7 +94,9 @@ export class NodeClustersService implements OnInit
          
       ).subscribe(
          res => {
-            console.log(res);
+            console.log("[ClusterService] Node has unsubscribed from clusters successfully.");
+            // Close the SSE http connection afterwards
+            this.closeSseConnection();
          },
 
          err => {
@@ -100,6 +112,7 @@ export class NodeClustersService implements OnInit
       {
          if (this.providersEventSource.OPEN || this.providersEventSource.CONNECTING) {
             this.providersEventSource.close();
+            console.log("[ClusterService] Providers SSE connection has been closed successfully.");
          }
       }
 
@@ -107,6 +120,7 @@ export class NodeClustersService implements OnInit
       {
          if (this.consumersEventSource.OPEN || this.consumersEventSource.CONNECTING) {
             this.consumersEventSource.close();
+            console.log("[ClusterService] Consumers SSE connection has been closed successfully.");
          }
       } 
    }
