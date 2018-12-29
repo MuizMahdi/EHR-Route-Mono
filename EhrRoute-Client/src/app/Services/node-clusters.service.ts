@@ -51,13 +51,21 @@ export class NodeClustersService implements OnInit
 
       let Jwt = localStorage.getItem('accessToken');
 
-      this.providersEventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+      if (!this.providersEventSource) 
+      {
+         console.log("SENDING PROVDER SUBSCRIBE REQUEST");
 
-      this.providersEventSource.onmessage = ((event:any) => {
+         this.providersEventSource = new EventSourcePolyfill(
+            url, 
+            {headers: {Authorization: "Bearer " + Jwt}}
+         );
 
-         console.log(event.data);
+         this.providersEventSource.onmessage = ((event:any) => {
 
-      });
+            console.log(event.data);
+
+         });
+      }
 
    }
 
@@ -69,13 +77,21 @@ export class NodeClustersService implements OnInit
 
       let Jwt = localStorage.getItem('accessToken');
 
-      this.consumersEventSource = new EventSourcePolyfill(url, {headers: {Authorization: "Bearer " + Jwt}});
+      if (!this.consumersEventSource)
+      {
+         console.log("SENDING CONSUMER SUBSCRIBE REQUEST");
 
-      this.consumersEventSource.onmessage = ((event:any) => {
+         this.consumersEventSource = new EventSourcePolyfill(
+            url, 
+            {headers: {Authorization: "Bearer " + Jwt}}
+         );
 
-         console.log(event.data);
+         this.consumersEventSource.onmessage = ((event:any) => {
 
-      });
+            console.log(event.data);
+
+         });
+      }   
    }
 
    
@@ -108,10 +124,18 @@ export class NodeClustersService implements OnInit
 
    closeSseConnection():void 
    {
+      // If event source exists
       if (this.providersEventSource) 
       {
+         // And connection is open 
          if (this.providersEventSource.OPEN || this.providersEventSource.CONNECTING) {
+
+            // Close the connection
             this.providersEventSource.close();
+
+            // Set event source as undefined so we could subscribe again
+            this.providersEventSource = undefined;
+
             console.log("[ClusterService] Providers SSE connection has been closed successfully.");
          }
       }
@@ -119,7 +143,11 @@ export class NodeClustersService implements OnInit
       if (this.consumersEventSource) 
       {
          if (this.consumersEventSource.OPEN || this.consumersEventSource.CONNECTING) {
+
             this.consumersEventSource.close();
+
+            this.consumersEventSource = undefined;
+            
             console.log("[ClusterService] Consumers SSE connection has been closed successfully.");
          }
       } 

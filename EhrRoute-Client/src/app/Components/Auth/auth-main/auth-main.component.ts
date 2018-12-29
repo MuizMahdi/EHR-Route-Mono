@@ -18,9 +18,23 @@ export class AuthMainComponent implements OnInit
 
    ngOnInit() 
    {
-      console.log("AUTH COMPONENT");
+      // Handles when user reloads auth page, disabling the prompt on login page,
+      // which is only shown when user reloads page after logging in.
+      this.handleOnAuthPageReloads();
+
       this.mainLayout.hide();
       this.isOnRegister = false;
+   }
+
+
+   handleOnAuthPageReloads(): void
+   {
+      window.onbeforeunload = function(evt) {       
+         evt.returnValue = '';
+         return '';
+      }
+     
+      window.onunload = function () { }
    }
 
 }

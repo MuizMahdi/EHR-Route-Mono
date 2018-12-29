@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap, shareReplay, catchError, first } from 'rxjs/operators';
 import { throwError, Subject, Observable } from 'rxjs';
+import { NodeClustersService } from './node-clusters.service';
 
 
 @Injectable({
@@ -23,7 +24,7 @@ export class AuthService
    currentUser: Subject<UserInfo> = new Subject<UserInfo>();
    isLoggedIn:boolean = false;
 
-   constructor(private http:HttpClient) 
+   constructor(private http:HttpClient, private clustersService:NodeClustersService) 
    { }
 
 
@@ -46,8 +47,13 @@ export class AuthService
 
          tap(tokenResponse => {
 
-            this.saveSession(tokenResponse),
+            this.saveSession(tokenResponse);
             this.isLoggedIn = true;
+
+            // Subscribe user node to providers and consumers cluster
+            this.clustersService.subscribeProvider();
+            this.clustersService.subscribeConsumer();
+            
             shareReplay()
 
          }),
@@ -85,6 +91,9 @@ export class AuthService
 
    logout()
    {
+      // Unsubscribe user node from clusters
+      this.clustersService.unsubscribeClusters();
+
       // Remove user token
       localStorage.removeItem('accessToken');
 
@@ -100,7 +109,7 @@ export class AuthService
    {
       if(jwtToken && jwtToken.accessToken)
       {
-         // Saves jwt to local storage
+         // Save jwt to local storage
          localStorage.setItem('accessToken', jwtToken.accessToken)
       }
 
