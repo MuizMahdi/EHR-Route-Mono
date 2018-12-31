@@ -1,0 +1,115 @@
+/************** FONT AWESOME ICONS ****************/
+.fa-2x
+{
+   font-size: 2em;
+}
+
+.fa
+{
+   position: relative;
+   display: table-cell;
+   width: 60px;
+   height: 36px;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 20px;
+}
+/**************************************************/
+
+/**/
+
+/*************** NOTIFICATION ICON ****************/
+#nav-notifications-icon 
+{
+   position: relative;
+   display: inline-block;
+}
+
+#nav-notifications-icon a 
+{
+   color: rgb(165, 165, 165);
+}
+
+#nav-notifications-icon a:hover
+{
+   color: rgb(125, 125, 125); 
+}
+/**************************************************/
+
+/**/
+ 
+/*************** NOTIFICATIONS MENU ***************/
+.nav-notifications-menu
+{
+   display: block;
+   position: absolute;
+   background-color: rgb(242, 246, 247);
+   min-width: 30vw;
+   box-shadow: 0px 4px 5px 0px rgba(0,0,0,0.2);
+   border: 1px solid rgb(233, 233, 233);
+   z-index: 1; 
+   right: 6vw;
+   border-radius: 3px;
+   overflow: hidden;
+}
+ 
+.nav-notifications-menu a 
+{
+   color: rgb(165, 165, 165);
+   text-decoration: none;
+   display: block;
+}
+
+.nav-notifications-menu a 
+{
+   color: rgb(125, 125, 125); 
+}
+/****************************************************/
+ 
+/**/
+
+/************* NOTIFICATIONS LIST ITEMS *************/
+.notifications-list
+{
+   list-style-type: none;
+   display: block;
+   margin-left: -35px;
+   max-height: 60vh;
+   overflow-y: scroll;
+   margin-right: -50px; /* maximum width of scrollbar */
+   padding-right: 35px; /* maximum width of scrollbar */
+}
+
+.notification-item:hover
+{
+   background-color: rgb(220, 226, 227);
+}
+
+.notification-item
+{
+   background-color: rgb(231, 237, 238);
+   padding: 35px;
+   margin-left: 15px;
+   margin-right: 15px;
+   margin-bottom: 10px;
+   border-radius: 6px;
+}
+
+::-webkit-scrollbar { 
+   display: none; 
+}
+
+.notifications-list li:first-child a {
+   margin-top: 15px;
+   border-radius: 20px;
+   border-bottom-left-radius: 1px;
+   border-bottom-right-radius: 1px;
+}
+
+.notifications-list li:last-child a {
+   margin-bottom: 5px;
+   border-radius: 20px;
+   border-top-left-radius: 1px;
+   border-top-right-radius: 1px;
+}
+/*****************************************************/

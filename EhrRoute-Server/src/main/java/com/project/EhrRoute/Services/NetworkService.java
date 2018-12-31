@@ -20,8 +20,14 @@ public class NetworkService
         return networkRepository.findByNetworkUUID(netUUID).orElse(null);
     }
 
+
     @Transactional
     public void saveNetwork(Network network) {
         networkRepository.save(network);
+    }
+
+
+    @Transactional String getNetworkChainRoot(Network network) {
+        return network.getChainRoot().getRoot();
     }
 }

@@ -4,7 +4,6 @@ import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
 import com.project.EhrRoute.Entities.Core.Network;
-import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping("/network")
@@ -43,7 +41,7 @@ public class NetworkController
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
+    public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
         System.out.println("A NETWORK CREATION REQUEST HAS BEEN MADE WITH NETWORK NAME: " + networkName);
 
@@ -94,6 +92,26 @@ public class NetworkController
 
         return new ResponseEntity<>(
             genesis,
+            HttpStatus.OK
+        );
+    }
+
+
+    @GetMapping("/get-root")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getNetworkChainRoot(@RequestParam("networkuuid") String networkUUID)
+    {
+        Network network = networkService.findByNetUUID(networkUUID);
+
+        if (network == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "A Network with networkUUID: " + networkUUID + " was not found"),
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        return new ResponseEntity<>(
+            network.getChainRoot().getRoot(),
             HttpStatus.OK
         );
     }

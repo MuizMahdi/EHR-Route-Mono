@@ -29,6 +29,7 @@ import { NetworkManagerComponent } from './Components/network-manager/network-ma
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
+import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
 
 registerLocaleData(en);
 
@@ -45,7 +46,8 @@ registerLocaleData(en);
     NavBarComponent,
     NavUserMenuComponent,
     NavSearchComponent,
-    NetworkManagerComponent
+    NetworkManagerComponent,
+    NavUserNotificationsComponent
   ],
 
   imports: [

@@ -1,6 +1,5 @@
+import { Component } from '@angular/core';
 import { MainLayoutService } from './Services/main-layout.service';
-import { Component, OnInit } from '@angular/core';
-import { NodeClustersService } from './Services/node-clusters.service';
 
 
 @Component({
@@ -10,10 +9,7 @@ import { NodeClustersService } from './Services/node-clusters.service';
 })
 
 
-export class AppComponent implements OnInit
+export class AppComponent
 {
-   constructor(public mainLayout:MainLayoutService, ) { }
-
-   ngOnInit() 
-   { }
+   constructor(public mainLayout:MainLayoutService) { }
 }

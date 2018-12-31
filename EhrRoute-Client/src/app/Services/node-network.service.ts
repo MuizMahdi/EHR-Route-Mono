@@ -14,6 +14,7 @@ export class NodeNetworkService
 {
    
    userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
+   networkRootUrl:string = environment.apiUrl + '/network/get-root';
    createNetworkUrl:string = environment.apiUrl + '/network/create';
 
    
@@ -29,6 +30,20 @@ export class NodeNetworkService
          })
          
       );
+      
+   }
+
+
+   getNetworkRoot(networkUUID:string): Observable<any> {
+
+      return this.http.get(this.networkRootUrl + '?networkuuid=' + networkUUID).pipe(first(),
+
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
    }
 
    
