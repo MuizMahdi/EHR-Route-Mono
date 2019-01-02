@@ -2,14 +2,9 @@ package com.project.EhrRoute.Utilities;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
-import com.project.EhrRoute.Entities.Core.Network;
-import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Exceptions.InvalidNotificationException;
 import com.project.EhrRoute.Models.NotificationType;
-import com.project.EhrRoute.Services.NetworkService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.InvalidObjectException;
 
 
 @Component
