@@ -3,6 +3,7 @@ import com.project.EhrRoute.Audits.DateAudit;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Models.NotificationType;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 
@@ -24,10 +25,11 @@ public class Notification extends DateAudit
     private User recipient;
 
     @NotNull
+    @NotBlank
     private NotificationType type;
 
     @JoinColumn(name = "reference_id", nullable = false)
-    private Object reference;
+    private Object reference; // NetworkInvitationRequest or ConsentRequest
 
 
     public Notification() { }
