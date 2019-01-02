@@ -1,6 +1,9 @@
 package com.project.EhrRoute.Entities.Core;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 
 @Entity
 @Table(name="Network")
@@ -10,6 +13,8 @@ public class Network
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
+    @NotBlank
     private String name;
 
     @NaturalId
@@ -22,6 +27,7 @@ public class Network
             inverseJoinColumns = @JoinColumn(name = "root_id")
     )
     private ChainRoot chainRoot;
+
 
     public Network() { }
     public Network(String networkUUID, ChainRoot chainRoot) {
