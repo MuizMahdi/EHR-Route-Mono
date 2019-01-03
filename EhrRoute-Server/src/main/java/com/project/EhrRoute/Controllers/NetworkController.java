@@ -13,10 +13,7 @@ import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
-import com.project.EhrRoute.Services.NetworkInvitationRequestService;
-import com.project.EhrRoute.Services.NetworkService;
-import com.project.EhrRoute.Services.UserService;
-import com.project.EhrRoute.Services.VerificationTokenService;
+import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +28,7 @@ public class NetworkController
 {
     private NetworkInvitationRequestService invitationRequestService;
     private VerificationTokenService verificationTokenService;
+    private NotificationService notificationService;
     private NetworkService networkService;
     private UserService userService;
 
@@ -40,9 +38,10 @@ public class NetworkController
 
 
     @Autowired
-    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, NotificationService notificationService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
         this.invitationRequestService = invitationRequestService;
         this.verificationTokenService = verificationTokenService;
+        this.notificationService = notificationService;
         this.networkService = networkService;
         this.userService = userService;
         this.genesisBlock = genesisBlock;
@@ -124,6 +123,57 @@ public class NetworkController
 
         return new ResponseEntity<>(
             network.getChainRoot().getRoot(),
+            HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/invite")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity sendNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationRequest)
+    {
+        // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
+        User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getInvitationRecipientUsernameOrEmail());
+        User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderName());
+
+        // Validate recipient
+        if (recipient == null) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid recipient username or email on invitation request"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Validate sender
+        if (sender == null) {
+            return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid sender username on invitation request"),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Create a Notification object
+        Notification notification = new Notification();
+
+        // Generate(and save) a NetworkInvitationRequest using NetworkInvitationRequestService
+        NetworkInvitationRequest networkInvitationRequest = invitationRequestService.generateInvitationRequest(
+                invitationRequest.getSenderName(),
+                invitationRequest.getNetworkName(),
+                invitationRequest.getNetworkUUID()
+        );
+
+        // Add the generated NetworkInvitationRequest to Notification object as reference
+        notification.setReference(networkInvitationRequest);
+
+        // Set notification data
+        notification.setRecipient(recipient);
+        notification.setSender(sender);
+        notification.setType(NotificationType.NETWORK_INVITATION);
+
+        // Persist notification
+        notificationService.saveNotification(notification);
+
+        return new ResponseEntity<>(
+            new ApiResponse(true, "A network invitation request notification has been successfully sent"),
             HttpStatus.OK
         );
     }
