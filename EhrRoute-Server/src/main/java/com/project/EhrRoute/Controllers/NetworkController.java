@@ -127,6 +127,7 @@ public class NetworkController
         );
     }
 
+
     @PostMapping("/invite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity sendNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationRequest)

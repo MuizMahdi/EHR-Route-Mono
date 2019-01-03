@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface NetworkInvitationRequestRepository extends JpaRepository<NetworkInvitationRequest, Long>
 {
     Optional<NetworkInvitationRequest> findByInvitationToken(String invitationToken);
+    Boolean existsByToken(String token);
+    Boolean existsByNetworkUUID(String networkUUID);
+    Boolean existsBySenderName(String senderName);
 }

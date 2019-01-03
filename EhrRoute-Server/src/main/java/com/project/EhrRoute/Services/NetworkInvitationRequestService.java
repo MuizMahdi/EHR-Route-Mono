@@ -40,4 +40,20 @@ public class NetworkInvitationRequestService
         // Return the request object to be added as a Notification reference
         return invitationRequest;
     }
+
+    public boolean validateInvitationRequestExistence(NetworkInvitationRequest invitationRequest)
+    {
+        // Check if a network invitation request exists in DB by the values of 'invitationRequest'
+        boolean existsByToken = networkInvitationRequestRepository.existsByToken(invitationRequest.getInvitationToken());
+        boolean existsByNetUUID = networkInvitationRequestRepository.existsByNetworkUUID(invitationRequest.getNetworkUUID());
+        boolean existsBySenderName = networkInvitationRequestRepository.existsBySenderName(invitationRequest.getSenderName());
+
+        // If valid (all exist)
+        if (existsByToken && existsByNetUUID && existsBySenderName) {
+            return true;
+        }
+
+        // If invalid
+        return false;
+    }
 }
