@@ -26,8 +26,8 @@ public class VerificationTokenService
     }
 
     @Transactional
-    public VerificationToken getVerificationToken(String UuidFromURL)
+    public VerificationToken getVerificationToken(String token)
     {
-        return verificationTokenRepository.findByToken(UuidFromURL);
+        return verificationTokenRepository.findByToken(token);
     }
 }

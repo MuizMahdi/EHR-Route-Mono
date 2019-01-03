@@ -28,6 +28,7 @@ public class Notification extends DateAudit
     @NotBlank
     private NotificationType type;
 
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reference_id", nullable = false)
     private Object reference; // NetworkInvitationRequest or ConsentRequest
 

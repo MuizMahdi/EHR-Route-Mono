@@ -27,6 +27,11 @@ public class NetworkInvitationRequest
     @NotBlank
     private String networkUUID;
 
+    // The token of a verification token, which lasts for 24 hours, and is used to accept the invitation.
+    @NotNull
+    @NotBlank
+    private String invitationToken;
+
 
     public NetworkInvitationRequest() { }
     public NetworkInvitationRequest(@NotNull @NotBlank String senderName, @NotNull @NotBlank String networkName, @NotNull @NotBlank String networkUUID) {
