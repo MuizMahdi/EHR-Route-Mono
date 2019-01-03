@@ -25,6 +25,12 @@ public class VerificationTokenService
         verificationTokenRepository.save(token);
     }
 
+    @Transactional void createToken(String UUID)
+    {
+        VerificationToken token = new VerificationToken(UUID);
+        verificationTokenRepository.save(token);
+    }
+
     @Transactional
     public VerificationToken getVerificationToken(String token)
     {

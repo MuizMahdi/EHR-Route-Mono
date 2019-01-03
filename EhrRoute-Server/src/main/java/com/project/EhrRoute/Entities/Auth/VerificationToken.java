@@ -16,7 +16,7 @@ public class VerificationToken
     private String token;
 
     @OneToOne(targetEntity=User.class, fetch=FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name="user_id")
     private User user;
 
     private static final int expiration = 60*24; // Token Expiration time = 24 Hours
