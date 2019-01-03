@@ -4,8 +4,11 @@ import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Auth.VerificationToken;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Exceptions.NullUserNetworkException;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
 import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
@@ -19,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Calendar;
 
 
 @RestController
@@ -33,6 +39,7 @@ public class NetworkController
     private UserService userService;
 
     private GenesisBlock genesisBlock;
+
     private ModelMapper modelMapper;
     private StringUtil stringUtil;
 
@@ -178,4 +185,129 @@ public class NetworkController
             HttpStatus.OK
         );
     }
+
+
+    @PostMapping("/invitation-accept")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationResponse invitationResponse)
+    {
+        NetworkInvitationRequest invitationRequest;
+
+        try
+        {
+            // Get NetworkInvitationRequest object from invitation response
+            invitationRequest = modelMapper.mapInvitationResponseToRequest(invitationResponse);
+        }
+        catch (ResourceEmptyException Ex) // Catch null or empty response fields
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(true, "Invalid invitation response object"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Validate invitation request of response
+        boolean requestExists = invitationRequestService.validateInvitationRequestExistence(invitationRequest);
+
+        /*
+        *   Verify token in response and its expiration date -
+        *   (by getting token from DB using tokenService and checking if expired)
+        *   after validating the response existence
+        */
+
+        // If a request with the response values exist on DB
+        if (requestExists)
+        {
+            // Get current calendar time(used to check if invitation token is expired)
+            Calendar cal = Calendar.getInstance();
+
+            // Get token object from DB using the token string taken from url.
+            VerificationToken token = verificationTokenService.getVerificationToken(invitationResponse.getToken());
+
+            // Invalid token check
+            if (token == null)
+            {
+                return new ResponseEntity<>(
+                    new ApiResponse(false, "Invalid invitation token in response"),
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+
+            // Expired token check
+            if ((token.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0)
+            {
+                return new ResponseEntity<>(
+                    new ApiResponse(false, "Expired invitation request"),
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+
+            // Add Network to User networks if token is valid (not expired and exists)
+            try
+            {
+                addUserNetwork(invitationResponse.getRecipientName(), invitationResponse.getNetworkUUID());
+            }
+            catch (Exception Ex)
+            {
+                // If a user with the recipient name of response was not found
+                if (Ex.getClass().equals(UsernameNotFoundException.class))
+                {
+                    return new ResponseEntity<>(
+                        new ApiResponse(false, Ex.getMessage()),
+                        HttpStatus.BAD_REQUEST
+                    );
+                }
+
+                // If a network with the network UUID of response was not found
+                if (Ex.getClass().equals(NullUserNetworkException.class))
+                {
+                    return new ResponseEntity<>(
+                        new ApiResponse(false, Ex.getMessage()),
+                        HttpStatus.BAD_REQUEST
+                    );
+                }
+            }
+
+        }
+        // If a request with the response values doesn't exist on DB
+        else
+        {
+            return new ResponseEntity<>(
+                new ApiResponse(true, "An invitation request wasn't sent with such invitation response values. Invalid invitation."),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // If no error occurred, and everything was valid, send an OK response.
+        return new ResponseEntity<>(
+            new ApiResponse(true, "An invitation request wasn't sent with such invitation response values. Invalid invitation."),
+            HttpStatus.OK
+        );
+    }
+
+    private void addUserNetwork(String invitedUserUsername, String networkUUID) throws UsernameNotFoundException, NullUserNetworkException
+    {
+        // Get the invited User object
+        User invitedUser = userService.findUserByUsernameOrEmail(invitedUserUsername);
+
+        // Handle user not found on DB
+        if (invitedUser == null) {
+            throw new UsernameNotFoundException("A user with username: " + invitedUserUsername + " was not found. Adding network to user networks failed.");
+        }
+
+        // Get the network of networkUUID
+        Network network = networkService.findByNetUUID(networkUUID);
+
+        // Handle network not found on DB
+        if (network == null) {
+            throw new NullUserNetworkException("A network with networkUUID: [" + networkUUID + "] was not found. Adding network to user networks failed.");
+        }
+
+        // Add network to user networks if no error occurred
+        invitedUser.addNetwork(network);
+
+        // Save user to persist changes
+        userService.saveUser(invitedUser);
+    }
+
 }

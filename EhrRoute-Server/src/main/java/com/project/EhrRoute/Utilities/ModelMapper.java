@@ -174,7 +174,7 @@ public class ModelMapper
         return userNetworksResponse;
     }
 
-    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationResponse invitationResponse)
+    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationResponse invitationResponse) throws ResourceEmptyException
     {
         String senderName = invitationResponse.getSenderName();
         String networkName = invitationResponse.getNetworkName();
