@@ -34,10 +34,11 @@ public class NetworkInvitationRequest
 
 
     public NetworkInvitationRequest() { }
-    public NetworkInvitationRequest(@NotNull @NotBlank String senderName, @NotNull @NotBlank String networkName, @NotNull @NotBlank String networkUUID) {
+    public NetworkInvitationRequest(@NotNull @NotBlank String senderName, @NotNull @NotBlank String networkName, @NotNull @NotBlank String networkUUID, @NotNull @NotBlank String invitationToken) {
         this.senderName = senderName;
         this.networkName = networkName;
         this.networkUUID = networkUUID;
+        this.invitationToken = invitationToken;
     }
 
 
@@ -53,6 +54,9 @@ public class NetworkInvitationRequest
     public String getNetworkUUID() {
         return networkUUID;
     }
+    public String getInvitationToken() {
+        return invitationToken;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -65,5 +69,8 @@ public class NetworkInvitationRequest
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
+    }
+    public void setInvitationToken(String invitationToken) {
+        this.invitationToken = invitationToken;
     }
 }
