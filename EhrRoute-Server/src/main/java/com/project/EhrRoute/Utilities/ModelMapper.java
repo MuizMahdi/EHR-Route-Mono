@@ -2,9 +2,12 @@ package com.project.EhrRoute.Utilities;
 import com.project.EhrRoute.Core.*;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
+import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
 import com.project.EhrRoute.Payload.Core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -169,5 +172,32 @@ public class ModelMapper
         userNetworksResponse.setUserNetworks(networkResponseSet);
 
         return userNetworksResponse;
+    }
+
+    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationResponse invitationResponse)
+    {
+        String senderName = invitationResponse.getSenderName();
+        String networkName = invitationResponse.getNetworkName();
+        String networkUUID = invitationResponse.getNetworkUUID();
+        String invitationToken = invitationResponse.getToken();
+
+        // Validate NetworkInvitationResponse fields
+        if (
+            senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
+            networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty())
+        {
+            throw new ResourceEmptyException("Invalid invitation response");
+        }
+
+        // Create a request object using the response fields (will be used to validate the
+        // response by checking whether a request with the fields of the response exists or not)
+        NetworkInvitationRequest invitationRequest = new NetworkInvitationRequest(
+                invitationResponse.getSenderName(),
+                invitationResponse.getNetworkName(),
+                invitationResponse.getNetworkUUID(),
+                invitationResponse.getToken()
+        );
+
+        return invitationRequest;
     }
 }
