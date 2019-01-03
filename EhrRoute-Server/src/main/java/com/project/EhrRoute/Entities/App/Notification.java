@@ -36,6 +36,7 @@ public class Notification extends DateAudit
     public Notification() { }
     public Notification(@NotNull boolean isRead, User sender, User recipient, @NotNull NotificationType type, Object reference) {
         this.isRead = isRead;
+        this.isRead = false;
         this.sender = sender;
         this.recipient = recipient;
         this.type = type;

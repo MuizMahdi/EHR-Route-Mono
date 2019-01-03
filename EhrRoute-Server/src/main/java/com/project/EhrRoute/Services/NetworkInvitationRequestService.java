@@ -23,7 +23,7 @@ public class NetworkInvitationRequestService
 
 
     @Transactional
-    public void saveInvitationRequest(String senderName, String networkName, String networkUUID)
+    public NetworkInvitationRequest generateInvitationRequest(String senderName, String networkName, String networkUUID)
     {
         // Save token on DB, will be used to verify invitation request expiration
         String token = uuidUtil.generateUUID();
@@ -36,5 +36,8 @@ public class NetworkInvitationRequestService
 
         // Save invitation request
         networkInvitationRequestRepository.save(invitationRequest);
+
+        // Return the request object to be added as a Notification reference
+        return invitationRequest;
     }
 }

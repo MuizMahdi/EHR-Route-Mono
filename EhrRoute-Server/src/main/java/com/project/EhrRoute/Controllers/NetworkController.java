@@ -1,15 +1,22 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.GenesisBlock;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
+import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
+import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Models.NotificationType;
+import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
+import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
+import com.project.EhrRoute.Services.NetworkInvitationRequestService;
 import com.project.EhrRoute.Services.NetworkService;
 import com.project.EhrRoute.Services.UserService;
+import com.project.EhrRoute.Services.VerificationTokenService;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/network")
 public class NetworkController
 {
+    private NetworkInvitationRequestService invitationRequestService;
+    private VerificationTokenService verificationTokenService;
     private NetworkService networkService;
     private UserService userService;
 
@@ -31,13 +40,16 @@ public class NetworkController
 
 
     @Autowired
-    public NetworkController(NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+        this.invitationRequestService = invitationRequestService;
+        this.verificationTokenService = verificationTokenService;
         this.networkService = networkService;
         this.userService = userService;
         this.genesisBlock = genesisBlock;
         this.modelMapper = modelMapper;
         this.stringUtil = stringUtil;
     }
+
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
