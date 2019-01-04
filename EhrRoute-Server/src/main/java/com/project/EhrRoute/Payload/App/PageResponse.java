@@ -5,32 +5,37 @@ import java.util.List;
 public class PageResponse<T>
 {
     private List<T> resources;
-    private int page;
-    private int size;
+    private int pageNumber;
+    private int pageSize;
     private long totalElements;
     private int totalPages;
-    private boolean last;
+    private boolean isFirst;
+    private boolean isLast;
 
 
     public PageResponse() { }
-    public PageResponse(List<T> resources, int page, int size, long totalElements, int totalPages, boolean last) {
+    public PageResponse(List<T> resources, int pageNumber, int pageSize, long totalElements, int totalPages, boolean isFirst, boolean isLast) {
         this.resources = resources;
-        this.page = page;
-        this.size = size;
+        this.pageNumber = pageNumber;
+        this.pageSize = pageSize;
         this.totalElements = totalElements;
         this.totalPages = totalPages;
-        this.last = last;
+        this.isFirst = isFirst;
+        this.isLast = isLast;
     }
 
 
-    public int getSize() {
-        return size;
-    }
-    public int getPage() {
-        return page;
-    }
     public boolean isLast() {
-        return last;
+        return isLast;
+    }
+    public boolean isFirst() {
+        return isFirst;
+    }
+    public int getPageSize() {
+        return pageSize;
+    }
+    public int getPageNumber() {
+        return pageNumber;
     }
     public int getTotalPages() {
         return totalPages;
@@ -42,14 +47,17 @@ public class PageResponse<T>
         return totalElements;
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
-    public void setPage(int page) {
-        this.page = page;
-    }
     public void setLast(boolean last) {
-        this.last = last;
+        isLast = last;
+    }
+    public void setFirst(boolean first) {
+        isFirst = first;
+    }
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
     }
     public void setResources(List<T> content) {
         this.resources = resources;
