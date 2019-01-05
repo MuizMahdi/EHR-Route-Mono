@@ -3,11 +3,15 @@ import com.project.EhrRoute.Core.*;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
+import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Models.NotificationType;
+import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
 import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
+import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.Core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -201,5 +205,24 @@ public class ModelMapper
         return invitationRequest;
     }
 
+    public NotificationResponse mapNotificationToNotificationResponse(User sender, User recipient, NotificationType type, Object reference)
+    {
+        return new NotificationResponse(
+                sender.getUsername(),
+                recipient.getUsername(),
+                type.toString(),
+                reference
+        );
+    }
 
+    public NetworkInvitationRequestPayload mapNetworkInvitationRequestToPayload(NetworkInvitationRequest invitationRequest, String recipientUsername)
+    {
+        return new NetworkInvitationRequestPayload(
+            recipientUsername,
+            invitationRequest.getSenderName(),
+            invitationRequest.getNetworkName(),
+            invitationRequest.getNetworkUUID(),
+            invitationRequest.getInvitationToken()
+        );
+    }
 }

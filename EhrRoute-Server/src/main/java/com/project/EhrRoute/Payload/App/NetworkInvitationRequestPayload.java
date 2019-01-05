@@ -3,36 +3,37 @@ package com.project.EhrRoute.Payload.App;
 
 public class NetworkInvitationRequestPayload
 {
-    private String invitationRecipientUsernameOrEmail;
-    private String senderName;
+    private String recipientUsername;
+    private String senderUsername;
     private String networkName;
     private String networkUUID;
+    private String invitationToken;
 
 
     public NetworkInvitationRequestPayload() { }
-    public NetworkInvitationRequestPayload(String invitationRecipientUsernameOrEmail, String senderName, String networkName, String networkUUID) {
-        this.invitationRecipientUsernameOrEmail = invitationRecipientUsernameOrEmail;
-        this.senderName = senderName;
+    public NetworkInvitationRequestPayload(String recipientUsername, String senderUsername, String networkName, String networkUUID, String invitationToken) {
+        this.recipientUsername = recipientUsername;
+        this.senderUsername = senderUsername;
         this.networkName = networkName;
         this.networkUUID = networkUUID;
+        this.invitationToken = invitationToken;
     }
 
 
-    public String getSenderName() {
-        return senderName;
-    }
     public String getNetworkName() {
         return networkName;
     }
     public String getNetworkUUID() {
         return networkUUID;
     }
-    public String getInvitationRecipientUsernameOrEmail() {
-        return invitationRecipientUsernameOrEmail;
+    public String getSenderUsername() {
+        return senderUsername;
     }
-
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public String getInvitationToken() {
+        return invitationToken;
+    }
+    public String getRecipientUsername() {
+        return recipientUsername;
     }
     public void setNetworkName(String networkName) {
         this.networkName = networkName;
@@ -40,7 +41,13 @@ public class NetworkInvitationRequestPayload
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
     }
-    public void setInvitationRecipientUsernameOrEmail(String invitationRecipientUsernameOrEmail) {
-        this.invitationRecipientUsernameOrEmail = invitationRecipientUsernameOrEmail;
+    public void setSenderUsername(String senderUsername) {
+        this.senderUsername = senderUsername;
+    }
+    public void setInvitationToken(String invitationToken) {
+        this.invitationToken = invitationToken;
+    }
+    public void setRecipientUsername(String recipientUsername) {
+        this.recipientUsername = recipientUsername;
     }
 }

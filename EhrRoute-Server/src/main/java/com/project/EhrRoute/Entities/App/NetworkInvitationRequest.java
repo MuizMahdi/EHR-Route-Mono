@@ -6,8 +6,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "network_invitation_requests")
-public class NetworkInvitationRequest
-{
+public class NetworkInvitationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -13,8 +13,7 @@ import java.util.HashSet;
 
 @Entity
 @Table(name = "ConsentRequestBlock")
-public class ConsentRequestBlock
-{
+public class ConsentRequestBlock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

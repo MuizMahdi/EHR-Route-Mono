@@ -7,6 +7,7 @@ import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Models.PageConstants;
+import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.App.PageResponse;
 import com.project.EhrRoute.Repositories.NotificationRepository;
 import com.project.EhrRoute.Security.CurrentUser;
@@ -46,6 +47,7 @@ public class NotificationService
     }
 
 
+    @Transactional
     public PageResponse getCurrentUserNotifications(@CurrentUser UserPrincipal currentUser, int pageNumber, int pageSize) throws ResourceNotFoundException
     {
         // Validate page number and size constraints
@@ -85,25 +87,36 @@ public class NotificationService
         List<NotificationResponse> notificationResponses = notifications.forEach(notification -> {
 
             // Check for network invitation notifications
-            if ((notification.getType().equals(NotificationType.NETWORK_INVITATION)) && (notification.getReference() == NetworkInvitationRequest.class))
+            if ((notification.getType().equals(NotificationType.NETWORK_INVITATION)) && (notification.getReference() instanceof NetworkInvitationRequest))
             {
-                // Add a network invitation type notification
+                // Get invitation request from notification's reference
+                NetworkInvitationRequest invitationRequest = (NetworkInvitationRequest) notification.getReference();
+
+                // recipient username is needed for the network invitation request payload
+                String recipientUsername = notification.getRecipient().getUsername();
+
+                // Add a Network_Invitation type notification response
                 return modelMapper.mapNotificationToNotificationResponse(
                     notification.getSender(),
                     notification.getRecipient(),
-                    notification.getType().toString(),
-                    modelMapper.mapNetworkInvitationRequestToPayload(notification.getReference())
+                    notification.getType(),
+
+                    // Convert the invitation request to an invitation request payload object before setting it as the NotificationResponse's reference
+                    modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientUsername)
                 );
             }
 
             // Check for consent request notifications
-            if ((notification.getType().equals(NotificationType.CONSENT_REQUEST)) && (notification.getReference() == ConsentRequestBlock.class))
+            if ((notification.getType().equals(NotificationType.CONSENT_REQUEST)) && (notification.getReference() instanceof ConsentRequestBlock))
             {
-                // Add a consent request type notification
+                // Get ConsentRequest from notification's reference
+                
+
+                // Add a Consent_Request type notification response
                 return modelMapper.mapNotificationToNotificationResponse(
                     notification.getSender(),
                     notification.getRecipient(),
-                    notification.getType().toString(),
+                    notification.getType(),
                     modelMapper.mapConsentRequestToUserConsentRequest(notification.getReference())
                 );
             }
