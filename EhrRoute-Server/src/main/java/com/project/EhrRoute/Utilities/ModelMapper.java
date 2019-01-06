@@ -229,7 +229,49 @@ public class ModelMapper
         );
     }
 
-    public List<String> mapEhrProblemsToList(Set<EhrProblems> ehrPatientProblems)
+
+    public UserConsentRequest mapConsentRequestBlockToUserConsentRequest(ConsentRequestBlock consentRequestBlock)
+    {
+        MedicalRecord medicalRecord = new MedicalRecord();
+
+        // Patients information are not stored on server-side, and are obtained from client-side
+        // when the user accepts the consent request as a consent response.
+        medicalRecord.setPatientInfo(new PatientInfo());
+
+        medicalRecord.setProblems(mapEhrProblemsToList(consentRequestBlock.getProblems()));
+        medicalRecord.setHistory(mapEhrHistoryToMap(consentRequestBlock.getHistory()));
+        medicalRecord.setAllergiesAndReactions(mapEhrAllergiesToList(consentRequestBlock.getAllergies()));
+
+        SerializableTransaction transaction = new SerializableTransaction(
+            consentRequestBlock.getTransactionId(),
+            medicalRecord,
+            consentRequestBlock.getSenderPubKey(),
+            consentRequestBlock.getSenderAddress(),
+            consentRequestBlock.getRecipientAddress(),
+            consentRequestBlock.getSignature()
+        );
+
+        SerializableBlockHeader blockHeader = new SerializableBlockHeader(
+            consentRequestBlock.getHash(),
+            consentRequestBlock.getPreviousHash(),
+            consentRequestBlock.getTimeStamp(),
+            consentRequestBlock.getBlockIndex(),
+            consentRequestBlock.getMerkleRoot(),
+            consentRequestBlock.getNetworkUUID()
+        );
+
+        SerializableBlock block = new SerializableBlock(blockHeader, transaction);
+
+        return new UserConsentRequest(
+            block,
+            consentRequestBlock.getChainRootWithBlock(),
+            consentRequestBlock.getProviderUUID(),
+            consentRequestBlock.getNetworkUUID(),
+            consentRequestBlock.getUserID()
+        );
+    }
+
+    private List<String> mapEhrProblemsToList(Set<EhrProblems> ehrPatientProblems)
     {
         List<String> patientProblems = ehrPatientProblems.stream().map(
             EhrProblems::getProblem
@@ -238,7 +280,7 @@ public class ModelMapper
         return patientProblems;
     }
 
-    public List<String> mapEhrAllergiesToList(Set<EhrAllergies> ehrPatientAllergies)
+    private List<String> mapEhrAllergiesToList(Set<EhrAllergies> ehrPatientAllergies)
     {
         List<String> pateintAllergies = ehrPatientAllergies.stream().map(
                 EhrAllergies::getAllergy
@@ -247,7 +289,7 @@ public class ModelMapper
         return pateintAllergies;
     }
 
-    public Map<String, Boolean> mapEhrHistoryToMap(Set<EhrHistory> ehrPatientHistory)
+    private Map<String, Boolean> mapEhrHistoryToMap(Set<EhrHistory> ehrPatientHistory)
     {
         Map<String, Boolean> patientHistory = ehrPatientHistory.stream().collect(
             Collectors.toMap(EhrHistory::getCondition, EhrHistory::isOccurrence)
