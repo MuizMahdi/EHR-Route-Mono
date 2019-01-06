@@ -2,11 +2,9 @@ package com.project.EhrRoute.Entities.Core;
 import com.project.EhrRoute.Entities.EHR.EhrHistory;
 import com.project.EhrRoute.Entities.EHR.EhrProblems;
 import com.project.EhrRoute.Entities.EHR.EhrAllergies;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-
 import java.util.Set;
 import java.util.HashSet;
 

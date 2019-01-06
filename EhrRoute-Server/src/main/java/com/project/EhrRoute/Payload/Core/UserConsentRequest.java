@@ -6,9 +6,9 @@ public class UserConsentRequest
     private String chainRootWithBlock;
     private String providerUUID;
     private String networkUUID;
-    private String userID;
+    private Long userID;
 
-    public UserConsentRequest(SerializableBlock block, String chainRootWithBlock, String providerUUID, String networkUUID, String userID) {
+    public UserConsentRequest(SerializableBlock block, String chainRootWithBlock, String providerUUID, String networkUUID, Long userID) {
         this.block = block;
         this.chainRootWithBlock = chainRootWithBlock;
         this.providerUUID = providerUUID;
@@ -16,7 +16,7 @@ public class UserConsentRequest
         this.userID = userID;
     }
 
-    public String getUserID() {
+    public Long getUserID() {
         return userID;
     }
     public SerializableBlock getBlock() {
@@ -32,7 +32,7 @@ public class UserConsentRequest
         return chainRootWithBlock;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(Long userID) {
         this.userID = userID;
     }
     public void setBlock(SerializableBlock block) {

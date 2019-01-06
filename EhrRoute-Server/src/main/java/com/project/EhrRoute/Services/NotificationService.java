@@ -110,14 +110,16 @@ public class NotificationService
             if ((notification.getType().equals(NotificationType.CONSENT_REQUEST)) && (notification.getReference() instanceof ConsentRequestBlock))
             {
                 // Get ConsentRequest from notification's reference
-                
+                ConsentRequestBlock consentRequestBlock = (ConsentRequestBlock) notification.getReference();
 
                 // Add a Consent_Request type notification response
                 return modelMapper.mapNotificationToNotificationResponse(
                     notification.getSender(),
                     notification.getRecipient(),
                     notification.getType(),
-                    modelMapper.mapConsentRequestToUserConsentRequest(notification.getReference())
+
+                    //
+                    modelMapper.mapConsentRequestBlockToUserConsentRequest(consentRequestBlock)
                 );
             }
 

@@ -279,11 +279,11 @@ public class TransactionController
         {
             // Create a consent request from block, user ID and provider UUID
             ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(
-                    userID,
-                    event.getProviderUUID(),
-                    event.getNetworkUUID(), // NetworkUUID of the provider
-                    event.getBlock(),
-                    event.getChainRootWithBlock()
+                userID,
+                event.getProviderUUID(),
+                event.getNetworkUUID(), // NetworkUUID of the provider
+                event.getBlock(),
+                event.getChainRootWithBlock()
             );
 
             // Persist the consent request
@@ -295,11 +295,11 @@ public class TransactionController
         // If user exists (online) then send it as a notification through a server sent event.
 
         UserConsentRequest userConsentRequest = new UserConsentRequest(
-                event.getBlock(),
-                event.getChainRootWithBlock(),
-                event.getProviderUUID(),
-                event.getNetworkUUID(),
-                stringUserID
+            event.getBlock(),
+            event.getChainRootWithBlock(),
+            event.getProviderUUID(),
+            event.getNetworkUUID(),
+            userID
         );
 
         // Get user emitter from users cluster

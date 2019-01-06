@@ -6,6 +6,9 @@ import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Entities.EHR.EhrProblems;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Entities.EHR.PatientInfo;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
@@ -208,10 +211,10 @@ public class ModelMapper
     public NotificationResponse mapNotificationToNotificationResponse(User sender, User recipient, NotificationType type, Object reference)
     {
         return new NotificationResponse(
-                sender.getUsername(),
-                recipient.getUsername(),
-                type.toString(),
-                reference
+            sender.getUsername(),
+            recipient.getUsername(),
+            type.toString(),
+            reference
         );
     }
 
@@ -224,5 +227,14 @@ public class ModelMapper
             invitationRequest.getNetworkUUID(),
             invitationRequest.getInvitationToken()
         );
+    }
+
+    public Set<String> mapEhrProblemsToStringSet(Set<EhrProblems> ehrPatientProblems)
+    {
+        Set<String> patientProblems = ehrPatientProblems.stream().map(
+            EhrProblems::getProblem
+        ).collect(Collectors.toSet());
+
+        return patientProblems;
     }
 }
