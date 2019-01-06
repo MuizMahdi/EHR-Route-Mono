@@ -4,6 +4,7 @@ import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Exceptions.BadRequestException;
+import com.project.EhrRoute.Exceptions.InvalidNotificationException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Models.PageConstants;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -48,7 +50,7 @@ public class NotificationService
 
 
     @Transactional
-    public PageResponse getCurrentUserNotifications(@CurrentUser UserPrincipal currentUser, int pageNumber, int pageSize) throws ResourceNotFoundException
+    public PageResponse getCurrentUserNotifications(@CurrentUser UserPrincipal currentUser, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
     {
         // Validate page number and size constraints
         validatePageNumberAndSize(pageNumber, pageSize);
@@ -84,10 +86,12 @@ public class NotificationService
         List<Notification> notifications = notificationsPage.getContent();
 
         // Map Notifications to NotificationResponses
-        List<NotificationResponse> notificationResponses = notifications.forEach(notification -> {
+        List<NotificationResponse> notificationResponses = notifications.stream().map(notification -> {
+
+            Object notificationReference = null;
 
             // Check for network invitation notifications
-            if ((notification.getType().equals(NotificationType.NETWORK_INVITATION)) && (notification.getReference() instanceof NetworkInvitationRequest))
+            if (notification.getType().equals(NotificationType.NETWORK_INVITATION))
             {
                 // Get invitation request from notification's reference
                 NetworkInvitationRequest invitationRequest = (NetworkInvitationRequest) notification.getReference();
@@ -95,35 +99,40 @@ public class NotificationService
                 // recipient username is needed for the network invitation request payload
                 String recipientUsername = notification.getRecipient().getUsername();
 
-                // Add a Network_Invitation type notification response
-                return modelMapper.mapNotificationToNotificationResponse(
-                    notification.getSender(),
-                    notification.getRecipient(),
-                    notification.getType(),
+                if (invitationRequest == null || invitationRequest.getId() == null) {
+                    throw new InvalidNotificationException("Invalid NetworkInvitationRequest notification reference.");
+                }
 
-                    // Convert the invitation request to an invitation request payload object before setting it as the NotificationResponse's reference
-                    modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientUsername)
-                );
+                // Set the notification reference object as a UserConsentRequest
+                notificationReference = modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientUsername);
             }
 
             // Check for consent request notifications
-            if ((notification.getType().equals(NotificationType.CONSENT_REQUEST)) && (notification.getReference() instanceof ConsentRequestBlock))
+            if (notification.getType().equals(NotificationType.CONSENT_REQUEST))
             {
                 // Get ConsentRequest from notification's reference
                 ConsentRequestBlock consentRequestBlock = (ConsentRequestBlock) notification.getReference();
 
-                // Add a Consent_Request type notification response
-                return modelMapper.mapNotificationToNotificationResponse(
-                    notification.getSender(),
-                    notification.getRecipient(),
-                    notification.getType(),
+                if (consentRequestBlock == null || consentRequestBlock.getId() == null) {
+                    throw new InvalidNotificationException("Invalid ConsentRequestBlock notification reference.");
+                }
 
-                    //
-                    modelMapper.mapConsentRequestBlockToUserConsentRequest(consentRequestBlock)
-                );
+                // Set the notification reference object as a UserConsentRequest
+                notificationReference = modelMapper.mapConsentRequestBlockToUserConsentRequest(consentRequestBlock);
             }
 
-        });
+            if (notificationReference == null) {
+                throw new InvalidNotificationException("Invalid or null notification type");
+            }
+
+            return modelMapper.mapNotificationToNotificationResponse(
+                notification.getSender(),
+                notification.getRecipient(),
+                notification.getType(),
+                notificationReference
+            );
+
+        }).collect(Collectors.toList());
 
         // Return a page response with the notification responses
         return new PageResponse<>(
