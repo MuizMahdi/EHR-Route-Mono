@@ -6,9 +6,7 @@ import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
-import com.project.EhrRoute.Entities.EHR.EhrProblems;
-import com.project.EhrRoute.Entities.EHR.MedicalRecord;
-import com.project.EhrRoute.Entities.EHR.PatientInfo;
+import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
@@ -20,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -229,12 +229,30 @@ public class ModelMapper
         );
     }
 
-    public Set<String> mapEhrProblemsToStringSet(Set<EhrProblems> ehrPatientProblems)
+    public List<String> mapEhrProblemsToList(Set<EhrProblems> ehrPatientProblems)
     {
-        Set<String> patientProblems = ehrPatientProblems.stream().map(
+        List<String> patientProblems = ehrPatientProblems.stream().map(
             EhrProblems::getProblem
-        ).collect(Collectors.toSet());
+        ).collect(Collectors.toList());
 
         return patientProblems;
+    }
+
+    public List<String> mapEhrAllergiesToList(Set<EhrAllergies> ehrPatientAllergies)
+    {
+        List<String> pateintAllergies = ehrPatientAllergies.stream().map(
+                EhrAllergies::getAllergy
+        ).collect(Collectors.toList());
+
+        return pateintAllergies;
+    }
+
+    public Map<String, Boolean> mapEhrHistoryToMap(Set<EhrHistory> ehrPatientHistory)
+    {
+        Map<String, Boolean> patientHistory = ehrPatientHistory.stream().collect(
+            Collectors.toMap(EhrHistory::getCondition, EhrHistory::isOccurrence)
+        );
+
+        return patientHistory;
     }
 }
