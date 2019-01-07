@@ -1,7 +1,12 @@
 package com.project.EhrRoute.Entities.App;
 import com.project.EhrRoute.Audits.DateAudit;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Models.NotificationType;
+import org.hibernate.annotations.Any;
+import org.hibernate.annotations.AnyMetaDef;
+import org.hibernate.annotations.MetaValue;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,9 +33,17 @@ public class Notification extends DateAudit
     @NotBlank
     private NotificationType type;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reference_id", nullable = false)
-    private Object reference; // NetworkInvitationRequest or ConsentRequest
+    @Any(metaColumn = @Column(name = "notification_type_reference"))
+    @AnyMetaDef(name= "NotificationReferenceMetaDef", metaType = "string", idType = "long",
+        metaValues = {
+            @MetaValue(value = "InvitationRequest", targetEntity = NetworkInvitationRequest.class),
+            @MetaValue(value = "ConsentRequest", targetEntity = ConsentRequestBlock.class)
+        }
+    )
+    @JoinColumn(name = "reference_id")
+    private Object reference;
+
+
 
 
     public Notification() { }

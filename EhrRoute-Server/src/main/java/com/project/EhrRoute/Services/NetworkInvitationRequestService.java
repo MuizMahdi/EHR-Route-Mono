@@ -44,7 +44,7 @@ public class NetworkInvitationRequestService
     public boolean validateInvitationRequestExistence(NetworkInvitationRequest invitationRequest)
     {
         // Check if a network invitation request exists in DB by the values of 'invitationRequest'
-        boolean existsByToken = networkInvitationRequestRepository.existsByToken(invitationRequest.getInvitationToken());
+        boolean existsByToken = networkInvitationRequestRepository.existsByInvitationToken(invitationRequest.getInvitationToken());
         boolean existsByNetUUID = networkInvitationRequestRepository.existsByNetworkUUID(invitationRequest.getNetworkUUID());
         boolean existsBySenderName = networkInvitationRequestRepository.existsBySenderName(invitationRequest.getSenderName());
 
