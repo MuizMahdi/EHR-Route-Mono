@@ -50,7 +50,7 @@ public class NotificationService
 
 
     @Transactional
-    public PageResponse getCurrentUserNotifications(@CurrentUser UserPrincipal currentUser, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
+    public PageResponse getCurrentUserNotifications(String username, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
     {
         // Validate page number and size constraints
         validatePageNumberAndSize(pageNumber, pageSize);
@@ -59,10 +59,10 @@ public class NotificationService
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "createdAt");
 
         // Get currentUser User object
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
+        User user = userService.findUserByUsernameOrEmail(username);
 
         if (user == null) {
-            throw new ResourceNotFoundException("User", "username", currentUser.getUsername());
+            throw new ResourceNotFoundException("User", "username", username);
         }
 
         // Get a page of notifications using the pageable and current user as the notification recipient
@@ -145,6 +145,7 @@ public class NotificationService
             notificationsPage.isLast()
         );
     }
+
 
     private void validatePageNumberAndSize(int page, int size)
     {

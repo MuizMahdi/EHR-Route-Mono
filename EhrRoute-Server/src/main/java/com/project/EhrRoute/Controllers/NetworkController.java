@@ -139,22 +139,22 @@ public class NetworkController
     public ResponseEntity sendNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationRequest)
     {
         // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
-        User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getInvitationRecipientUsernameOrEmail());
-        User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderName());
+        User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getRecipientUsername());
+        User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderUsername());
 
         // Validate recipient
         if (recipient == null) {
             return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid recipient username or email on invitation request"),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "Invalid recipient username or email on invitation request"),
+                HttpStatus.BAD_REQUEST
             );
         }
 
         // Validate sender
         if (sender == null) {
             return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid sender username on invitation request"),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "Invalid sender username on invitation request"),
+                HttpStatus.BAD_REQUEST
             );
         }
 
@@ -163,9 +163,9 @@ public class NetworkController
 
         // Generate(and save) a NetworkInvitationRequest using NetworkInvitationRequestService
         NetworkInvitationRequest networkInvitationRequest = invitationRequestService.generateInvitationRequest(
-                invitationRequest.getSenderName(),
-                invitationRequest.getNetworkName(),
-                invitationRequest.getNetworkUUID()
+            invitationRequest.getSenderUsername(),
+            invitationRequest.getNetworkName(),
+            invitationRequest.getNetworkUUID()
         );
 
         // Add the generated NetworkInvitationRequest to Notification object as reference
