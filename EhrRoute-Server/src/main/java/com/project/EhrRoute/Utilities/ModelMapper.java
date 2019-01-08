@@ -224,8 +224,7 @@ public class ModelMapper
             recipientUsername,
             invitationRequest.getSenderName(),
             invitationRequest.getNetworkName(),
-            invitationRequest.getNetworkUUID(),
-            invitationRequest.getInvitationToken()
+            invitationRequest.getNetworkUUID()
         );
     }
 

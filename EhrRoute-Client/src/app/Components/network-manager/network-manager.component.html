@@ -25,6 +25,20 @@
       <p style="padding-bottom:70em;">Network Status</p> 
    </div>
 
+   <div>
+      <h3>Invite user to network</h3>
+      <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+         <input type="text" nz-input placeholder="User's username" [(ngModel)]="invitedUserUsername">
+      </nz-input-group>
+      
+      <ng-template #prefixTemplate><i nz-icon type="user"></i></ng-template>
+      <ng-template #suffixTemplate><i nz-icon type="close-circle" (click)="invitedUserUsername=null" *ngIf="invitedUserUsername"></i></ng-template>      
+   
+      <button (click)="inviteUser(invitedUserUsername)" nz-button nzType="primary">Invite User</button>
+   </div>
+
+
+
 </div>
 
 

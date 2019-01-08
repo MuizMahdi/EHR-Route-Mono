@@ -4,3 +4,11 @@ body
 {
    background-color: whitesmoke;
 }
+
+.boxed-content {
+   background: white;
+   border: 2px solid rgb(233, 233, 233);
+   border-radius: 5px;
+   padding: 25px;
+   margin-top: 10px;
+}

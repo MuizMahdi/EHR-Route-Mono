@@ -23,14 +23,15 @@ public class Notification extends DateAudit
     @Column(columnDefinition = "tinyint(1) default 0") // Set to false as default value
     private boolean isRead;
 
-    @JoinColumn(name = "sender_id", nullable = false)
+    @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
     private User sender;
 
-    @JoinColumn(name = "recipient_id", nullable = false)
+    @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id")
     private User recipient;
 
     @NotNull
-    @NotBlank
     private NotificationType type;
 
     @Any(metaColumn = @Column(name = "notification_type_reference"))
@@ -42,8 +43,6 @@ public class Notification extends DateAudit
     )
     @JoinColumn(name = "reference_id")
     private Object reference;
-
-
 
 
     public Notification() { }

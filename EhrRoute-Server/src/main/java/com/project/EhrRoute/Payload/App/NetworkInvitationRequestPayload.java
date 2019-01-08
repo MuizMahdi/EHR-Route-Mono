@@ -7,16 +7,14 @@ public class NetworkInvitationRequestPayload
     private String senderUsername;
     private String networkName;
     private String networkUUID;
-    private String invitationToken;
 
 
     public NetworkInvitationRequestPayload() { }
-    public NetworkInvitationRequestPayload(String recipientUsername, String senderUsername, String networkName, String networkUUID, String invitationToken) {
+    public NetworkInvitationRequestPayload(String recipientUsername, String senderUsername, String networkName, String networkUUID) {
         this.recipientUsername = recipientUsername;
         this.senderUsername = senderUsername;
         this.networkName = networkName;
         this.networkUUID = networkUUID;
-        this.invitationToken = invitationToken;
     }
 
 
@@ -29,9 +27,6 @@ public class NetworkInvitationRequestPayload
     public String getSenderUsername() {
         return senderUsername;
     }
-    public String getInvitationToken() {
-        return invitationToken;
-    }
     public String getRecipientUsername() {
         return recipientUsername;
     }
@@ -43,9 +38,6 @@ public class NetworkInvitationRequestPayload
     }
     public void setSenderUsername(String senderUsername) {
         this.senderUsername = senderUsername;
-    }
-    public void setInvitationToken(String invitationToken) {
-        this.invitationToken = invitationToken;
     }
     public void setRecipientUsername(String recipientUsername) {
         this.recipientUsername = recipientUsername;

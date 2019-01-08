@@ -163,6 +163,7 @@ public class NetworkController
 
         // Generate(and save) a NetworkInvitationRequest using NetworkInvitationRequestService
         NetworkInvitationRequest networkInvitationRequest = invitationRequestService.generateInvitationRequest(
+            recipient,
             invitationRequest.getSenderUsername(),
             invitationRequest.getNetworkName(),
             invitationRequest.getNetworkUUID()

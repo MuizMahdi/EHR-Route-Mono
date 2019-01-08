@@ -8,6 +8,7 @@ import { NetworkInfo } from 'src/app/Models/NetworkInfo';
 import { NzModalService } from 'ng-zorro-antd';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 import { ErrorResponse } from 'src/app/Models/ErrorResponse';
+import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/NetworkInvitationRequest';
 
 
 @Component({
@@ -29,6 +30,8 @@ export class NetworkManagerComponent implements OnInit
 
    newNetworkName:string;
    isNetworkCreationModalVisible:boolean = false;
+
+   invitedUserUsername:string;
 
 
    constructor(
@@ -148,5 +151,31 @@ export class NetworkManagerComponent implements OnInit
    onNetworkCreationCancel(): void 
    {
       this.isNetworkCreationModalVisible = false;
+   }
+
+
+   inviteUser(username:string): void 
+   {
+      let currentUserUsername = this.authService.getCurrentUser().username;
+
+      let invitationRequest:NetworkInvitationRequest = {
+         recipientUsername: username,
+         senderUsername: currentUserUsername,
+         networkName: this.selectedNetwork.name,
+         networkUUID: this.selectedNetwork.networkUUID
+      }
+
+      this.nodeNetworkService.sendNetworkInvitationRequest(invitationRequest).subscribe(
+
+         response => {
+            console.log(response);
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+
    }
 }

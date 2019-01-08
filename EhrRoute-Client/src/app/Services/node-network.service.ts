@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { catchError, first } from 'rxjs/operators';
 import { throwError, Observable } from 'rxjs';
+import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvitationRequest';
 
 
 @Injectable({
@@ -16,6 +17,7 @@ export class NodeNetworkService
    userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
    networkRootUrl:string = environment.apiUrl + '/network/get-root';
    createNetworkUrl:string = environment.apiUrl + '/network/create';
+   networkInviteUrl:string = environment.apiUrl + '/network/invite';
 
    
    constructor(private http:HttpClient) { }
@@ -59,4 +61,16 @@ export class NodeNetworkService
 
    }
 
+
+   sendNetworkInvitationRequest(invitationRequest:NetworkInvitationRequest): Observable<any> {
+
+      return this.http.post(this.networkInviteUrl, invitationRequest).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
+   }
 }
