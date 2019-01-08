@@ -1,3 +1,26 @@
-<p>
-  admin-panel works!
-</p>
+<div class="boxed-content">
+
+   <h2>Change a user's role</h2>
+
+   <div>
+      <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+         <input type="text" nz-input placeholder="User's username" [(ngModel)]="roleChangeUsername">
+      </nz-input-group>
+      
+      <ng-template #prefixTemplate><i nz-icon type="user"></i></ng-template>
+      <ng-template #suffixTemplate><i nz-icon type="close-circle" (click)="roleChangeUsername=null" *ngIf="roleChangeUsername"></i></ng-template>      
+   </div>
+   
+
+   <div>
+      <nz-select style="width: 120px;" [(ngModel)]="selectedRoleChangeValue" nzAllowClear nzPlaceHolder="Role">
+        <nz-option nzValue="ROLE_PROVIDER" nzLabel="Provider"></nz-option>
+        <nz-option nzValue="ROLE_ADMIN" nzLabel="Admin"></nz-option>
+      </nz-select>
+   </div>
+
+   <button (click)="changeUserRole(roleChangeUsername, selectedRoleChangeValue)" nz-button nzType="primary">Change Role</button>
+
+</div>
+
+

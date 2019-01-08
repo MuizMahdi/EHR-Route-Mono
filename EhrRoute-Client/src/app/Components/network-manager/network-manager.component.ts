@@ -55,9 +55,11 @@ export class NetworkManagerComponent implements OnInit
 
             // Iterate through the roles array and set role flags
             roles.forEach(role => {
-               if (role.roleName.trim() === 'ROLE_ADMIN') this.isAdmin = true;
+               if (role.roleName.trim() === 'ROLE_ADMIN') this.isAdmin = true; 
                if (role.roleName.trim() === 'ROLE_PROVIDER') this.isProvider = true;
             });
+
+            console.log('ADMIN: ' + this.isAdmin);
 
          },
 
