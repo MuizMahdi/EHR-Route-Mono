@@ -1,35 +1,46 @@
 <div id="nav-notifications-icon" (clickOutside)="onClickedOutside($event)">
-   <a (click)="navNotificationsMenu=!navNotificationsMenu" href="javascript:void(0)">
+   <a (click)="isNavNotificationsMenuVisible=!isNavNotificationsMenuVisible" href="javascript:void(0)">
       <i class="fa fa-bell fa-2x"></i>
    </a>
 </div>
 
 
-<div class="nav-notifications-menu" *ngIf="navNotificationsMenu">
+<div class="nav-notifications-menu" *ngIf="isNavNotificationsMenuVisible">
 
    <div style="text-align:left; font-size:16px; padding:10px 15px;">
-      <p style="font-weight:600; color: gray; letter-spacing: 0.13em;">
+      <p class="notification-menu-header">
          NOTIFICATIONS
       </p>
    </div>
 
    <ul class="notifications-list">
 
-      <li>
-         <a class="notification-item" href="javascript:void(0)">
+      <li *ngFor="let notification of notifications">
+         <a (click)="onNotificationClick(notification)" class="notification-item" href="javascript:void(0)">
             <span style="float:left;" class="fa fa-network-wired fa-2x"></span>
-            <p>Notification 01</p>
+            <p>{{fa(notification)}}</p>
          </a>
       </li>
-
-      <li>
-         <a class="notification-item" href="javascript:void(0)">
-            <span style="float:left;" class="fa fa-network-wired fa-2x"></span>
-            <p>Notification 02</p>
-         </a>
-      </li>
-
 
    </ul>
-   
+
 </div>
+
+<div>
+   <ng-template #tplTitle>
+      <span>Title Template</span>
+   </ng-template>
+   
+   <ng-template #tplContent>
+      <p>some contents...</p>
+      <p>some contents...</p>
+      <p>some contents...</p>
+      <p>some contents...</p>
+      <p>some contents...</p>
+   </ng-template>
+
+   <ng-template #tplFooter>
+      <button nz-button nzType="primary" (click)="destroyTplModal()" [nzLoading]="tplModalButtonLoading">Close after submit</button>
+   </ng-template>
+</div>
+

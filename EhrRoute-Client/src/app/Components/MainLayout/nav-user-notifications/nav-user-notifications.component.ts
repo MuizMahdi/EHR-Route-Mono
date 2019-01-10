@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { NotificationService } from 'src/app/Services/notification.service';
+import { NotificationsPageResponse } from 'src/app/Models/Payload/Responses/NotificationsResponse';
+import { Notification } from 'src/app/Models/Payload/Responses/Notification';
 
 
 @Component({
@@ -10,15 +13,64 @@ import { Component, OnInit } from '@angular/core';
 
 export class NavUserNotificationsComponent implements OnInit 
 {
-   navNotificationsMenu: boolean = false;
+   isNotificationModalVisible:boolean = false;
+   isNavNotificationsMenuVisible:boolean = false;
 
-   constructor() { }
-   ngOnInit() { }
+   notifications:Notification[];
+   notificationsResponse:NotificationsPageResponse;
 
 
+   constructor(private notificationService:NotificationService) { }
+   
+
+   ngOnInit() 
+   { 
+      this.notificationService.getUserNotifications().subscribe(
+
+         response => {
+            this.notificationsResponse = response;
+            this.notifications = this.notificationsResponse.resources;
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   /* Notificaiton Menu Methods */
    onClickedOutside(e: Event) 
    {
-      this.navNotificationsMenu = false;
+      this.isNavNotificationsMenuVisible = false;
+   }
+
+
+   /* Notificaiton Methods */
+   onNotificationClick(notification:Notification) 
+   {
+      console.log(notification.notificationType);
+   }
+
+   fa(notification:Notification):string
+   {
+      return "FA!" + notification.notificationType;
+   }
+
+
+   /* Notificaiton Modal Methods */
+
+   showNotificationModal(): void {
+      this.isNotificationModalVisible = true;
+   }
+
+   handleNotificationOk(): void {
+      this.isNotificationModalVisible = false;
+   }
+
+   handleNotificationIgnore(): void {
+      this.isNotificationModalVisible = false;
    }
 
 }
