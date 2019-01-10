@@ -1,4 +1,4 @@
-import { UserInfo } from './../Models/UserInfo';
+import { UserInfo } from '../Models/Payload/Responses/UserInfo';
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from './../Services/auth.service';

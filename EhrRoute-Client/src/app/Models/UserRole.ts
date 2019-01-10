@@ -1,5 +1,4 @@
-
 export interface UserRole
 {
-    roleName:string;
+   roleName:string;
 }

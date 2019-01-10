@@ -1,7 +1,7 @@
-import { UserInfo } from './../Models/UserInfo';
+import { UserInfo } from '../Models/Payload/Responses/UserInfo';
 import { environment } from './../../environments/environment';
-import { UserLoginRequest } from './../Models/UserLoginRequest';
-import { UserRegistrationRequest } from './../Models/UserRegistrationRequest';
+import { UserLoginRequest } from '../Models/Payload/Requests/UserLoginRequest';
+import { UserRegistrationRequest } from '../Models/Payload/Requests/UserRegistrationRequest';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap, shareReplay, catchError, first } from 'rxjs/operators';

@@ -1,4 +1,4 @@
-import { UserRegistrationRequest } from './../../../Models/UserRegistrationRequest';
+import { UserRegistrationRequest } from '../../../Models/Payload/Requests/UserRegistrationRequest';
 import { AuthService } from './../../../Services/auth.service';
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';

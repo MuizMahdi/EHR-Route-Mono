@@ -1,13 +1,13 @@
-import { UserNetworks } from './../../Models/UserNetworks';
+import { UserNetworks } from '../../Models/Payload/Responses/UserNetworks';
 import { NodeNetworkService } from './../../Services/node-network.service';
 import { UserRole } from './../../Models/UserRole';
 import { MainLayoutService } from './../../Services/main-layout.service';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/Services/auth.service';
-import { NetworkInfo } from 'src/app/Models/NetworkInfo';
+import { NetworkInfo } from 'src/app/Models/Payload/Responses/NetworkInfo';
 import { NzModalService } from 'ng-zorro-antd';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
-import { ErrorResponse } from 'src/app/Models/ErrorResponse';
+import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/NetworkInvitationRequest';
 
 
