@@ -18,29 +18,10 @@
       <li *ngFor="let notification of notifications">
          <a (click)="onNotificationClick(notification)" class="notification-item" href="javascript:void(0)">
             <span style="float:left;" class="fa fa-network-wired fa-2x"></span>
-            <p>{{fa(notification)}}</p>
+            <p>{{notificationMessageBuilder(notification)}}</p>
          </a>
       </li>
 
    </ul>
 
 </div>
-
-<div>
-   <ng-template #tplTitle>
-      <span>Title Template</span>
-   </ng-template>
-   
-   <ng-template #tplContent>
-      <p>some contents...</p>
-      <p>some contents...</p>
-      <p>some contents...</p>
-      <p>some contents...</p>
-      <p>some contents...</p>
-   </ng-template>
-
-   <ng-template #tplFooter>
-      <button nz-button nzType="primary" (click)="destroyTplModal()" [nzLoading]="tplModalButtonLoading">Close after submit</button>
-   </ng-template>
-</div>
-

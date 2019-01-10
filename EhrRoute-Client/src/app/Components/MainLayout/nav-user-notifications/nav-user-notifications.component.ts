@@ -1,7 +1,9 @@
+import { NetworkInvitationRequest } from './../../../Models/Payload/Requests/NetworkInvitationRequest';
 import { Component, OnInit } from '@angular/core';
 import { NotificationService } from 'src/app/Services/notification.service';
 import { NotificationsPageResponse } from 'src/app/Models/Payload/Responses/NotificationsResponse';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
+import { NotificationType } from 'src/app/Models/Payload/NotificationType';
 
 
 @Component({
@@ -53,24 +55,24 @@ export class NavUserNotificationsComponent implements OnInit
       console.log(notification.notificationType);
    }
 
-   fa(notification:Notification):string
+   // TODO: ADD CONSENT REQUEST NOTIFICATION [SERVER-END] AND ITS HANDLING [CLIENT-END]
+   notificationMessageBuilder(notification:Notification): string
    {
-      return "FA!" + notification.notificationType;
-   }
+      if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
+      {
+         let invitationRequest:NetworkInvitationRequest = notification.reference;
 
+         let message:string = 
+         invitationRequest.senderUsername + " has invited you to join their network, " +
+         invitationRequest.networkName;
 
-   /* Notificaiton Modal Methods */
+         return message;
+      }
 
-   showNotificationModal(): void {
-      this.isNotificationModalVisible = true;
-   }
-
-   handleNotificationOk(): void {
-      this.isNotificationModalVisible = false;
-   }
-
-   handleNotificationIgnore(): void {
-      this.isNotificationModalVisible = false;
+      if (notification.notificationType === NotificationType.CONSENT_REQUEST) 
+      {
+         // TODO: ADD CONSENT REQUEST NOTIFICATION [SERVER-END] AND ITS HANDLING [CLIENT-END]
+      }
    }
 
 }
