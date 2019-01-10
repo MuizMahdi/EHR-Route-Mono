@@ -1,9 +1,11 @@
+import { MainComponent } from './../../main/main.component';
 import { NetworkInvitationRequest } from './../../../Models/Payload/Requests/NetworkInvitationRequest';
 import { Component, OnInit } from '@angular/core';
 import { NotificationService } from 'src/app/Services/notification.service';
 import { NotificationsPageResponse } from 'src/app/Models/Payload/Responses/NotificationsResponse';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
 import { NotificationType } from 'src/app/Models/Payload/NotificationType';
+import { NzModalService } from 'ng-zorro-antd';
 
 
 @Component({
@@ -22,7 +24,7 @@ export class NavUserNotificationsComponent implements OnInit
    notificationsResponse:NotificationsPageResponse;
 
 
-   constructor(private notificationService:NotificationService) { }
+   constructor(private notificationService:NotificationService, private modalService: NzModalService) { }
    
 
    ngOnInit() 
@@ -49,13 +51,25 @@ export class NavUserNotificationsComponent implements OnInit
    }
 
 
+
    /* Notificaiton Methods */
    onNotificationClick(notification:Notification) 
    {
-      console.log(notification.notificationType);
+      if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
+      {
+         // View MetworkInviteNotification component within modal
+
+         /*
+         this.createComponentModal(
+            NotificationType.NETWORK_INVITATION, NetworkInviteNotificationComponent
+         );
+         */
+
+         this.createComponentModal();
+      }
    }
 
-   // TODO: ADD CONSENT REQUEST NOTIFICATION [SERVER-END] AND ITS HANDLING [CLIENT-END]
+   // Todo: add consent request notification
    notificationMessageBuilder(notification:Notification): string
    {
       if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
@@ -73,6 +87,48 @@ export class NavUserNotificationsComponent implements OnInit
       {
          // TODO: ADD CONSENT REQUEST NOTIFICATION [SERVER-END] AND ITS HANDLING [CLIENT-END]
       }
+   }
+
+
+   
+   /* Notificaiton Modal Methods */
+   createComponentModal(): void 
+   {
+      const notificationModal = this.modalService.create({
+
+         nzTitle: 'Modal Title',
+
+         nzContent: MainComponent,
+
+         /*
+         nzComponentParams: {
+            title: 'title in component',
+            subtitle: 'component sub title，will be changed after 2 sec'
+         },
+         */
+
+         nzFooter: [
+            {
+               label: 'Confirm',
+               type: 'primary',
+               onClick: () => { console.log('Confirmed'); }
+            },
+            {
+               label: 'Ignore',
+               shape: 'default',
+               onClick: () => notificationModal.destroy()
+            }
+         ]
+
+      });
+  
+      notificationModal.afterOpen.subscribe(() => console.log('Notification Modal Opened'));
+      notificationModal.afterClose.subscribe(() => console.log('Notification Modal Closed'));
+  
+      // delay until modal instance created
+      window.setTimeout(() => {
+        const instance = notificationModal.getContentComponent();
+      }, 2000);
    }
 
 }

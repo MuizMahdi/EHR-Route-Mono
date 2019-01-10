@@ -108,17 +108,3 @@
 }
 
 /*****************************************************/
-
-/**/
- 
-/**************** NOTIFICATION MODAL *****************/
-::ng-deep .notification-modal {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-}
-
-::ng-deep .notification-modal .ant-modal {
-   top: 0;
-}
-/*****************************************************/
