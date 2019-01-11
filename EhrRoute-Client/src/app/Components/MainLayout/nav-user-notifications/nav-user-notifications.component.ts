@@ -1,11 +1,11 @@
-import { MainComponent } from './../../main/main.component';
+import { NetworkInvitationComponent } from '../../Notifications/network-invitation/network-invitation.component';
 import { NetworkInvitationRequest } from './../../../Models/Payload/Requests/NetworkInvitationRequest';
 import { Component, OnInit } from '@angular/core';
 import { NotificationService } from 'src/app/Services/notification.service';
 import { NotificationsPageResponse } from 'src/app/Models/Payload/Responses/NotificationsResponse';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
-import { NotificationType } from 'src/app/Models/Payload/NotificationType';
-import { NzModalService } from 'ng-zorro-antd';
+import { NotificationType } from 'src/app/Models/NotificationType';
+import { NzModalService } from 'ng-zorro-antd'; 
 
 
 @Component({
@@ -29,6 +29,12 @@ export class NavUserNotificationsComponent implements OnInit
 
    ngOnInit() 
    { 
+      this.getUserNotifications();
+   }
+
+
+   getUserNotifications(): void
+   {
       this.notificationService.getUserNotifications().subscribe(
 
          response => {
@@ -45,29 +51,41 @@ export class NavUserNotificationsComponent implements OnInit
 
 
    /* Notificaiton Menu Methods */
-   onClickedOutside(e: Event) 
+
+   onClickedOutside(e: Event): void
    {
       this.isNavNotificationsMenuVisible = false;
    }
 
 
-
    /* Notificaiton Methods */
-   onNotificationClick(notification:Notification) 
+
+   onNotificationClick(notification:Notification): void
    {
       if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
       {
+         let title = "Network Invitation Request";
+
          // View MetworkInviteNotification component within modal
-
-         /*
-         this.createComponentModal(
-            NotificationType.NETWORK_INVITATION, NetworkInviteNotificationComponent
+         this.createNotificationComponentModal(
+            notification, title, NetworkInvitationComponent
          );
-         */
+      }
 
-         this.createComponentModal();
+      if (notification.notificationType === NotificationType.CONSENT_REQUEST)
+      {
+         let title = "User Info Exchange Consent Request";
+
+         /* Todo: add InformationExchangeRequestComponent and consent request handling
+
+         this.createComponentModal(
+            notification, title, InformationExchangeRequestComponent
+         );
+
+         */
       }
    }
+
 
    // Todo: add consent request notification
    notificationMessageBuilder(notification:Notification): string
@@ -90,41 +108,39 @@ export class NavUserNotificationsComponent implements OnInit
    }
 
 
-   
    /* Notificaiton Modal Methods */
-   createComponentModal(): void 
+
+   createNotificationComponentModal(notification:Notification, notificationTypeTitle:string, notificationComponent:any): void 
    {
       const notificationModal = this.modalService.create({
 
-         nzTitle: 'Modal Title',
+         nzTitle: notificationTypeTitle,
 
-         nzContent: MainComponent,
+         nzContent: notificationComponent,
 
-         /*
+         // Pass the notification object to the component as an input
          nzComponentParams: {
-            title: 'title in component',
-            subtitle: 'component sub title，will be changed after 2 sec'
+            notification: notification
          },
-         */
 
          nzFooter: [
             {
-               label: 'Confirm',
-               type: 'primary',
-               onClick: () => { console.log('Confirmed'); }
-            },
-            {
-               label: 'Ignore',
+               label: 'Later',
                shape: 'default',
                onClick: () => notificationModal.destroy()
+            },
+            {
+               label: 'Reject',
+               shape: 'danger',
+               onClick: () => { /* Delete Notification from DB */ notificationModal.destroy(); }
             }
          ]
 
       });
-  
+
       notificationModal.afterOpen.subscribe(() => console.log('Notification Modal Opened'));
       notificationModal.afterClose.subscribe(() => console.log('Notification Modal Closed'));
-  
+
       // delay until modal instance created
       window.setTimeout(() => {
         const instance = notificationModal.getContentComponent();

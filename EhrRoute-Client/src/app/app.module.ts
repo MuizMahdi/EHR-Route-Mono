@@ -31,47 +31,54 @@ import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
 import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
 import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
+import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
 
 registerLocaleData(en);
 
 
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    RegistrationComponent,
-    AuthMainComponent,
-    MainComponent,
-    SideBarComponent,
-    NavBarComponent,
-    NavUserMenuComponent,
-    NavSearchComponent,
-    NetworkManagerComponent,
-    NavUserNotificationsComponent,
-    AdminPanelComponent
-  ],
 
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    NgbModule,
-    ClickOutsideModule,
-    NgxElectronModule,
-    NgZorroAntdModule
-  ],
+   entryComponents: [ 
+      NetworkInvitationComponent 
+   ],
 
-  providers: [
-   { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-   { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-   { provide: NZ_I18N, useValue: en_US }
-  ],
+   declarations: [
+      AppComponent,
+      LoginComponent,
+      RegistrationComponent,
+      AuthMainComponent,
+      MainComponent,
+      SideBarComponent,
+      NavBarComponent,
+      NavUserMenuComponent,
+      NavSearchComponent,
+      NetworkManagerComponent,
+      NavUserNotificationsComponent,
+      AdminPanelComponent,
+      NetworkInvitationComponent
+   ],
 
-  bootstrap: [AppComponent]
+   imports: [
+      BrowserModule,
+      AppRoutingModule,
+      FormsModule,
+      ReactiveFormsModule,
+      HttpClientModule,
+      BrowserAnimationsModule,
+      NgbModule,
+      ClickOutsideModule,
+      NgxElectronModule,
+      NgZorroAntdModule
+   ],
+
+   providers: [
+      { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+      { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+      { provide: NZ_I18N, useValue: en_US }
+   ],
+
+   bootstrap: [AppComponent]
 })
 
 
