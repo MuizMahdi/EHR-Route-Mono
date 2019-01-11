@@ -50,6 +50,13 @@ public class NotificationService
 
 
     @Transactional
+    public void deleteNotification(long id)
+    {
+        notificationRepository.deleteById(id);
+    }
+
+
+    @Transactional
     public PageResponse getCurrentUserNotifications(String username, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
     {
         // Validate page number and size constraints
@@ -126,9 +133,7 @@ public class NotificationService
             }
 
             return modelMapper.mapNotificationToNotificationResponse(
-                notification.getSender(),
-                notification.getRecipient(),
-                notification.getType(),
+                notification,
                 notificationReference
             );
 
@@ -140,7 +145,7 @@ public class NotificationService
             notificationsPage.getNumber(),
             notificationsPage.getSize(),
             notificationsPage.getTotalElements(),
-             notificationsPage.getTotalPages(),
+            notificationsPage.getTotalPages(),
             notificationsPage.isFirst(),
             notificationsPage.isLast()
         );

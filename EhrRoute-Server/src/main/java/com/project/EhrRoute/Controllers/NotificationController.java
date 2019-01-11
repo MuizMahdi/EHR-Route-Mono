@@ -9,10 +9,7 @@ import com.project.EhrRoute.Services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -52,4 +49,24 @@ public class NotificationController
         );
     }
 
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteNotification(@PathVariable("id") Long id)
+    {
+        try {
+            notificationService.deleteNotification(id);
+        }
+        // If resource doesn't exist
+        catch (Exception Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(true, "Notification doesn't exist"),
+                HttpStatus.NO_CONTENT
+            );
+        }
+
+        return new ResponseEntity<>(
+            new ApiResponse(true, "Notification has been deleted"),
+            HttpStatus.OK
+        );
+    }
 }

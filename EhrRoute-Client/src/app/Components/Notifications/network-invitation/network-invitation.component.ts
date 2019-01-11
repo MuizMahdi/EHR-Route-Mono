@@ -1,8 +1,11 @@
+import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
+import { AuthService } from './../../../Services/auth.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
 import { NzModalRef } from 'ng-zorro-antd';
 import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/NetworkInvitationRequest';
 import { NotificationService } from 'src/app/Services/notification.service';
+import { NodeNetworkService } from 'src/app/Services/node-network.service';
 
 
 @Component({
@@ -18,7 +21,9 @@ export class NetworkInvitationComponent implements OnInit
    invitationRequest:NetworkInvitationRequest;
 
 
-   constructor(private notificationService:NotificationService, private modal:NzModalRef) { }
+   constructor(private notificationService:NotificationService, 
+      private modal:NzModalRef) 
+   { }
 
 
    ngOnInit() {
@@ -30,10 +35,29 @@ export class NetworkInvitationComponent implements OnInit
    }
 
 
-   public onInvitationAccept() {
+   onInvitationAccept(): void
+   {
+      if (this.notification) 
+      {
+         this.deleteNotification();
+      }
 
-      console.log("Invitation accepted.");
       this.modal.destroy();
-   }   
+   }
+
+   deleteNotification(): void
+   {
+      this.notificationService.deleteNotification(this.notification.notificationID).subscribe( 
+
+         response => {
+            console.log(response);
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+   }
 
 }

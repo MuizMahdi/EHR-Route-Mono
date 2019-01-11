@@ -3,6 +3,7 @@ package com.project.EhrRoute.Payload.App;
 
 public class NotificationResponse
 {
+    private long notificationID;
     private String senderName;
     private String recipientName;
     private String notificationType;
@@ -10,7 +11,8 @@ public class NotificationResponse
 
 
     public NotificationResponse() { }
-    public NotificationResponse(String senderName, String recipientName, String notificationType, Object reference) {
+    public NotificationResponse(long notificationID, String senderName, String recipientName, String notificationType, Object reference) {
+        this.notificationID = notificationID;
         this.senderName = senderName;
         this.recipientName = recipientName;
         this.notificationType = notificationType;
@@ -23,6 +25,9 @@ public class NotificationResponse
     }
     public String getSenderName() {
         return senderName;
+    }
+    public long getNotificationID() {
+        return notificationID;
     }
     public String getRecipientName() {
         return recipientName;
@@ -38,6 +43,9 @@ public class NotificationResponse
     }
     public void setRecipientName(String recipientName) {
         this.recipientName = recipientName;
+    }
+    public void setNotificationID(long notificationID) {
+        this.notificationID = notificationID;
     }
     public void setNotificationType(String notificationType) {
         this.notificationType = notificationType;

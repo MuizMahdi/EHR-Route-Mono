@@ -3,6 +3,7 @@ import com.project.EhrRoute.Core.*;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
+import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
@@ -208,12 +209,13 @@ public class ModelMapper
         return invitationRequest;
     }
 
-    public NotificationResponse mapNotificationToNotificationResponse(User sender, User recipient, NotificationType type, Object reference)
+    public NotificationResponse mapNotificationToNotificationResponse(Notification notification, Object reference)
     {
         return new NotificationResponse(
-            sender.getUsername(),
-            recipient.getUsername(),
-            type.toString(),
+            notification.getId(),
+            notification.getSender().getUsername(),
+            notification.getRecipient().getUsername(),
+            notification.getType().toString(),
             reference
         );
     }
