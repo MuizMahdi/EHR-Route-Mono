@@ -11,7 +11,6 @@ import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
-import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
@@ -189,7 +188,7 @@ public class NetworkController
 
     @PostMapping("/invitation-accept")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationResponse invitationResponse)
+    public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationResponse)
     {
         NetworkInvitationRequest invitationRequest;
 
@@ -222,7 +221,7 @@ public class NetworkController
             Calendar cal = Calendar.getInstance();
 
             // Get token object from DB using the token string taken from url.
-            VerificationToken token = verificationTokenService.getVerificationToken(invitationResponse.getToken());
+            VerificationToken token = verificationTokenService.getVerificationToken(invitationResponse.getInvitationToken());
 
             // Invalid token check
             if (token == null)
@@ -245,7 +244,7 @@ public class NetworkController
             // Add Network to User networks if token is valid (not expired and exists)
             try
             {
-                addUserNetwork(invitationResponse.getRecipientName(), invitationResponse.getNetworkUUID());
+                addUserNetwork(invitationResponse.getRecipientUsername(), invitationResponse.getNetworkUUID());
             }
             catch (Exception Ex)
             {

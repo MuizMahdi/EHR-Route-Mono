@@ -4,4 +4,5 @@ export interface NetworkInvitationRequest
    senderUsername:string;
    networkName:string;
    networkUUID:string;
+   invitationToken:string;
 }

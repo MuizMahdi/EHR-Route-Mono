@@ -162,7 +162,8 @@ export class NetworkManagerComponent implements OnInit
          recipientUsername: username,
          senderUsername: currentUserUsername,
          networkName: this.selectedNetwork.name,
-         networkUUID: this.selectedNetwork.networkUUID
+         networkUUID: this.selectedNetwork.networkUUID,
+         invitationToken: null // Invitation token is created on server-side
       }
 
       this.nodeNetworkService.sendNetworkInvitationRequest(invitationRequest).subscribe(

@@ -4,15 +4,12 @@ import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.App.Notification;
-import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
-import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
-import com.project.EhrRoute.Payload.App.NetworkInvitationResponse;
 import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.Core.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,12 +179,12 @@ public class ModelMapper
         return userNetworksResponse;
     }
 
-    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationResponse invitationResponse) throws ResourceEmptyException
+    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationRequestPayload invitationResponse) throws ResourceEmptyException
     {
-        String senderName = invitationResponse.getSenderName();
+        String senderName = invitationResponse.getSenderUsername();
         String networkName = invitationResponse.getNetworkName();
         String networkUUID = invitationResponse.getNetworkUUID();
-        String invitationToken = invitationResponse.getToken();
+        String invitationToken = invitationResponse.getInvitationToken();
 
         // Validate NetworkInvitationResponse fields
         if (
@@ -200,10 +197,10 @@ public class ModelMapper
         // Create a request object using the response fields (will be used to validate the
         // response by checking whether a request with the fields of the response exists or not)
         NetworkInvitationRequest invitationRequest = new NetworkInvitationRequest(
-                invitationResponse.getSenderName(),
+                invitationResponse.getSenderUsername(),
                 invitationResponse.getNetworkName(),
                 invitationResponse.getNetworkUUID(),
-                invitationResponse.getToken()
+                invitationResponse.getInvitationToken()
         );
 
         return invitationRequest;
@@ -226,10 +223,10 @@ public class ModelMapper
             recipientUsername,
             invitationRequest.getSenderName(),
             invitationRequest.getNetworkName(),
-            invitationRequest.getNetworkUUID()
+            invitationRequest.getNetworkUUID(),
+            invitationRequest.getInvitationToken()
         );
     }
-
 
     public UserConsentRequest mapConsentRequestBlockToUserConsentRequest(ConsentRequestBlock consentRequestBlock)
     {

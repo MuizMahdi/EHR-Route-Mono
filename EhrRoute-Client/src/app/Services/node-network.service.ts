@@ -1,3 +1,4 @@
+import { UserInfo } from './../Models/Payload/Responses/UserInfo';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
@@ -18,6 +19,7 @@ export class NodeNetworkService
    networkRootUrl:string = environment.apiUrl + '/network/get-root';
    createNetworkUrl:string = environment.apiUrl + '/network/create';
    networkInviteUrl:string = environment.apiUrl + '/network/invite';
+   networkInvitationAcceptUrl:string = environment.apiUrl + '/network/invitation-accept'
 
    
    constructor(private http:HttpClient) { }
@@ -66,6 +68,19 @@ export class NodeNetworkService
 
       return this.http.post(this.networkInviteUrl, invitationRequest).pipe(first(),
       
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
+   }
+
+
+   networkInvitationAccept(invitationResponse:NetworkInvitationRequest): Observable<any> {
+
+      return this.http.post(this.networkInvitationAcceptUrl, invitationResponse).pipe(first(),
+
          catchError(error => {
             return throwError(error);
          })

@@ -1,6 +1,5 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Models.PageConstants;
-import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.App.PageResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;

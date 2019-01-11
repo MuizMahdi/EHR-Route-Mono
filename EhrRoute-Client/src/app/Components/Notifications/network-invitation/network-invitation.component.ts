@@ -22,6 +22,8 @@ export class NetworkInvitationComponent implements OnInit
 
 
    constructor(private notificationService:NotificationService, 
+      private networkService:NodeNetworkService, 
+      private authService:AuthService, 
       private modal:NzModalRef) 
    { }
 
@@ -39,11 +41,29 @@ export class NetworkInvitationComponent implements OnInit
    {
       if (this.notification) 
       {
+         this.invitationAccept(this.invitationRequest);
          this.deleteNotification();
       }
 
       this.modal.destroy();
    }
+   
+
+   invitationAccept(invitationRequest:NetworkInvitationRequest): void
+   {
+      this.networkService.networkInvitationAccept(this.invitationRequest).subscribe(
+
+         response => {
+            console.log(response);
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+   }
+
 
    deleteNotification(): void
    {
