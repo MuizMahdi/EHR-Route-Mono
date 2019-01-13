@@ -15,6 +15,7 @@ public class NetworkService
         this.networkRepository = networkRepository;
     }
 
+
     @Transactional
     public Network findByNetUUID(String netUUID) {
         return networkRepository.findByNetworkUUID(netUUID).orElse(null);
@@ -27,7 +28,8 @@ public class NetworkService
     }
 
 
-    @Transactional String getNetworkChainRoot(Network network) {
+    @Transactional
+    public String getNetworkChainRoot(Network network) {
         return network.getChainRoot().getRoot();
     }
 }

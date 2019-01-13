@@ -41,6 +41,29 @@ public class Network
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Network)) return false;
+
+        Network network = (Network) o;
+
+        if (!id.equals(network.id)) return false;
+        if (!name.equals(network.name)) return false;
+        if (!networkUUID.equals(network.networkUUID)) return false;
+        return chainRoot.equals(network.chainRoot);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + networkUUID.hashCode();
+        result = 31 * result + chainRoot.hashCode();
+        return result;
+    }
+
+
     public Long getId() {
         return id;
     }

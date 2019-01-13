@@ -128,4 +128,23 @@ public class UserService
 
         userRepository.save(user);
     }
+
+    @Transactional
+    public boolean userHasNetwork(User user, Network network) throws BadRequestException {
+
+        boolean hasNetwork = false;
+
+        if (user == null || network == null) {
+            throw new BadRequestException("Invalid network or user");
+        }
+
+        // Iterate through user networks and check if network exists
+        for (Network userNetwork : user.getNetworks()) {
+            if (userNetwork.equals(network)) {
+                hasNetwork = true;
+            }
+        }
+
+        return hasNetwork;
+    }
 }

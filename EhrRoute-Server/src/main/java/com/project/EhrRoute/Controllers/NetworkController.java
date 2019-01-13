@@ -140,6 +140,7 @@ public class NetworkController
         // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
         User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getRecipientUsername());
         User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderUsername());
+        Network network = networkService.findByNetUUID(invitationRequest.getNetworkUUID());
 
         // Validate recipient
         if (recipient == null) {
@@ -154,6 +155,22 @@ public class NetworkController
             return new ResponseEntity<>(
                 new ApiResponse(false, "Invalid sender username on invitation request"),
                 HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Validate network
+        if (network == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid network on invitation request"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Check if recipient is already on network
+        if (userService.userHasNetwork(recipient, network)) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User is already on the network"),
+                HttpStatus.CONFLICT
             );
         }
 
