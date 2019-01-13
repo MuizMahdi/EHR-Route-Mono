@@ -4,8 +4,6 @@ const { ipcMain } = require('electron');
 const path = require("path");
 const url = require("url");
 
-//const keyService = require('./Electron/Services/AddressKeyService');
-//const ehrService = require('./Electron/Services/EhrChainService');
 
 let win; // Window object
 
@@ -36,6 +34,7 @@ app.on("window-all-closed", function () {
 
 function createWindow()
 {
+   // Window properties
    win = new BrowserWindow({
       width: 800,
       height: 600,
@@ -43,6 +42,7 @@ function createWindow()
    });
 
 
+   // load the index.html from the dist folder of Angular
    win.loadURL(
       url.format({
          pathname: path.join(__dirname, 'dist/index.html'),
@@ -52,12 +52,8 @@ function createWindow()
    );
 
 
-   // Open Chrome DevTools.
+   // Enable and open Chrome DevTools
    win.webContents.openDevTools();
-
-
-   // Create address table. All users with all roles must have it
-   //keyService.initializeAddressKeys();
 
 
    // On window closing set win to null
@@ -65,10 +61,3 @@ function createWindow()
       win = null
    });
 }
-
-
-ipcMain.on('Create_Node_EHR_Chain_DB', (event, arg) => {
-
-   //ehrService.initializeNodeEhrChain();
-
-});
