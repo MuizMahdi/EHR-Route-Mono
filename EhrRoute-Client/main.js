@@ -1,5 +1,8 @@
+'use strict';
+
 const { app, BrowserWindow } = require("electron");
 const { ipcMain } = require('electron');
+// require('electron-reload')(__dirname);
 
 const path = require("path");
 const url = require("url");
@@ -42,6 +45,14 @@ function createWindow()
    });
 
 
+   // For development only, get dynamic version from localhost:4200.
+   require('electron-reload')(__dirname, {
+      electron: require(`${__dirname}/node_modules/electron`)
+   });
+   
+   win.loadURL('http://localhost:4200');
+
+/*
    // load the index.html from the dist folder of Angular
    win.loadURL(
       url.format({
@@ -50,7 +61,7 @@ function createWindow()
          slashes: true
       })
    );
-
+*/
 
    // Enable and open Chrome DevTools
    win.webContents.openDevTools();

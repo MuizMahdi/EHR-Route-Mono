@@ -22,7 +22,7 @@ export class MainComponent implements OnInit
    {
       // Handles when user reloads page after loggin in, to show a prompt, which 
       // allows for a request to be made, unsubscribing the node from clusters.
-      this.handleReloads();
+      //this.handleReloads();
 
       // Subscribe to providers and consumers cluster
       //this.clustersService.subscribeProvider();

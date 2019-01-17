@@ -20,7 +20,7 @@ export class AuthMainComponent implements OnInit
    {
       // Handles when user reloads auth page, disabling the prompt on login page,
       // which is only shown when user reloads page after logging in.
-      this.handleOnAuthPageReloads();
+      //this.handleOnAuthPageReloads();
 
       this.mainLayout.hide();
       this.isOnRegister = false;

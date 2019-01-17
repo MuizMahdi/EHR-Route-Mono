@@ -43,4 +43,12 @@ export class ElectronAppConfig
       // Path to the address/keys db file
       this.addressDbPath = path.join(this.databaseFolderPath, this.addressDbName);
    }
+
+   
+   public static getNetworkChainDbPath(networkUUID:string): string
+   {
+      let networkDbFileName:string = networkUUID + '.chain';
+
+      return path.join(this.databaseFolderPath, networkDbFileName);
+   }
 }

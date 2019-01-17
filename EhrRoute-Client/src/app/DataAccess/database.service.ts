@@ -1,41 +1,81 @@
 import { Injectable } from "@angular/core";
-import { Connection, ConnectionOptions, createConnection } from 'typeorm';
+import { Connection, ConnectionOptions, createConnection, getConnectionManager } from 'typeorm';
 import { ElectronAppConfig } from "../Configuration/ElectronAppConfig";
-
+import { Block } from "./entities/Block";
+import { MedicalRecord } from "./entities/EHR/MedicalRecord";
+import { EhrAllergyAndReaction } from "./entities/EHR/EhrAllergyAndReaction";
+import { EhrCondition } from "./entities/EHR/EhrCondition";
+import { EhrHistory } from "./entities/EHR/EhrHistory";
+import { EhrPatientInfo } from "./entities/EHR/EhrPatientInfo";
+import { Address } from "./entities/Address";
 
 @Injectable({
    providedIn: 'root'
 })
 
 
+/* 
+*   A Network DB file is created for each database.
+*   A connection is created for each network's DB on startup
+*/
+
+
 export class DatabaseService 
 {
-   public chainDbconnection: Promise<Connection>;
    public addressDbConnection: Promise<Connection>;
-   private readonly chainDbOptions: ConnectionOptions;
    private readonly addressDbOptions: ConnectionOptions;
 
    constructor() {
 
       ElectronAppConfig.initialize();
 
-      this.chainDbOptions = {
-         type: "sqlite",
-         database: ElectronAppConfig.chainDbPath,
-         entities: [__dirname + "/entities/**/*.ts"],
-         synchronize: true,
-         logging: false
-      };
-
+      // User address db connection is created on construction
       this.addressDbOptions = {
+         name:"address-connection",
          type: "sqlite",
          database: ElectronAppConfig.addressDbPath,
-         entities: [__dirname + "/entities/**/*.ts"],
+         entities: [Address],
          synchronize: true,
          logging: false
       };
 
-      this.chainDbconnection = createConnection(this.chainDbOptions);
       this.addressDbConnection = createConnection(this.addressDbOptions);
+   }
+
+
+   // Creates a connection to the network db with networkUUID
+   public async createNetworkDbConnection(networkUUID:string)
+   {
+      let dbOptions:ConnectionOptions = {
+         name: this.getNetConnectionName(networkUUID),
+         type: "sqlite",
+         database: ElectronAppConfig.getNetworkChainDbPath(networkUUID),
+         entities: [
+            Block,
+            MedicalRecord,
+            EhrAllergyAndReaction,
+            EhrCondition,
+            EhrHistory,
+            EhrPatientInfo
+         ],
+         synchronize: true,
+         logging: false
+      }
+
+      await createConnection(dbOptions).catch(error => console.log("[ Error creating connection ] - " + error));
+   }
+
+
+   // Returns a connection for the network with networkUUID
+   public getNetworkDbConnection(networkUUID:string): Connection
+   {
+      return getConnectionManager().get(this.getNetConnectionName(networkUUID));
+   }
+
+
+   // Attaches a "-connection" prefix to networkUUID to form connection name for a network
+   getNetConnectionName(networkUUID:string): string
+   {
+      return networkUUID + "-connection";
    }
 }
