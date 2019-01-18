@@ -18,8 +18,6 @@ import { DatabaseService } from 'src/app/DataAccess/database.service';
   styleUrls: ['./network-manager.component.css']
 })
 
-// TODO: Establish a new connection on new network creation
-// TODO: Establish a new connection on joining a network
 
 export class NetworkManagerComponent implements OnInit 
 {
