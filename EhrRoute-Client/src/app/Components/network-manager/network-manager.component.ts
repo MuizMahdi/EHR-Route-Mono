@@ -9,6 +9,7 @@ import { NzModalService } from 'ng-zorro-antd';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/NetworkInvitationRequest';
+import { DatabaseService } from 'src/app/DataAccess/database.service';
 
 
 @Component({
@@ -17,6 +18,8 @@ import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/Networ
   styleUrls: ['./network-manager.component.css']
 })
 
+// TODO: Establish a new connection on new network creation
+// TODO: Establish a new connection on joining a network
 
 export class NetworkManagerComponent implements OnInit 
 {
@@ -37,7 +40,7 @@ export class NetworkManagerComponent implements OnInit
    constructor(
       private nodeNetworkService:NodeNetworkService, private authService:AuthService, 
       public mainLayout:MainLayoutService, private modalService:NzModalService,
-      private nodeClusterService:NodeClustersService
+      private nodeClusterService:NodeClustersService, private databaseService:DatabaseService
    ) { }
 
 
@@ -90,6 +93,9 @@ export class NetworkManagerComponent implements OnInit
 
             // Currently selected network UUID
             this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
+
+            // Ensure that a connection is established for each network's database
+            this.ensureNetworksDBsConnect(this.userNetworks);
          },
 
          (error:ErrorResponse) => {
@@ -105,6 +111,33 @@ export class NetworkManagerComponent implements OnInit
    }
 
 
+   ensureNetworksDBsConnect(userNetworks:NetworkInfo[])
+   {
+      if (userNetworks.length > 0)
+      {
+         userNetworks.forEach(async network => {
+
+            try 
+            {
+               await this.databaseService.createNetworkDbConnection(network.networkUUID);
+            }
+            catch(error)
+            {
+               // If a connection for the network has already been established before
+               if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
+                  return;
+               }
+               else {
+                  console.log(error);
+               }
+            
+            }
+            
+         });
+      }
+   }
+
+
    generateNetwork(networkName:string):void
    {
       this.nodeNetworkService.generateNetwork(networkName).subscribe(
@@ -113,6 +146,7 @@ export class NetworkManagerComponent implements OnInit
             console.log(response);
 
             // Update page contents with the newly added network
+            // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
             this.getUserNetworks();
          },
 

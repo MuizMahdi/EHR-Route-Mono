@@ -84,7 +84,20 @@ export class MainComponent implements OnInit
             {
                // Establish a connection for each network DB (creates a DB file if its first time)
                userNetworks.forEach(async network => {
-                  await this.databaseService.createNetworkDbConnection(network.networkUUID);
+
+                  try {
+                     await this.databaseService.createNetworkDbConnection(network.networkUUID);
+                  }
+                  catch(error) {
+                     // If a connection for the network has already been established before
+                     if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
+                        return;
+                     }
+                     else {
+                        console.log(error);
+                     }
+                  }
+
                });
             }
 

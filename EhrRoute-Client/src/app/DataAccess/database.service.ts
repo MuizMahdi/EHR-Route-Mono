@@ -62,7 +62,8 @@ export class DatabaseService
          logging: false
       }
 
-      await createConnection(dbOptions).catch(error => console.log("[ Error creating connection ] - " + error));
+      // If a connection has already been established
+      await createConnection(dbOptions);
    }
 
 
