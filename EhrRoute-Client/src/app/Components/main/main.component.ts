@@ -1,6 +1,11 @@
+import { DatabaseService } from './../../DataAccess/database.service';
+import { ErrorResponse } from './../../Models/Payload/Responses/ErrorResponse';
+import { NetworkInfo } from './../../Models/Payload/Responses/NetworkInfo';
+import { UserNetworks } from './../../Models/Payload/Responses/UserNetworks';
 import { MainLayoutService } from './../../Services/main-layout.service';
 import { Component, OnInit } from '@angular/core';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
+import { NodeNetworkService } from 'src/app/Services/node-network.service';
 
 
 @Component({
@@ -13,7 +18,9 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 export class MainComponent implements OnInit
 {
    
-   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService) { 
+   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
+   private nodeNetworkService:NodeNetworkService, private databaseService:DatabaseService) 
+   { 
       this.mainLayout.show();
    }
 
@@ -27,6 +34,9 @@ export class MainComponent implements OnInit
       // Subscribe to providers and consumers cluster
       //this.clustersService.subscribeProvider();
       //this.clustersService.subscribeConsumer();
+
+      // Establishes a connection for each user network database
+      this.initializeNetworksDBs();
    }
 
 
@@ -57,6 +67,38 @@ export class MainComponent implements OnInit
          // Subscribe to clusters again
          clusterService.subscribeClusters();
       }
+   }
+
+
+   async initializeNetworksDBs()
+   {
+      // Get logged in user's networks
+      this.nodeNetworkService.getUserNetworks().subscribe(
+        
+         (response:UserNetworks) => {
+
+            let userNetworks:NetworkInfo[] = response.userNetworks;
+
+            // If the user has networks
+            if (userNetworks.length > 0) 
+            {
+               // Establish a connection for each network DB (creates a DB file if its first time)
+               userNetworks.forEach(async network => {
+                  await this.databaseService.createNetworkDbConnection(network.networkUUID);
+               });
+            }
+
+         },
+
+         (error:ErrorResponse) => {
+            // If no networks are found for user
+            if (error.httpStatus === 404) {
+               console.log("[ User has no networks ]");
+               // TODO: Set the network-manager userHasNetworks boolean to false
+            }
+         }
+
+      );
    }
 
 }
