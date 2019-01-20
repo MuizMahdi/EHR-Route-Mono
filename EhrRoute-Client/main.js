@@ -45,7 +45,7 @@ function createWindow()
    });
 
 
-   // For development only, get dynamic version from localhost:4200.
+   // [Dev only] get dynamic version from localhost:4200.
    require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`)
    });
@@ -65,6 +65,10 @@ function createWindow()
 
    // Enable and open Chrome DevTools
    win.webContents.openDevTools();
+
+
+   // [Dev only] Disable menu 
+   win.setMenu(null);
 
 
    // On window closing set win to null

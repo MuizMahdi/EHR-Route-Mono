@@ -19,6 +19,7 @@ export class NavUserNotificationsComponent implements OnInit
 {
    isNotificationModalVisible:boolean = false;
    isNavNotificationsMenuVisible:boolean = false;
+   hasNewNotifications:boolean;
 
    notifications:Notification[];
    notificationsResponse:NotificationsPageResponse;
@@ -38,8 +39,18 @@ export class NavUserNotificationsComponent implements OnInit
       this.notificationService.getUserNotifications().subscribe(
 
          response => {
+            
             this.notificationsResponse = response;
+
             this.notifications = this.notificationsResponse.resources;
+            
+            if (this.notifications.length == 0) {
+               this.hasNewNotifications = false;
+            }
+            else {
+               this.hasNewNotifications = true;
+            }
+
          },
 
          error => {

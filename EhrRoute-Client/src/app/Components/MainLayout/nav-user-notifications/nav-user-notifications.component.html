@@ -13,6 +13,12 @@
       </p>
    </div>
 
+   
+   <div *ngIf="!hasNewNotifications" class="empty-notifications">
+      <p>You currently have no new notifications</p>
+   </div>
+
+
    <ul class="notifications-list">
 
       <li *ngFor="let notification of notifications">
