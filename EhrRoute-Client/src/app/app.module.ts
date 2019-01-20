@@ -32,6 +32,7 @@ import en from '@angular/common/locales/en';
 import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
 import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
+import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
 
 registerLocaleData(en);
 
@@ -56,7 +57,8 @@ registerLocaleData(en);
       NetworkManagerComponent,
       NavUserNotificationsComponent,
       AdminPanelComponent,
-      NetworkInvitationComponent
+      NetworkInvitationComponent,
+      HealthRecordsManagerComponent
    ],
 
    imports: [

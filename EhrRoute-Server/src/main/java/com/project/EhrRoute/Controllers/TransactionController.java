@@ -108,7 +108,7 @@ public class TransactionController
         //String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
 
         // Check if provider's network uuid is valid
-        if (networkUUID == null || networkUUID.isEmpty() || !uuidUtil.isValidUUID(providerUUID)) {
+        if (networkUUID == null || networkUUID.isEmpty()) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Invalid provider network or doesn't exist"),
                 HttpStatus.BAD_REQUEST
