@@ -1,4 +1,23 @@
-<form class="nav-form">
-   <a href="" id="nav-search"><i class="fa fa-search fa-2x"></i></a>
-   <input class="mr-sm-2" type="search" placeholder="Search..." aria-label="Search">
-</form>
+<div class="nav-form">
+
+   <nz-input-group [nzAddOnAfter]="addOnAfterTemplate" [nzAddOnBefore]="addOnBeforeTemplate">
+     <input type="text" nz-input [(ngModel)]="searchInputValue" placeholder="Search..." type="search">
+   </nz-input-group>
+
+   <ng-template #addOnBeforeTemplate>
+      <a (click)="onSearch()"><i nz-icon type="search"></i></a>
+   </ng-template>
+   
+   <ng-template #addOnAfterTemplate>
+      <nz-select [(ngModel)]="selectedSearchOption">
+         <nz-option [nzLabel]="'Network'" [nzValue]="'Network'"></nz-option>
+         <nz-option [nzLabel]="'User'" [nzValue]="'User'"></nz-option>
+         <nz-option [nzLabel]="'EHR'" [nzValue]="'EHR'"></nz-option>
+         <nz-option [nzLabel]="'Provider'" [nzValue]="'Provider'"></nz-option>
+      </nz-select>
+   </ng-template>
+   
+</div>
+
+
+

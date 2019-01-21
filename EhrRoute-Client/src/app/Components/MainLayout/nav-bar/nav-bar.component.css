@@ -24,12 +24,14 @@
    border-bottom: 1px solid rgb(233, 233, 233);
 }
 
-.navbar > div:nth-child(2){
-   margin-left: 2%;
+.navbar > div:nth-child(2)
+{
+   margin-left: auto;
 }
 
-.navbar > div:nth-child(3){
-   margin-left: auto;
+.navbar > div:nth-child(3)
+{
+   margin-left: 2%;
 }
 
 .nav-logo img
