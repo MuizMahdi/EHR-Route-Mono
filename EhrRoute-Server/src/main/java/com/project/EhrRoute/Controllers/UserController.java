@@ -165,6 +165,12 @@ public class UserController
     }
 
 
+    @GetMapping("/search-by-username")
+    public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username) {
+        return userService.searchUsername(username);
+    }
+
+
     @GetMapping("/get-notifications")
     @PreAuthorize("hasRole('USER')")
     public SseEmitter streamUserNotifications(@RequestParam("userid") String userID , @CurrentUser UserPrincipal currentUser) throws IOException

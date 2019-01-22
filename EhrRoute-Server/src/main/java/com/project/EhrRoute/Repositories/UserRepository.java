@@ -18,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long>
     Optional<User> findByUsernameOrEmail(String username, String email);
 
     List<User> findByIdIn(List<Long> userIds);
+
+    @Query("SELECT u.username FROM User u WHERE u.username LIKE CONCAT('%', :keyword, '%')")
+    List<String> searchUsernamesByUsername(@Param("keyword") String keyword);
 }

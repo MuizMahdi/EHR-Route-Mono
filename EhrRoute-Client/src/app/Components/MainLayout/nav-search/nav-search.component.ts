@@ -1,3 +1,4 @@
+import { UsersService } from './../../../Services/users.service';
 import { Component, OnInit } from '@angular/core';
 
 
@@ -13,11 +14,12 @@ export class NavSearchComponent implements OnInit
 
    // "Network" option is initially selected
    selectedSearchOption:string = "Network"; 
+   isSearchOptionsEmpty:boolean;
    searchInputValue:string = "";
    searchOptions = [];
 
 
-   constructor() 
+   constructor(private userService:UsersService) 
    { }
 
 
@@ -33,11 +35,40 @@ export class NavSearchComponent implements OnInit
 
 
    onInput(value: string): void {
-      this.searchOptions = value ? [
-        value,
-        value + value,
-        value + value + value
-      ] : [];
-    }
+      
+      // If user option is selected on search bar
+      if (this.selectedSearchOption === "User") 
+      {
+         // Search for username with input value
+         this.userService.searchUsername(value).subscribe(
+
+            (response:string[]) => {
+   
+               if (response.length > 0) {
+                  this.isSearchOptionsEmpty = false;
+                  this.searchOptions = response;
+               } 
+               else {
+                  this.searchOptions = [""];
+                  this.isSearchOptionsEmpty = true;
+               }
+               
+            },
+   
+            error => {
+               console.log(error);
+            }
+   
+         );
+      }
+      
+
+   }
+
+   onSelectedSearchOptionChange() {
+      // Reset the found values from previous option
+      this.isSearchOptionsEmpty = true;
+      this.searchOptions = null;
+   }
 
 }

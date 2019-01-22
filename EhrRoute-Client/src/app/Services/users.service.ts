@@ -14,13 +14,15 @@ import { Observable, throwError } from 'rxjs';
 export class UsersService 
 {
    
-   userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
+   private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
+   private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
 
 
-   constructor(private http:HttpClient) { }
+   constructor(private http:HttpClient) {
+   }
 
 
-   changeUserRole(roleChange:RoleChangeRequest): Observable<any> {
+   public changeUserRole(roleChange:RoleChangeRequest): Observable<any> {
 
       return this.http.post(this.userRoleChangeUrl, roleChange).pipe(first(),
 
@@ -30,6 +32,20 @@ export class UsersService
 
       );
 
+   }
+
+
+   public searchUsername(username:string): Observable<any> {
+      
+      let searchUrl = this.userSearchUrl + "?keyword=" + username;
+
+      return this.http.get(searchUrl).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
    }
 
 }

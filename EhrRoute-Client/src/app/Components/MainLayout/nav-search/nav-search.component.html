@@ -9,6 +9,10 @@
          <nz-auto-option *ngFor="let option of searchOptions" [nzValue]="option">
             {{option}}
          </nz-auto-option>
+
+        <div *ngIf="isSearchOptionsEmpty">
+            <p class="nav-search-options-not-found">Not found</p>
+        </div>
       </nz-autocomplete>
    </div>
    
@@ -18,7 +22,7 @@
    </ng-template>
    
    <ng-template #addOnAfterTemplate>
-      <nz-select [(ngModel)]="selectedSearchOption">
+      <nz-select [(ngModel)]="selectedSearchOption" (ngModelChange)="onSelectedSearchOptionChange()">
          <nz-option [nzLabel]="'Network'" [nzValue]="'Network'"></nz-option>
          <nz-option [nzLabel]="'User'" [nzValue]="'User'"></nz-option>
          <nz-option [nzLabel]="'EHR'" [nzValue]="'EHR'"></nz-option>

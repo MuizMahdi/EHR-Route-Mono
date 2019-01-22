@@ -149,4 +149,9 @@ public class UserService
 
         return hasNetwork;
     }
+
+    @Transactional
+    public List<String> searchUsername(String usernameKeyword) {
+        return userRepository.searchUsernamesByUsername(usernameKeyword);
+    }
 }
