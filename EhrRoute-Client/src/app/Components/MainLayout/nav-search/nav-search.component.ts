@@ -14,6 +14,7 @@ export class NavSearchComponent implements OnInit
    // "Network" option is initially selected
    selectedSearchOption:string = "Network"; 
    searchInputValue:string = "";
+   searchOptions = [];
 
 
    constructor() 
@@ -29,5 +30,14 @@ export class NavSearchComponent implements OnInit
       console.log(this.selectedSearchOption);
       console.log(this.searchInputValue);
    }
+
+
+   onInput(value: string): void {
+      this.searchOptions = value ? [
+        value,
+        value + value,
+        value + value + value
+      ] : [];
+    }
 
 }

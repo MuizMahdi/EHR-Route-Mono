@@ -1,8 +1,17 @@
 <div class="nav-form">
 
-   <nz-input-group [nzAddOnAfter]="addOnAfterTemplate" [nzAddOnBefore]="addOnBeforeTemplate">
-     <input type="text" nz-input [(ngModel)]="searchInputValue" placeholder="Search..." type="search">
-   </nz-input-group>
+   <div>
+      <nz-input-group [nzAddOnAfter]="addOnAfterTemplate" [nzAddOnBefore]="addOnBeforeTemplate">
+         <input (input)="onInput($event.target?.value)" [nzAutocomplete]="auto" nz-input [(ngModel)]="searchInputValue" placeholder="Search..." type="search">
+      </nz-input-group>
+      
+      <nz-autocomplete nzBackfill #auto>
+         <nz-auto-option *ngFor="let option of searchOptions" [nzValue]="option">
+            {{option}}
+         </nz-auto-option>
+      </nz-autocomplete>
+   </div>
+   
 
    <ng-template #addOnBeforeTemplate>
       <a (click)="onSearch()"><i nz-icon type="search"></i></a>
@@ -18,6 +27,3 @@
    </ng-template>
    
 </div>
-
-
-
