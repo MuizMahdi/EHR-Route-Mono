@@ -24,6 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import java.util.Calendar;
+import java.util.List;
 
 
 @RestController
@@ -130,6 +131,13 @@ public class NetworkController
             network.getChainRoot().getRoot(),
             HttpStatus.OK
         );
+    }
+
+
+    @GetMapping("/search-by-name")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<String> searchNetworksByNetworkNames(@RequestParam("keyword") String networkName) {
+        return networkService.searchNetworksByName(networkName);
     }
 
 

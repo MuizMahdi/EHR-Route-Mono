@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class NetworkService
 {
@@ -31,5 +33,11 @@ public class NetworkService
     @Transactional
     public String getNetworkChainRoot(Network network) {
         return network.getChainRoot().getRoot();
+    }
+
+
+    @Transactional
+    public List<String> searchNetworksByName(String networkNameKeyword) {
+        return networkRepository.searchNetworksByName(networkNameKeyword);
     }
 }

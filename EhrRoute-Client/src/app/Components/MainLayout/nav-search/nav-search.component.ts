@@ -43,13 +43,18 @@ export class NavSearchComponent implements OnInit
          // In case 'User' is selected
          case "User": {
             // Search for users names
-            this.searchUsersnames(value);
+            this.searchUsernames(value);
             break;
          }
 
          case "Network": {
             // Search for networks
             this.searchNetworks(value);
+            break;
+         }
+
+         case "Provider": {
+            this.searchProvidersUsernames(value);
             break;
          }
 
@@ -61,7 +66,7 @@ export class NavSearchComponent implements OnInit
    }
 
 
-   private searchUsersnames(username:string): void
+   private searchUsernames(username:string): void
    {
       this.userService.searchUsername(username).subscribe(
 
@@ -108,6 +113,12 @@ export class NavSearchComponent implements OnInit
          }
 
       );
+   }
+
+
+   private searchProvidersUsernames(providerUsername:string): void 
+   {
+      
    }
 
 
