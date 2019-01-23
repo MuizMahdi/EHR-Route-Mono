@@ -15,17 +15,18 @@ import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvi
 export class NodeNetworkService
 {
    
-   userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
-   networkRootUrl:string = environment.apiUrl + '/network/get-root';
-   createNetworkUrl:string = environment.apiUrl + '/network/create';
-   networkInviteUrl:string = environment.apiUrl + '/network/invite';
-   networkInvitationAcceptUrl:string = environment.apiUrl + '/network/invitation-accept'
+   private userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
+   private networkRootUrl:string = environment.apiUrl + '/network/get-root';
+   private createNetworkUrl:string = environment.apiUrl + '/network/create';
+   private networkInviteUrl:string = environment.apiUrl + '/network/invite';
+   private networkInvitationAcceptUrl:string = environment.apiUrl + '/network/invitation-accept';
+   private searchNetworksByNameURL:string = environment.apiUrl + '/network/search-by-name';
 
    
    constructor(private http:HttpClient) { }
 
 
-   getUserNetworks(): Observable<any> {
+   public getUserNetworks(): Observable<any> {
       
       return this.http.get(this.userNetworkUrl).pipe(first(),
 
@@ -38,7 +39,7 @@ export class NodeNetworkService
    }
 
 
-   getNetworkRoot(networkUUID:string): Observable<any> {
+   public getNetworkRoot(networkUUID:string): Observable<any> {
 
       return this.http.get(this.networkRootUrl + '?networkuuid=' + networkUUID).pipe(first(),
 
@@ -50,8 +51,23 @@ export class NodeNetworkService
 
    }
 
+
+   public searchNetworksByName(networkName:string): Observable<any> {
+
+      let searchUrl = this.searchNetworksByNameURL + "?keyword=" + networkName;
+
+      return this.http.get(searchUrl).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
+   }
+
    
-   generateNetwork(networkName:string): Observable<any> {
+   public generateNetwork(networkName:string): Observable<any> {
 
       return this.http.post(this.createNetworkUrl, networkName).pipe(first(),
          
@@ -64,7 +80,7 @@ export class NodeNetworkService
    }
 
 
-   sendNetworkInvitationRequest(invitationRequest:NetworkInvitationRequest): Observable<any> {
+   public sendNetworkInvitationRequest(invitationRequest:NetworkInvitationRequest): Observable<any> {
 
       return this.http.post(this.networkInviteUrl, invitationRequest).pipe(first(),
       
@@ -77,7 +93,7 @@ export class NodeNetworkService
    }
 
 
-   networkInvitationAccept(invitationResponse:NetworkInvitationRequest): Observable<any> {
+   public networkInvitationAccept(invitationResponse:NetworkInvitationRequest): Observable<any> {
 
       return this.http.post(this.networkInvitationAcceptUrl, invitationResponse).pipe(first(),
 

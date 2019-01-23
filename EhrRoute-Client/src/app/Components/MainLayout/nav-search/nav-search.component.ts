@@ -1,5 +1,6 @@
 import { UsersService } from './../../../Services/users.service';
 import { Component, OnInit } from '@angular/core';
+import { NodeNetworkService } from 'src/app/Services/node-network.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class NavSearchComponent implements OnInit
    searchOptions = [];
 
 
-   constructor(private userService:UsersService) 
+   constructor(private userService:UsersService, private networkService:NodeNetworkService) 
    { }
 
 
@@ -27,7 +28,7 @@ export class NavSearchComponent implements OnInit
    { }
 
    
-   onSearch()
+   onSearch(): void
    {
       console.log(this.selectedSearchOption);
       console.log(this.searchInputValue);
@@ -36,18 +37,31 @@ export class NavSearchComponent implements OnInit
 
    onSearchBarInput(value:string): void {
       
-      // If user option is selected on search bar
-      if (this.selectedSearchOption === "User") 
+      // Search for the selected search bar option with the input value
+      switch(this.selectedSearchOption)
       {
-         // Search for username with input value
-         this.searchUsersnames(value);
-      }  
+         // In case 'User' is selected
+         case "User": {
+            // Search for users names
+            this.searchUsersnames(value);
+            break;
+         }
+
+         case "Network": {
+            // Search for networks
+            this.searchNetworks(value);
+            break;
+         }
+
+         default: {
+            break;
+         }
+      }
       
-      // TODO: Use a Select instead of multiple Ifs to check selectedSearchOption values 
    }
 
 
-   private searchUsersnames(username:string)
+   private searchUsersnames(username:string): void
    {
       this.userService.searchUsername(username).subscribe(
 
@@ -72,7 +86,32 @@ export class NavSearchComponent implements OnInit
    }
 
 
-   private onSelectedSearchOptionChange() {
+   private searchNetworks(networkName:string): void
+   {
+      this.networkService.searchNetworksByName(networkName).subscribe(
+
+         (response:string[]) => {
+
+            if (response.length > 0) {
+               this.isSearchOptionsEmpty = false;
+               this.searchOptions = response;
+            } 
+            else {
+               this.searchOptions = [""];
+               this.isSearchOptionsEmpty = true;
+            }
+            
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   private onSelectedSearchOptionChange(): void {
       // Reset the found values from previous option
       this.isSearchOptionsEmpty = true;
       this.searchOptions = null;
