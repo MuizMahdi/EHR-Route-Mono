@@ -2,7 +2,7 @@
 
    <div>
       <nz-input-group [nzAddOnAfter]="addOnAfterTemplate" [nzAddOnBefore]="addOnBeforeTemplate">
-         <input (input)="onInput($event.target?.value)" [nzAutocomplete]="auto" nz-input [(ngModel)]="searchInputValue" placeholder="Search..." type="search">
+         <input (input)="onSearchBarInput($event.target?.value)" [nzAutocomplete]="auto" nz-input [(ngModel)]="searchInputValue" placeholder="Search..." type="search">
       </nz-input-group>
       
       <nz-autocomplete nzBackfill #auto>

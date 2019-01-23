@@ -34,38 +34,45 @@ export class NavSearchComponent implements OnInit
    }
 
 
-   onInput(value: string): void {
+   onSearchBarInput(value:string): void {
       
       // If user option is selected on search bar
       if (this.selectedSearchOption === "User") 
       {
          // Search for username with input value
-         this.userService.searchUsername(value).subscribe(
-
-            (response:string[]) => {
-   
-               if (response.length > 0) {
-                  this.isSearchOptionsEmpty = false;
-                  this.searchOptions = response;
-               } 
-               else {
-                  this.searchOptions = [""];
-                  this.isSearchOptionsEmpty = true;
-               }
-               
-            },
-   
-            error => {
-               console.log(error);
-            }
-   
-         );
-      }
+         this.searchUsersnames(value);
+      }  
       
-
+      // TODO: Use a Select instead of multiple Ifs to check selectedSearchOption values 
    }
 
-   onSelectedSearchOptionChange() {
+
+   private searchUsersnames(username:string)
+   {
+      this.userService.searchUsername(username).subscribe(
+
+         (response:string[]) => {
+
+            if (response.length > 0) {
+               this.isSearchOptionsEmpty = false;
+               this.searchOptions = response;
+            } 
+            else {
+               this.searchOptions = [""];
+               this.isSearchOptionsEmpty = true;
+            }
+            
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   private onSelectedSearchOptionChange() {
       // Reset the found values from previous option
       this.isSearchOptionsEmpty = true;
       this.searchOptions = null;
