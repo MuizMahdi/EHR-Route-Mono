@@ -166,8 +166,16 @@ public class UserController
 
 
     @GetMapping("/search-by-username")
-    public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username) {
+    public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username)
+    {
         return userService.searchUsername(username);
+    }
+
+
+    @GetMapping("/search-providers-by-username")
+    public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerUsername)
+    {
+        return userService.searchProviderUsername(providerUsername);
     }
 
 

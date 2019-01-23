@@ -154,4 +154,10 @@ public class UserService
     public List<String> searchUsername(String usernameKeyword) {
         return userRepository.searchUsernamesByUsername(usernameKeyword);
     }
+
+    @Transactional
+    public List<String> searchProviderUsername(String usernameKeyword) {
+        System.out.println(userRepository.searchProvidersUsernamesByUsername(usernameKeyword).get(0));
+        return userRepository.searchProvidersUsernamesByUsername(usernameKeyword);
+    }
 }

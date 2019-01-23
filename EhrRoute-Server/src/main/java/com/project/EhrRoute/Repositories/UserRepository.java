@@ -1,5 +1,6 @@
 package com.project.EhrRoute.Repositories;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Entities.Auth.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long>
 
     @Query("SELECT u.username FROM User u WHERE u.username LIKE CONCAT('%', :keyword, '%')")
     List<String> searchUsernamesByUsername(@Param("keyword") String keyword);
+    
+    @Query("SELECT u.username FROM User u INNER JOIN u.roles r WHERE r.name='ROLE_PROVIDER' AND u.username LIKE CONCAT('%', :keyword, '%')")
+    List<String> searchProvidersUsernamesByUsername(@Param("keyword") String keyword);
 }

@@ -118,7 +118,26 @@ export class NavSearchComponent implements OnInit
 
    private searchProvidersUsernames(providerUsername:string): void 
    {
-      
+      this.userService.searchProviderUsername(providerUsername).subscribe(
+
+         (response:string[]) => {
+
+            if (response.length > 0) {
+               this.isSearchOptionsEmpty = false;
+               this.searchOptions = response;
+            } 
+            else {
+               this.searchOptions = [""];
+               this.isSearchOptionsEmpty = true;
+            }
+            
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
    }
 
 

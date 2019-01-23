@@ -16,6 +16,7 @@ export class UsersService
    
    private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
+   private providerSearchUrl:string = environment.apiUrl + '/users/search-providers-by-username';
 
 
    constructor(private http:HttpClient) {
@@ -38,6 +39,20 @@ export class UsersService
    public searchUsername(username:string): Observable<any> {
       
       let searchUrl = this.userSearchUrl + "?keyword=" + username;
+
+      return this.http.get(searchUrl).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+   }
+
+
+   public searchProviderUsername(username:string): Observable<any> {
+      
+      let searchUrl = this.providerSearchUrl + "?keyword=" + username;
 
       return this.http.get(searchUrl).pipe(first(),
       
