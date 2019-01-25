@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NzModalService } from 'ng-zorro-antd';
 import { UsersService } from './../../../Services/users.service';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
+import { UserProfileComponent } from './../../Searches/user-profile/user-profile.component';
 
 
 @Component({
@@ -173,27 +174,27 @@ export class NavSearchComponent
    private showUserInfo()
    {
       // Show user info contents on modal
-      this.showSearchResultsModal(null, this.searchInputValue);
+      this.showSearchResultsModal(UserProfileComponent, this.searchInputValue);
    }
 
 
    private showNetworkInfo()
    {
       // Show network info contents on modal
-      
+      this.showSearchResultsModal(null, this.searchInputValue);
    }
 
 
    private showProviderInfo()
    {
       // Show provider info contents on modal
-      
+      this.showSearchResultsModal(null, this.searchInputValue);
    }
 
 
    private showSearchResultsModal(searchResultComponent:any, searchParameter:string) 
    {
-      // searchResultParameter: could be a username, network name, provider username, or an EHR id
+      // searchResultParameter: could be a username, network name, provider username, or an EHR ID
 
       const searchResultModal = this.modalService.create({
 
