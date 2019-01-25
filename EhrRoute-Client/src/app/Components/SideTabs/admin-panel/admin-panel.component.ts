@@ -1,6 +1,6 @@
-import { UsersService } from './../../Services/users.service';
-import { RoleChangeRequest } from './../../Models/Payload/Requests/RoleChangeRequest';
-import { MainLayoutService } from './../../Services/main-layout.service';
+import { UsersService } from './../../../Services/users.service';
+import { RoleChangeRequest } from './../../../Models/Payload/Requests/RoleChangeRequest';
+import { MainLayoutService } from './../../../Services/main-layout.service';
 import { Component } from '@angular/core';
 
 
