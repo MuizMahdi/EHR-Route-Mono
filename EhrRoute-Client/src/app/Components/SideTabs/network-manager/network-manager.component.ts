@@ -1,7 +1,7 @@
-import { UserNetworks } from '../../Models/Payload/Responses/UserNetworks';
-import { NodeNetworkService } from './../../Services/node-network.service';
-import { UserRole } from './../../Models/UserRole';
-import { MainLayoutService } from './../../Services/main-layout.service';
+import { UserNetworks } from '../../../Models/Payload/Responses/UserNetworks';
+import { NodeNetworkService } from './../../../Services/node-network.service';
+import { UserRole } from './../../../Models/UserRole';
+import { MainLayoutService } from './../../../Services/main-layout.service';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/Services/auth.service';
 import { NetworkInfo } from 'src/app/Models/Payload/Responses/NetworkInfo';

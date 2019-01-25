@@ -21,7 +21,7 @@ import { SideBarComponent } from './Components/MainLayout/side-bar/side-bar.comp
 import { NavSearchComponent } from './Components/MainLayout/nav-search/nav-search.component';
 import { RegistrationComponent } from './Components/Auth/registration/registration.component';
 import { AdminPanelComponent } from './Components/SideTabs/admin-panel/admin-panel.component';
-import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
+import { NetworkManagerComponent } from './Components/SideTabs/network-manager/network-manager.component';
 import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-user-menu.component';
 import { HealthRecordsManagerComponent } from './Components/SideTabs/health-records-manager/health-records-manager.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
