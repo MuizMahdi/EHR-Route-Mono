@@ -1,11 +1,11 @@
-import { DatabaseService } from './../../DataAccess/database.service';
-import { ErrorResponse } from './../../Models/Payload/Responses/ErrorResponse';
-import { NetworkInfo } from './../../Models/Payload/Responses/NetworkInfo';
-import { UserNetworks } from './../../Models/Payload/Responses/UserNetworks';
-import { MainLayoutService } from './../../Services/main-layout.service';
 import { Component, OnInit } from '@angular/core';
-import { NodeClustersService } from 'src/app/Services/node-clusters.service';
+import { NetworkInfo } from './../../../Models/Payload/Responses/NetworkInfo';
+import { UserNetworks } from './../../../Models/Payload/Responses/UserNetworks';
+import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
+import { DatabaseService } from './../../../DataAccess/database.service';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
+import { MainLayoutService } from './../../../Services/main-layout.service';
+import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 
 
 @Component({

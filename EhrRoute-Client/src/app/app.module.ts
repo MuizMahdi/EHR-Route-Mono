@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './Components/Auth/login/login.component';
 import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { RegistrationComponent } from './Components/Auth/registration/registration.component';
-import { MainComponent } from './Components/main/main.component';
+import { MainComponent } from './Components/SideTabs/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SideBarComponent } from './Components/MainLayout/side-bar/side-bar.component';
 import { NavBarComponent } from './Components/MainLayout/nav-bar/nav-bar.component';
@@ -33,7 +33,6 @@ import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-
 import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
 import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
-import { SearchModalComponent } from './Components/Searches/search-modal/search-modal.component';
 
 registerLocaleData(en);
 
@@ -59,8 +58,7 @@ registerLocaleData(en);
       NavUserNotificationsComponent,
       AdminPanelComponent,
       NetworkInvitationComponent,
-      HealthRecordsManagerComponent,
-      SearchModalComponent
+      HealthRecordsManagerComponent
    ],
 
    imports: [

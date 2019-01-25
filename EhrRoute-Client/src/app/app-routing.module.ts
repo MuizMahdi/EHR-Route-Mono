@@ -1,11 +1,11 @@
-import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
-import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
-import { MainComponent } from './Components/main/main.component';
-import { AuthGuard } from './Guards/AuthGuard';
-import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
 import { NgModule } from '@angular/core';
+import { AuthGuard } from './Guards/AuthGuard';
 import { Routes, RouterModule } from '@angular/router';
+import { MainComponent } from './Components/SideTabs/main/main.component';
+import { AuthMainComponent } from './Components/Auth/auth-main/auth-main.component';
+import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
 import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
+import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
 
 
 const routes: Routes = [
