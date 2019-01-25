@@ -23,7 +23,7 @@ import { RegistrationComponent } from './Components/Auth/registration/registrati
 import { AdminPanelComponent } from './Components/SideTabs/admin-panel/admin-panel.component';
 import { NetworkManagerComponent } from './Components/network-manager/network-manager.component';
 import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-user-menu.component';
-import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
+import { HealthRecordsManagerComponent } from './Components/SideTabs/health-records-manager/health-records-manager.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
 import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
 
