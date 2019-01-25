@@ -1,6 +1,7 @@
 import { UsersService } from './../../../Services/users.service';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
+import { NzModalService } from 'ng-zorro-antd';
 
 
 @Component({
@@ -10,29 +11,26 @@ import { NodeNetworkService } from 'src/app/Services/node-network.service';
 })
 
 
-export class NavSearchComponent implements OnInit 
+export class NavSearchComponent
 {
-
    // "Network" option is initially selected
    selectedSearchOption:string = "Network"; 
+
    isSearchOptionsEmpty:boolean;
    searchInputValue:string = "";
    searchOptions = [];
 
+   // Search modal contents visibility booleans
+   isUserSearched = false;
+   isNetworkSearched = false;
+   isProviderSearched = false;
+   isEhrSearched = false;
 
-   constructor(private userService:UsersService, private networkService:NodeNetworkService) 
-   { }
 
-
-   ngOnInit() 
-   { }
-
-   
-   onSearch(): void
-   {
-      console.log(this.selectedSearchOption);
-      console.log(this.searchInputValue);
-   }
+   constructor(
+      private userService:UsersService, private networkService:NodeNetworkService,
+      private modalService:NzModalService
+   ) { }
 
 
    onSearchBarInput(value:string): void {
@@ -147,4 +145,61 @@ export class NavSearchComponent implements OnInit
       this.searchOptions = null;
    }
 
+
+   onSearch(): void
+   {
+      // Set all options booleans to false
+      this.isUserSearched = false;
+      this.isNetworkSearched = false;
+      this.isProviderSearched = false;
+      this.isEhrSearched = false;
+
+
+      // Search for the selected search bar option with the input value
+      switch(this.selectedSearchOption)
+      {
+         case "User": {
+            // open user profile on modal
+            this.getUser();
+            break;
+         }
+
+         case "Network": {
+            // open network profile on modal
+            this.getNetwork();
+            break;
+         }
+
+         case "Provider": {
+            // open provider profile on modal
+            this.getProvider();
+            break;
+         }
+
+         default: {
+            break;
+         }
+      }
+   }
+
+
+   getUser()
+   {
+      // Show user info contents on modal
+      this.isUserSearched = true;
+   }
+
+
+   getNetwork()
+   {
+      // Show network info contents on modal
+      this.isNetworkSearched = true;
+   }
+
+
+   getProvider()
+   {
+      // Show provider info contents on modal
+      this.isProviderSearched = true;
+   }
 }

@@ -16,7 +16,6 @@
       </nz-autocomplete>
    </div>
    
-
    <ng-template #addOnBeforeTemplate>
       <a (click)="onSearch()"><i nz-icon type="search"></i></a>
    </ng-template>
@@ -31,3 +30,16 @@
    </ng-template>
    
 </div>
+
+
+<ng-template [ngIf]="isUserSearched">
+   
+</ng-template>
+
+<ng-template [ngIf]="isNetworkSearched">
+   
+</ng-template>
+
+<ng-template [ngIf]="isProviderSearched">
+   
+</ng-template>

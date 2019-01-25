@@ -33,6 +33,7 @@ import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-
 import { AdminPanelComponent } from './Components/admin-panel/admin-panel.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
 import { HealthRecordsManagerComponent } from './Components/health-records-manager/health-records-manager.component';
+import { SearchModalComponent } from './Components/Searches/search-modal/search-modal.component';
 
 registerLocaleData(en);
 
@@ -58,7 +59,8 @@ registerLocaleData(en);
       NavUserNotificationsComponent,
       AdminPanelComponent,
       NetworkInvitationComponent,
-      HealthRecordsManagerComponent
+      HealthRecordsManagerComponent,
+      SearchModalComponent
    ],
 
    imports: [
