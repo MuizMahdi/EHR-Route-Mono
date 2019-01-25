@@ -1,7 +1,7 @@
-import { UsersService } from './../../../Services/users.service';
 import { Component } from '@angular/core';
-import { NodeNetworkService } from 'src/app/Services/node-network.service';
 import { NzModalService } from 'ng-zorro-antd';
+import { UsersService } from './../../../Services/users.service';
+import { NodeNetworkService } from 'src/app/Services/node-network.service';
 
 
 @Component({
@@ -13,18 +13,12 @@ import { NzModalService } from 'ng-zorro-antd';
 
 export class NavSearchComponent
 {
-   // "Network" option is initially selected
+   // Network search option is initially selected
    selectedSearchOption:string = "Network"; 
 
    isSearchOptionsEmpty:boolean;
    searchInputValue:string = "";
    searchOptions = [];
-
-   // Search modal contents visibility booleans
-   isUserSearched = false;
-   isNetworkSearched = false;
-   isProviderSearched = false;
-   isEhrSearched = false;
 
 
    constructor(
@@ -146,33 +140,26 @@ export class NavSearchComponent
    }
 
 
-   onSearch(): void
+   private onSearch(): void
    {
-      // Set all options booleans to false
-      this.isUserSearched = false;
-      this.isNetworkSearched = false;
-      this.isProviderSearched = false;
-      this.isEhrSearched = false;
-
-
       // Search for the selected search bar option with the input value
       switch(this.selectedSearchOption)
       {
          case "User": {
             // open user profile on modal
-            this.getUser();
+            this.showUserInfo();
             break;
          }
 
          case "Network": {
             // open network profile on modal
-            this.getNetwork();
+            this.showNetworkInfo();
             break;
          }
 
          case "Provider": {
             // open provider profile on modal
-            this.getProvider();
+            this.showProviderInfo();
             break;
          }
 
@@ -183,23 +170,52 @@ export class NavSearchComponent
    }
 
 
-   getUser()
+   private showUserInfo()
    {
       // Show user info contents on modal
-      this.isUserSearched = true;
+      this.showSearchResultsModal(null, this.searchInputValue);
    }
 
 
-   getNetwork()
+   private showNetworkInfo()
    {
       // Show network info contents on modal
-      this.isNetworkSearched = true;
+      
    }
 
 
-   getProvider()
+   private showProviderInfo()
    {
       // Show provider info contents on modal
-      this.isProviderSearched = true;
+      
+   }
+
+
+   private showSearchResultsModal(searchResultComponent:any, searchParameter:string) 
+   {
+      // searchResultParameter: could be a username, network name, provider username, or an EHR id
+
+      const searchResultModal = this.modalService.create({
+
+         nzTitle: null,
+
+         nzContent: searchResultComponent,
+
+         // Pass the parameter to the component as an input
+         nzComponentParams: {
+            searchParameter: searchParameter
+         },
+
+         nzFooter: null
+
+      });
+
+      searchResultModal.afterOpen.subscribe(() => console.log('Notification Modal Opened'));
+      searchResultModal.afterClose.subscribe(() => console.log('Notification Modal Closed'));
+
+      // delay until modal instance created
+      window.setTimeout(() => {
+        const instance = searchResultModal.getContentComponent();
+      }, 2000);
    }
 }
