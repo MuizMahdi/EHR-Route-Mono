@@ -1,4 +1,4 @@
-<div *ngIf="!userHasNetwork" class="network-content">
+<div *ngIf="!userHasNetwork" class="boxed-content">
    <h1> You have no network </h1>
    <h4> Ask for a network invitation or create a new network </h4>
 </div>
@@ -6,52 +6,56 @@
 
 <div *ngIf="userHasNetwork" class="network-header">
 
-   <div id="network-name">
-      <h1>{{selectedNetwork.name}}</h1>
+   <div class="boxed-content" id="network-name">
+      <h1 class="box-title">{{selectedNetwork.name}}</h1>
    </div>
 
-   
-   <nz-select id="network-selector" nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetwork" (ngModelChange)="log($event)">
+   <nz-select nzShowSearch nzPlaceHolder="Select a network" [(ngModel)]="selectedNetwork" (ngModelChange)="log($event)" class="boxed-content" id="network-selector">
       <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.name"></nz-option>
    </nz-select>
 
 </div>
 
 
-<div *ngIf="userHasNetwork" class="network-content">
+<div *ngIf="userHasNetwork" class="boxed-content" id="network-content">
 
-   <div>
-      <h1>Network UUID:   {{selectedNetwork.networkUUID}}</h1>
-      <p style="padding-bottom:70em;">Network Status</p> 
-   </div>
+   <h2 class="box-title">Network Status</h2>
+   <hr class="box-title-bottom-line"><br>
 
-   <div>
-      <h3>Invite user to network</h3>
-      <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
-         <input type="text" nz-input placeholder="User's username" [(ngModel)]="invitedUserUsername">
-      </nz-input-group>
-      
-      <ng-template #prefixTemplate><i nz-icon type="user"></i></ng-template>
-      <ng-template #suffixTemplate><i nz-icon type="close-circle" (click)="invitedUserUsername=null" *ngIf="invitedUserUsername"></i></ng-template>      
-   
-      <button (click)="inviteUser(invitedUserUsername)" nz-button nzType="primary">Invite User</button>
-   </div>
-
-
+   <h3>Name: {{selectedNetwork.name}}</h3>
+   <h3>UUID: {{selectedNetwork.networkUUID}}</h3>
 
 </div>
 
 
-<div class="network-content" id="network-creation">
+<div class="boxed-content" id="network-invite">
+
+   <h2 class="box-title">Invite a user to the network</h2>
+   <hr class="box-title-bottom-line"><br>
+
+   <label>Username: </label>
+   <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+      <input type="text" nz-input placeholder="User's username" [(ngModel)]="invitedUserUsername">
+   </nz-input-group>
+   
+   <ng-template #prefixTemplate><i nz-icon type="user"></i></ng-template>
+   <ng-template #suffixTemplate><i nz-icon type="close-circle" (click)="invitedUserUsername=null" *ngIf="invitedUserUsername"></i></ng-template>      
+
+   <button (click)="inviteUser(invitedUserUsername)" nz-button nzType="primary" id="network-invite-button">Send Invitation</button>
+
+</div>
+
+
+<div class="boxed-content" id="network-creation">
 
    <button nz-button [nzType]="'primary'" (click)="showNetworkCreationModal()">
-      <span>Create New Network</span>
+      <span>Create A New Network</span>
    </button>
 
    <nz-modal [(nzVisible)]="isNetworkCreationModalVisible" nzTitle="Create a new network" (nzOnCancel)="onNetworkCreationCancel()" (nzOnOk)="onNetworkCreationSubmit()">
 
       <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
-            <input type="text" nz-input placeholder="Enter network name" [(ngModel)]="newNetworkName">
+         <input type="text" nz-input placeholder="Enter network name" [(ngModel)]="newNetworkName">
       </nz-input-group>
 
       <ng-template #prefixTemplate><i nz-icon type="share-alt"></i></ng-template>

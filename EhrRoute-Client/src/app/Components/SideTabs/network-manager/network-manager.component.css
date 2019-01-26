@@ -1,52 +1,58 @@
-.network-header {
+.network-header 
+{
    display: flex;
    flex-direction: row;
    flex-wrap: wrap;
 }
 
 
-.network-header > * {
-   background: white;
-   border: 2px solid rgb(233, 233, 233);
-   border-radius: 5px;
-   padding: 25px;
-   margin-top: 10px;
-}
-
-
-.network-content {
-   background: white;
-   border: 2px solid rgb(233, 233, 233);
-   border-radius: 5px;
-   padding: 25px;
-   margin-top: 10px;
-}
-
-
-.network-header #network-name {
+#network-name 
+{
    flex-grow: 1;
    text-align: center;
 }
 
 
-.network-header #network-selector {
-   margin-left: 10px;
+#network-selector 
+{
+   margin-left: 15px;
    width: auto;
 }
 
-#network-creation {
+
+#network-content
+{
+   margin-top: 15px;
+   margin-bottom: 15px;
+}
+
+#network-invite
+{
+   margin-bottom: 15px;
+}
+
+#network-invite-button
+{
+   margin-top: 25px;
+}
+
+
+#network-creation 
+{
    width: fit-content;
 }
 
 
-::ng-deep .network-creation-modal {
+::ng-deep .network-creation-modal 
+{
    display: grid;
    align-items: center;
    justify-content: center;
 }
 
 
-.anticon-close-circle {
+.anticon-close-circle 
+{
    cursor: pointer;
    color: #ccc;
    transition: color 0.3s;
@@ -54,11 +60,13 @@
 }
 
 
-.anticon-close-circle:hover {
+.anticon-close-circle:hover 
+{
    color: #999;
 }
 
 
-.anticon-close-circle:active {
+.anticon-close-circle:active 
+{
    color: #666;
 }

@@ -22,7 +22,7 @@ export class ErrorInterceptor implements HttpInterceptor
 
             // Logout if http status code 401 response is returned
             if(error.status === 401) {
-               this.authService.logout;
+               this.authService.logout();
                location.reload(true);
             }
 
