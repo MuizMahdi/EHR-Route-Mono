@@ -17,6 +17,7 @@ export class UsersService
    private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
    private providerSearchUrl:string = environment.apiUrl + '/users/search-providers-by-username';
+   private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
 
 
    constructor(private http:HttpClient) {
@@ -61,6 +62,22 @@ export class UsersService
          })
 
       );
+
+   }
+
+
+   public getUserInfo(username:string): Observable<any> {
+
+      let userGetUrl = this.getUserInfoUrl + username;
+
+      return this.http.get(userGetUrl).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
    }
 
 }

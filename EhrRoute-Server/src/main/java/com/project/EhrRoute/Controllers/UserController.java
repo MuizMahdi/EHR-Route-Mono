@@ -22,10 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.HashSet;
@@ -176,6 +173,30 @@ public class UserController
     public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerUsername)
     {
         return userService.searchProviderUsername(providerUsername);
+    }
+
+
+    @GetMapping("/get-by-username/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getUserByUsername(@PathVariable("username") String username)
+    {
+        User user = userService.findUserByUsernameOrEmail(username);
+
+        if (user == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Invalid username"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        return ResponseEntity.ok (
+            new UserInfo(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.isNonFirstLogin()
+            )
+        );
     }
 
 

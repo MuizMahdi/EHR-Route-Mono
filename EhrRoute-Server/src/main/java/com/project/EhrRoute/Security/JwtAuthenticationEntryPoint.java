@@ -18,6 +18,8 @@ import java.io.IOException;
 *
 *   The commence() method is called whenever an exception is thrown due to an unauthenticated user
 *   trying to access a resource that requires authentication.
+*
+*   Mostly called when a user tries to authenticate with an expired JWT.
 */
 
 
