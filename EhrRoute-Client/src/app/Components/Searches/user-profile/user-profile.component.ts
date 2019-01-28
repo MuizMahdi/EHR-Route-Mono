@@ -25,6 +25,12 @@ export class UserProfileComponent implements OnInit
 
    ngOnInit()
    {
+      this.getSearchedUserProfile();
+   }
+
+
+   getSearchedUserProfile(): void
+   {
       if (this.searchParameter) {
 
          // Get user profile
@@ -41,6 +47,5 @@ export class UserProfileComponent implements OnInit
          );
       }
    }
-
 
 }

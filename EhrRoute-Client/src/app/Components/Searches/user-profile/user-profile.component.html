@@ -1,1 +1,27 @@
-<h1>{{searchParameter}}</h1>
+<div *ngIf="!searchedUser" class="user-info-text">
+   <h4>User not found</h4>
+</div>
+
+<div *ngIf="searchedUser">
+
+   <div class="user-info-avatar">
+      <img src="https://cdn1.iconfinder.com/data/icons/circle-outlines/512/User_Account_Avatar_Person_Profile_Login_Human-512.png" alt="User avatar icon">
+   </div>
+
+   
+   <div class="user-info-text">
+      <h2>{{searchedUser?.name}}</h2>
+      <h4>{{searchedUser?.username}}</h4>
+   </div>
+
+
+   <div class="user-info-buttons">
+      <a id="user-info-buttons-ehr-consent" href="javascript:void(0)">
+         <i class="far fa-address-card fa-2x"></i>
+         <br>
+         <span id="user-info-buttons-ehr-consent-text">Get EHR consent</span>
+      </a>
+   </div>
+
+
+</div>

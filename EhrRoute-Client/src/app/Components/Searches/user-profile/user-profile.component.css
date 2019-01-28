@@ -1,0 +1,59 @@
+.user-info-avatar img
+{
+   border-radius: 50%;
+   height: 170px;
+   width: 170px;
+   display: block;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+
+.user-info-text
+{
+   text-align: center;
+   font-family:'QanelasSoft-Regular';
+}
+
+
+.user-info-buttons
+{
+   display: flex;
+   justify-content: center;
+   border: 1px solid rgb(220, 220, 220);
+   margin: 10vh -1.8vw 6vh -1.8vw;
+}
+
+.user-info-buttons a i
+{
+   margin-left: 35%;
+   color: rgb(80, 80, 80);
+}
+
+.user-info-buttons a i:hover
+{
+   color: rgb(40, 40, 40);
+}
+
+.user-info-buttons a
+{
+   text-decoration: none;
+   color: rgb(80, 80, 80);
+}
+
+.user-info-buttons a:hover
+{
+   color: rgb(40, 40, 40);
+}
+
+#user-info-buttons-ehr-consent
+{
+   border-left: solid rgb(220, 220, 220);
+   border-right: solid rgb(220, 220, 220);
+   padding: 4%
+}
+
+#user-info-buttons-ehr-consent-text
+{
+   font-family:'QanelasSoft-Bold';
+}

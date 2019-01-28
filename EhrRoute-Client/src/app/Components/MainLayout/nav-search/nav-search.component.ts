@@ -207,7 +207,9 @@ export class NavSearchComponent
             searchParameter: searchParameter
          },
 
-         nzFooter: null
+         nzFooter: null,
+
+         nzWidth: '35vw'
 
       });
 
