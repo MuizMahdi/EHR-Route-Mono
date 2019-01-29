@@ -21,24 +21,16 @@
    display: flex;
    justify-content: center;
    border: 1px solid rgb(220, 220, 220);
-   margin: 10vh -1.8vw 6vh -1.8vw;
-}
-
-.user-info-buttons a i
-{
-   margin-left: 35%;
-   color: rgb(80, 80, 80);
-}
-
-.user-info-buttons a i:hover
-{
-   color: rgb(40, 40, 40);
+   margin: 10vh -1.75vw 6vh -1.75vw;
 }
 
 .user-info-buttons a
 {
+   padding: 4%;
    text-decoration: none;
-   color: rgb(80, 80, 80);
+   color: rgb(100, 100, 100);
+   border-left: 1px solid rgb(220, 220, 220);
+   border-right: 1px solid rgb(220, 220, 220);
 }
 
 .user-info-buttons a:hover
@@ -46,14 +38,13 @@
    color: rgb(40, 40, 40);
 }
 
-#user-info-buttons-ehr-consent
+.user-info-buttons a i
 {
-   border-left: solid rgb(220, 220, 220);
-   border-right: solid rgb(220, 220, 220);
-   padding: 4%
+   margin-left: 35%;
+   color: rgb(100, 100, 100);
 }
 
-#user-info-buttons-ehr-consent-text
+.user-info-buttons a span
 {
    font-family:'QanelasSoft-Bold';
 }

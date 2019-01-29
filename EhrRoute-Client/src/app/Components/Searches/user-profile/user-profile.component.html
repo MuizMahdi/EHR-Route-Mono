@@ -2,6 +2,7 @@
    <h4>User not found</h4>
 </div>
 
+
 <div *ngIf="searchedUser">
 
    <div class="user-info-avatar">
@@ -16,12 +17,37 @@
 
 
    <div class="user-info-buttons">
-      <a id="user-info-buttons-ehr-consent" href="javascript:void(0)">
+
+      <a (click)="createNetworkSelectionModal(networkSelectionModalContent)" href="javascript:void(0)">
          <i class="far fa-address-card fa-2x"></i>
          <br>
-         <span id="user-info-buttons-ehr-consent-text">Get EHR consent</span>
+         <span>Get EHR consent</span>
       </a>
+
    </div>
 
-
 </div>
+
+
+<ng-template #networkSelectionModalContent>
+
+   <div *ngIf="!userHasNetwork">
+      <p>
+         You have no network to share the patient's EHR to. To share a patient's EHR, join, or create a new network.
+      </p>
+   </div>
+   
+
+   <div *ngIf="userHasNetwork">
+      <p>
+         Select a network that you would you like to share this patient's EHR with.
+      </p>
+
+      <label for="network-selector" style="margin-right:10px;">Network: </label>
+
+      <nz-select *ngIf="userHasNetwork" nzShowSearch [(ngModel)]="selectedNetwork" nzPlaceHolder="Select a network" id="network-selector" style="width:18vw;">
+         <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.name"></nz-option>
+      </nz-select>
+   </div>
+
+</ng-template>

@@ -18,6 +18,7 @@ export class UsersService
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
    private providerSearchUrl:string = environment.apiUrl + '/users/search-providers-by-username';
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
+   private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
 
 
    constructor(private http:HttpClient) {
@@ -78,6 +79,22 @@ export class UsersService
 
       );
 
+   }
+
+
+   public sendUserEhrConsentRequest(): Observable<any>
+   {
+      let blockAdditionRequest = {
+         
+      }
+
+      return this.http.post(this.getUserEhrConsentUrl, blockAdditionRequest).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
    }
 
 }

@@ -1,45 +1,36 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Block;
 import com.project.EhrRoute.Core.BlockBroadcaster;
-import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Events.GetUserConsentEvent;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
-
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
-
-import com.project.EhrRoute.Exceptions.UnavailableNodeException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.BlockAddition;
 import com.project.EhrRoute.Payload.Core.UserConsentRequest;
-
 import com.project.EhrRoute.Payload.Core.UserConsentResponse;
 import com.project.EhrRoute.Services.ConsentRequestBlockService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Services.ChainRootUtil;
 import com.project.EhrRoute.Services.ClustersContainer;
-
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import com.project.EhrRoute.Utilities.ChainUtil;
 import com.project.EhrRoute.Utilities.SimpleStringUtil;
-
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -80,7 +71,7 @@ public class TransactionController
     }
 
     @PostMapping("/getConsent")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition)
     {
         String providerUUID = blockAddition.getProviderUUID();
