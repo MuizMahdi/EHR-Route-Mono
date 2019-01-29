@@ -91,12 +91,9 @@ public class UserService
     public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
 
         // Find user by username
-        User user = userRepository.findByUsername(username).orElse(null);
-
-        // If invalid username
-        if (user == null) {
-            throw new ResourceNotFoundException("User", "username", username);
-        }
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+           new ResourceNotFoundException("User", "username", username)
+        );
 
         // Return user roles
         return user.getRoles();

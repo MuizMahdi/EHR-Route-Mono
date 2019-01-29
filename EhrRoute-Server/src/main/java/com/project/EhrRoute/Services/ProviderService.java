@@ -1,6 +1,7 @@
 package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Entities.App.ProviderDetails;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Repositories.ProviderDetailsRepository;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,14 @@ public class ProviderService
 
         // Persist the provider details
         providerDetailsRepository.save(providerDetails);
+    }
+
+    
+    @Transactional
+    public String getProviderUuidByUserID(User user)
+    {
+        return providerDetailsRepository.findProviderUUIDByUserID(user.getId()).orElseThrow(() ->
+            new ResourceNotFoundException("User", "ID", user.getId())
+        );
     }
 }
