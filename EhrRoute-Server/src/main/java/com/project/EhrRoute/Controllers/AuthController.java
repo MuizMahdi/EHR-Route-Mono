@@ -9,6 +9,7 @@ import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Auth.*;
 import com.project.EhrRoute.Repositories.RoleRepository;
 import com.project.EhrRoute.Security.JwtTokenProvider;
+import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Services.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,10 @@ public class AuthController
     private VerificationTokenService verificationTokenService;
     private UserService userService;
     private RoleRepository roleRepository;
+    private ProviderService providerService;
 
     @Autowired
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService, RoleRepository roleRepository)
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService, RoleRepository roleRepository, ProviderService providerService)
     {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
@@ -48,6 +50,7 @@ public class AuthController
         this.verificationTokenService = verificationTokenService;
         this.userService = userService;
         this.roleRepository = roleRepository;
+        this.providerService = providerService;
     }
 
 
@@ -224,7 +227,7 @@ public class AuthController
         // Get the token's user
         User user = verificationToken.getUser();
 
-        // Get the 'ADMIN' role
+        // Get the role
         Role userRole = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(() ->
                 new InternalErrorException("Invalid Role")
         );
@@ -233,6 +236,9 @@ public class AuthController
         Set<Role> userRoles = user.getRoles();
         userRoles.add(userRole);
         user.setRoles(userRoles);
+
+        // Create provider details for user
+        providerService.generateProviderDetails(user);
 
         // Persist the user updates to DB
         userService.saveUser(user);

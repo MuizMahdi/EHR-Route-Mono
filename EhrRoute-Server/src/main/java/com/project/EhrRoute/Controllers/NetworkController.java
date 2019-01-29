@@ -60,8 +60,6 @@ public class NetworkController
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
-        System.out.println("A NETWORK CREATION REQUEST HAS BEEN MADE WITH NETWORK NAME: " + networkName);
-
         if (currentUser == null) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "User not logged in"),
