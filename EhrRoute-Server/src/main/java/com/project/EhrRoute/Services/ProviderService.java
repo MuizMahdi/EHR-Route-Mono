@@ -35,12 +35,12 @@ public class ProviderService
         providerDetailsRepository.save(providerDetails);
     }
 
-    
+
     @Transactional
-    public String getProviderUuidByUserID(User user)
+    public String getProviderUuidByUserID(Long userID)
     {
-        return providerDetailsRepository.findProviderUUIDByUserID(user.getId()).orElseThrow(() ->
-            new ResourceNotFoundException("User", "ID", user.getId())
+        return providerDetailsRepository.findProviderUUIDByUserID(userID).orElseThrow(() ->
+            new ResourceNotFoundException("User", "ID", userID)
         );
     }
 }

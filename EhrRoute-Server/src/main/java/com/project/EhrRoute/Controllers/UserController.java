@@ -63,7 +63,7 @@ public class UserController
 
         if (user == null) {
             return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid username"),
+                new ApiResponse(false, "User not found; Invalid user"),
                 HttpStatus.BAD_REQUEST
             );
         }
@@ -166,13 +166,6 @@ public class UserController
     public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username)
     {
         return userService.searchUsername(username);
-    }
-
-
-    @GetMapping("/search-providers-by-username")
-    public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerUsername)
-    {
-        return userService.searchProviderUsername(providerUsername);
     }
 
 

@@ -88,6 +88,11 @@ public class UserService
     }
 
     @Transactional
+    public boolean isValidUserUsername(String username) {
+        return findUserByUsernameOrEmail(username) != null;
+    }
+
+    @Transactional
     public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
 
         // Find user by username

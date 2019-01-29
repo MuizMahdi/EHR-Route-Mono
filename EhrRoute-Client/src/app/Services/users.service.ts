@@ -16,7 +16,7 @@ export class UsersService
    
    private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
-   private providerSearchUrl:string = environment.apiUrl + '/users/search-providers-by-username';
+   private providerSearchUrl:string = environment.apiUrl + '/providers/search-providers-by-username';
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
 
