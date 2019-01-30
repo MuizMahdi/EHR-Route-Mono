@@ -89,7 +89,8 @@ export class UserProfileComponent implements OnInit
    {
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
-      
+      let providerUUID = ""; // TODO: DO THIS
+
       console.log("Request Ehr Privilege Consent for user with ID: " + ehrUserID);
    }
 

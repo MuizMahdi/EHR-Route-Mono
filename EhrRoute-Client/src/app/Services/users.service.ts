@@ -16,10 +16,10 @@ export class UsersService
    
    private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
-   private providerSearchUrl:string = environment.apiUrl + '/providers/search-providers-by-username';
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
 
+   // TODO: ALSO DO: SAVING GENESIS ON DB ON NEW NETWORK CREATION, ALL READY JUST ADD THE DB PART !!
 
    constructor(private http:HttpClient) {
    }
@@ -49,21 +49,6 @@ export class UsersService
          })
 
       );
-   }
-
-
-   public searchProviderUsername(username:string): Observable<any> {
-      
-      let searchUrl = this.providerSearchUrl + "?keyword=" + username;
-
-      return this.http.get(searchUrl).pipe(first(),
-      
-         catchError(error => {
-            return throwError(error);
-         })
-
-      );
-
    }
 
 

@@ -85,6 +85,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             "/node/**",
             "/transaction/**",
             "/users/**",
+            "/providers/**",
             "/network/**",
             "/cluster/**"
     };

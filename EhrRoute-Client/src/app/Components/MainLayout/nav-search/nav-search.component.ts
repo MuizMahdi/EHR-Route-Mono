@@ -1,3 +1,4 @@
+import { ProviderService } from './../../../Services/provider.service';
 import { Component } from '@angular/core';
 import { NzModalService } from 'ng-zorro-antd';
 import { UsersService } from './../../../Services/users.service';
@@ -24,7 +25,7 @@ export class NavSearchComponent
 
    constructor(
       private userService:UsersService, private networkService:NodeNetworkService,
-      private modalService:NzModalService
+      private modalService:NzModalService, private providerService:ProviderService
    ) { }
 
 
@@ -111,7 +112,7 @@ export class NavSearchComponent
 
    private searchProvidersUsernames(providerUsername:string): void 
    {
-      this.userService.searchProviderUsername(providerUsername).subscribe(
+      this.providerService.searchProviderUsername(providerUsername).subscribe(
 
          (response:string[]) => {
 
