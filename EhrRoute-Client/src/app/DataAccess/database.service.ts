@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Connection, ConnectionOptions, createConnection, getConnectionManager } from 'typeorm';
 import { ElectronAppConfig } from "../Configuration/ElectronAppConfig";
-import { Block } from "./entities/Block";
+import { Block } from "./entities/Core/Block";
 import { MedicalRecord } from "./entities/EHR/MedicalRecord";
 import { EhrAllergyAndReaction } from "./entities/EHR/EhrAllergyAndReaction";
 import { EhrCondition } from "./entities/EHR/EhrCondition";
 import { EhrHistory } from "./entities/EHR/EhrHistory";
 import { EhrPatientInfo } from "./entities/EHR/EhrPatientInfo";
-import { Address } from "./entities/Address";
+import { Address } from "./entities/Core/Address";
 
 @Injectable({
    providedIn: 'root'

@@ -37,6 +37,24 @@ public class ProviderService
 
 
     @Transactional
+    public void setProviderAddress(User user, String address)
+    {
+        // Get user's provider details
+        ProviderDetails providerDetails = providerDetailsRepository.findProviderDetailsByUserID(
+            user.getId()
+        ).orElseThrow(() ->
+            new ResourceNotFoundException("Provider Details", "User ID", user.getId())
+        );
+
+        // Add the address
+        providerDetails.setProviderAddress(address);
+
+        // Persist changes
+        providerDetailsRepository.save(providerDetails);
+    }
+
+
+    @Transactional
     public String getProviderUuidByUserID(Long userID)
     {
         return providerDetailsRepository.findProviderUUIDByUserID(userID).orElseThrow(() ->

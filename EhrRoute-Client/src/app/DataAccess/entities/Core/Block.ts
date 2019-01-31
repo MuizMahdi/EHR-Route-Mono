@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
-import { MedicalRecord } from './EHR/MedicalRecord';
+import { MedicalRecord } from '../EHR/MedicalRecord';
 
 
 @Entity()

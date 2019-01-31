@@ -6,6 +6,7 @@ import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Payload.Core.AddressResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
+import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,16 @@ import java.security.PublicKey;
 public class AddressController
 {
     private UserService userService;
+    private ProviderService providerService;
+
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private AddressUtil addressUtil;
 
     @Autowired
-    public AddressController(UserService userService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
+    public AddressController(UserService userService, ProviderService providerService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
         this.userService = userService;
+        this.providerService = providerService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.addressUtil = addressUtil;
@@ -55,8 +59,8 @@ public class AddressController
         if (user.isNonFirstLogin())
         {
             return new ResponseEntity<>(
-                    new ApiResponse(false, "Not the first user login, user already has an address"),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "Not the first user login, user already has an address"),
+                HttpStatus.BAD_REQUEST
             );
         }
 
@@ -73,10 +77,13 @@ public class AddressController
         String publicKey = keyUtil.getStringFromPublicKey(pubKey);
         String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
+        // Add address to provider details of user
+        providerService.setProviderAddress(user, address);
+
         // Return address
         return new ResponseEntity<>(
-                new AddressResponse(address, publicKey, privateKey),
-                HttpStatus.OK
+            new AddressResponse(address, publicKey, privateKey),
+            HttpStatus.OK
         );
     }
 

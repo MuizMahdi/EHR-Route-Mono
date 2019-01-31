@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface ProviderDetailsRepository extends JpaRepository<ProviderDetails, Long>
 {
+    @Query("SELECT p FROM ProviderDetails p INNER JOIN User u WHERE u.id = :userID")
+    Optional<ProviderDetails> findProviderDetailsByUserID(@Param("userID") Long id);
+
     @Query("SELECT p.providerUUID FROM ProviderDetails p INNER JOIN User u WHERE u.id = :userID")
     Optional<String> findProviderUUIDByUserID(@Param("userID") Long id);
 }

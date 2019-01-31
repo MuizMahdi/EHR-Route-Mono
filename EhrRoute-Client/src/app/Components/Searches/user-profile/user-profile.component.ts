@@ -1,3 +1,4 @@
+import { ProviderService } from './../../../Services/provider.service';
 import { UserNetworks } from './../../../Models/Payload/Responses/UserNetworks';
 import { NodeNetworkService } from './../../../Services/node-network.service';
 import { NzModalService, NzModalRef } from 'ng-zorro-antd';
@@ -28,8 +29,10 @@ export class UserProfileComponent implements OnInit
    networkSelectionModal: NzModalRef;
 
 
-   constructor(private userService:UsersService, private modalService:NzModalService, private networkService:NodeNetworkService) 
-   { }
+   constructor(
+      private userService:UsersService, private modalService:NzModalService, 
+      private networkService:NodeNetworkService, private providerService:ProviderService
+   ) { }
 
 
    ngOnInit()
@@ -87,11 +90,34 @@ export class UserProfileComponent implements OnInit
 
    private requestEhrPrivilege()
    {
+      this.getCurrentProviderUUID();
+
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
-      let providerUUID = ""; // TODO: DO THIS
+      let providerUUID = this.getCurrentProviderUUID(); // Check if null, before creating BlockAddition object
 
       console.log("Request Ehr Privilege Consent for user with ID: " + ehrUserID);
+   }
+
+
+   private getCurrentProviderUUID(): string
+   {
+      let providerUUID:string;
+
+      this.providerService.getCurrentProviderUUID().subscribe(
+
+         (response:string) => {
+            providerUUID = response;
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
+            providerUUID = null;
+         }
+
+      )
+
+      return providerUUID;
    }
 
 

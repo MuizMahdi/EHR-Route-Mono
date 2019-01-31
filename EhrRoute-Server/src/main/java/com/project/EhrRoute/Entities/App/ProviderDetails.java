@@ -2,6 +2,7 @@ package com.project.EhrRoute.Entities.App;
 import com.project.EhrRoute.Entities.Auth.User;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 
 @Entity
@@ -13,7 +14,11 @@ public class ProviderDetails
     private Long id;
 
     @NotBlank
+    @NotNull
     private String providerUUID;
+
+    @NotNull
+    private String providerAddress;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -36,6 +41,9 @@ public class ProviderDetails
     public String getProviderUUID() {
         return providerUUID;
     }
+    public String getProviderAddress() {
+        return providerAddress;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -45,5 +53,8 @@ public class ProviderDetails
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
+    }
+    public void setProviderAddress(String providerAddress) {
+        this.providerAddress = providerAddress;
     }
 }
