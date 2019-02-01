@@ -9,6 +9,7 @@ import { EhrHistory } from "./entities/EHR/EhrHistory";
 import { EhrPatientInfo } from "./entities/EHR/EhrPatientInfo";
 import { Address } from "./entities/Core/Address";
 
+
 @Injectable({
    providedIn: 'root'
 })
@@ -22,8 +23,10 @@ import { Address } from "./entities/Core/Address";
 
 export class DatabaseService 
 {
+
    public addressDbConnection: Promise<Connection>;
    private readonly addressDbOptions: ConnectionOptions;
+
 
    constructor() {
 
@@ -79,4 +82,5 @@ export class DatabaseService
    {
       return networkUUID + "-connection";
    }
+
 }

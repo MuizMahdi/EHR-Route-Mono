@@ -20,7 +20,8 @@ export class NodeNetworkService
    private createNetworkUrl:string = environment.apiUrl + '/network/create';
    private networkInviteUrl:string = environment.apiUrl + '/network/invite';
    private networkInvitationAcceptUrl:string = environment.apiUrl + '/network/invitation-accept';
-   private searchNetworksByNameURL:string = environment.apiUrl + '/network/search-by-name';
+   private searchNetworksByNameUrl:string = environment.apiUrl + '/network/search-by-name';
+   private getNetworkUuidByNameUrl:string = environment.apiUrl + '/network/uuid'
 
    
    constructor(private http:HttpClient) { }
@@ -52,9 +53,24 @@ export class NodeNetworkService
    }
 
 
+   public getNetworkUuidByName(networkName:string): Observable<any> {
+
+      let url = this.getNetworkUuidByNameUrl + "?name=" + networkName;
+
+      return this.http.get(url).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
+   }
+
+
    public searchNetworksByName(networkName:string): Observable<any> {
 
-      let searchUrl = this.searchNetworksByNameURL + "?keyword=" + networkName;
+      let searchUrl = this.searchNetworksByNameUrl + "?keyword=" + networkName;
 
       return this.http.get(searchUrl).pipe(first(),
       

@@ -1,3 +1,4 @@
+import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
 import { UserNetworks } from '../../../Models/Payload/Responses/UserNetworks';
 import { NodeNetworkService } from './../../../Services/node-network.service';
 import { UserRole } from './../../../Models/UserRole';
@@ -140,12 +141,15 @@ export class NetworkManagerComponent implements OnInit
    {
       this.nodeNetworkService.generateNetwork(networkName).subscribe(
 
-         response => {
-            console.log(response);
+         (response:BlockResponse) => {
 
             // Update page contents with the newly added network
             // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
             this.getUserNetworks();
+
+            // Save received GenesisBlock to the network's local DB
+            this.saveNetworkGenesisBlock(networkName);
+
          },
 
          error => {
@@ -153,9 +157,20 @@ export class NetworkManagerComponent implements OnInit
          }
 
       );
+   }
 
-      // TODO: Save received GenesisBlock and save network chain to local DB file
-   }  
+
+   private saveNetworkGenesisBlock(networkName:string): void
+   {
+      // Get network UUID with network name
+      this.nodeNetworkService.getNetworkUuidByName(networkName).subscribe(
+
+         response => {
+            // Open a connection to db with the received UUID
+         }
+
+      );
+   }
 
 
    log(value:any): void 
