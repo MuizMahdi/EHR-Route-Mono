@@ -144,15 +144,15 @@ export class NetworkManagerComponent implements OnInit
 
       this.nodeNetworkService.generateNetwork(networkName).subscribe(
 
-         (response:BlockResponse) => {            
+         (response:BlockResponse) => {   
+            
             // Save the received genesis block
             this.saveNetworkGenesisBlock(networkName, response);
 
             // Update page contents with the newly added network
             // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
-            //this.getUserNetworks();
+            this.getUserNetworks();
 
-            //TODO: Fix bug when calling getUserNetworks() after saving block on DB
          },
 
          (error:ErrorResponse) => {

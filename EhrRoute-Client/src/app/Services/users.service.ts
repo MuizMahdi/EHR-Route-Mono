@@ -19,7 +19,6 @@ export class UsersService
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
 
-   // TODO: ALSO DO: SAVING GENESIS ON DB ON NEW NETWORK CREATION, ALL READY JUST ADD THE DB PART !!
 
    constructor(private http:HttpClient) {
    }

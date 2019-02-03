@@ -150,6 +150,8 @@ public class NetworkController
             );
         }
 
+        System.out.println(networkUUID);
+
         return new ResponseEntity<>(
             new SimpleStringResponse(networkUUID),
             HttpStatus.OK
