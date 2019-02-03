@@ -2,7 +2,7 @@ import { UserInfo } from './../Models/Payload/Responses/UserInfo';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
-import { catchError, first } from 'rxjs/operators';
+import { catchError, first, tap } from 'rxjs/operators';
 import { throwError, Observable } from 'rxjs';
 import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvitationRequest';
 

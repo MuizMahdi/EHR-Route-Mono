@@ -11,16 +11,16 @@ export class MedicalRecord
    @PrimaryGeneratedColumn()
    id: number;
 
-   @OneToMany(type => EhrHistory, history => history.medicalRecord)
+   @OneToMany(type => EhrHistory, history => history.medicalRecord, {cascade:true})
    history: EhrHistory[];
 
-   @OneToMany(type => EhrCondition, condition => condition.medicalRecord)
+   @OneToMany(type => EhrCondition, condition => condition.medicalRecord, {cascade:true})
    conditions: EhrCondition[];
 
-   @OneToMany(type => EhrAllergyAndReaction, allergy => allergy.medicalRecord)
+   @OneToMany(type => EhrAllergyAndReaction, allergy => allergy.medicalRecord, {cascade:true})
    allergies: EhrAllergyAndReaction[];
 
-   @OneToOne(type => EhrPatientInfo)
+   @OneToOne(type => EhrPatientInfo, {cascade:true})
    @JoinColumn()
    patientData: EhrPatientInfo;
 }

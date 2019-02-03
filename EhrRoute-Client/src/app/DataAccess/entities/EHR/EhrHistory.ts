@@ -1,5 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from "typeorm";
-import { EhrCondition } from "./EhrCondition";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { MedicalRecord } from "./MedicalRecord";
 
 
@@ -14,9 +13,8 @@ export class EhrHistory
    @PrimaryGeneratedColumn()
    id: number;
 
-   @OneToOne(type => EhrCondition)
-   @JoinColumn()
-   condition: EhrCondition;
+   @Column()
+   condition: string;
 
    @Column()
    occurrence: boolean;

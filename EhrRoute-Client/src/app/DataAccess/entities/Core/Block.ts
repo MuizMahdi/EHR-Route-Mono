@@ -42,7 +42,7 @@ export class Block
    @Column()
    signature:string;
 
-   @OneToOne(type => MedicalRecord)
+   @OneToOne(type => MedicalRecord, {cascade:true})
    @JoinColumn()
    medicalRecord: MedicalRecord;
 }

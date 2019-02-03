@@ -11,6 +11,7 @@ import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
+import com.project.EhrRoute.Payload.App.SimpleStringResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
@@ -126,7 +127,31 @@ public class NetworkController
         }
 
         return new ResponseEntity<>(
-            network.getChainRoot().getRoot(),
+            new SimpleStringResponse(network.getChainRoot().getRoot()),
+            HttpStatus.OK
+        );
+    }
+
+
+    @GetMapping("/uuid")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getNetworkUUID(@RequestParam("name") String networkName)
+    {
+        String networkUUID;
+
+        // Validate network with requested name existence, and get its UUID
+        try {
+            networkUUID = networkService.getNetworkUuidByName(networkName);
+        }
+        catch (NullUserNetworkException Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, Ex.getMessage()),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        return new ResponseEntity<>(
+            new SimpleStringResponse(networkUUID),
             HttpStatus.OK
         );
     }
@@ -134,7 +159,8 @@ public class NetworkController
 
     @GetMapping("/search-by-name")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<String> searchNetworksByNetworkNames(@RequestParam("keyword") String networkName) {
+    public List<String> searchNetworksByNetworkNames(@RequestParam("keyword") String networkName)
+    {
         return networkService.searchNetworksByName(networkName);
     }
 

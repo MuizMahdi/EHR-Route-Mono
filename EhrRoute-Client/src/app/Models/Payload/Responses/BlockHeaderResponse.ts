@@ -2,7 +2,7 @@ export interface BlockHeaderResponse
 {
    hash: string;
    previousHash: string;
-   timeStamp: number;
+   timeStamp: string;
    index: number;
    merkleRoot: string;
    networkUUID: string;

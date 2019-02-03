@@ -1,11 +1,12 @@
 package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Repositories.NetworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+
 
 @Service
 public class NetworkService
@@ -33,6 +34,14 @@ public class NetworkService
     @Transactional
     public String getNetworkChainRoot(Network network) {
         return network.getChainRoot().getRoot();
+    }
+
+
+    @Transactional
+    public String getNetworkUuidByName(String networkName) {
+        return networkRepository.getNetworkUUIDByName(networkName).orElseThrow(() ->
+            new NullUserNetworkException("A network with name " + networkName + " was not found")
+        );
     }
 
 

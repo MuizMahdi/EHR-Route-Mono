@@ -1,3 +1,5 @@
+import { SimpleStringResponse } from './../../../Models/Payload/Responses/SimpleStringResponse';
+import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
 import { UserNetworks } from '../../../Models/Payload/Responses/UserNetworks';
 import { NodeNetworkService } from './../../../Services/node-network.service';
@@ -8,9 +10,9 @@ import { AuthService } from 'src/app/Services/auth.service';
 import { NetworkInfo } from 'src/app/Models/Payload/Responses/NetworkInfo';
 import { NzModalService } from 'ng-zorro-antd';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
-import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { NetworkInvitationRequest } from 'src/app/Models/Payload/Requests/NetworkInvitationRequest';
 import { DatabaseService } from 'src/app/DataAccess/database.service';
+import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
 
 
 @Component({
@@ -139,37 +141,54 @@ export class NetworkManagerComponent implements OnInit
 
    generateNetwork(networkName:string):void
    {
+
       this.nodeNetworkService.generateNetwork(networkName).subscribe(
 
-         (response:BlockResponse) => {
+         (response:BlockResponse) => {            
+            // Save the received genesis block
+            this.saveNetworkGenesisBlock(networkName, response);
 
             // Update page contents with the newly added network
             // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
-            this.getUserNetworks();
+            //this.getUserNetworks();
 
-            // Save received GenesisBlock to the network's local DB
-            this.saveNetworkGenesisBlock(networkName);
-
+            //TODO: Fix bug when calling getUserNetworks() after saving block on DB
          },
 
-         error => {
+         (error:ErrorResponse) => {
             console.log(error);
          }
 
       );
+
    }
 
 
-   private saveNetworkGenesisBlock(networkName:string): void
+   private saveNetworkGenesisBlock(networkName:string, genesisBlock:BlockResponse): void
    {
-      // Get network UUID with network name
+      // Get network UUID of network with network name of the recently created network
       this.nodeNetworkService.getNetworkUuidByName(networkName).subscribe(
 
-         response => {
-            // Open a connection to db with the received UUID
+         async (response:SimpleStringResponse) => {
+            // UUID response
+            let networkUUID = response.payload;
+            
+            // Create a DB connection for the recently added network
+            await this.databaseService.createNetworkDbConnection(networkUUID);
+
+            // Get a Block from the response genesis block
+            let block = ModelMapper.mapBlockResponseToBlock(genesisBlock);
+
+            // Get DB connection for the network, then save the block
+            await this.databaseService.getNetworkDbConnection(networkUUID).manager.save(block);
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
          }
 
       );
+
    }
 
 
