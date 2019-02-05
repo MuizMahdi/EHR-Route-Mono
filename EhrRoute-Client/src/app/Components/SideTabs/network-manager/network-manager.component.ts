@@ -1,3 +1,4 @@
+import { ChainService } from './../../../Services/chain.service';
 import { SimpleStringResponse } from './../../../Models/Payload/Responses/SimpleStringResponse';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
@@ -39,9 +40,9 @@ export class NetworkManagerComponent implements OnInit
 
 
    constructor(
-      private nodeNetworkService:NodeNetworkService, private authService:AuthService, 
+      private networkService:NodeNetworkService, private authService:AuthService, 
       public mainLayout:MainLayoutService, private modalService:NzModalService,
-      private nodeClusterService:NodeClustersService, private databaseService:DatabaseService
+      private nodeClusterService:NodeClustersService, private databaseService:DatabaseService, private chainService:ChainService
    ) { }
 
 
@@ -49,7 +50,7 @@ export class NetworkManagerComponent implements OnInit
    {
       this.mainLayout.show();
       this.initUserRole();
-      this.getUserNetworks();
+      this.initUserNetworks();
    }
 
 
@@ -78,63 +79,21 @@ export class NetworkManagerComponent implements OnInit
    }
 
 
-   getUserNetworks():void 
+   initUserNetworks():void 
    {
-      this.nodeNetworkService.getUserNetworks().subscribe(
+      // Check if user has networks
+      this.userHasNetwork = this.networkService.userHasNetwork;
 
-         (response:UserNetworks) => {
-            // If network response is received then user has a network or more.
-            this.userHasNetwork = true;
-
-            // Networks the user joined
-            this.userNetworks = response.userNetworks;
-
-            // Select the first network as default
-            this.selectedNetwork = this.userNetworks[0];
-
-            // Currently selected network UUID
-            this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
-
-            // Ensure that a connection is established for each network's database
-            this.ensureNetworksDBsConnect(this.userNetworks);
-         },
-
-         (error:ErrorResponse) => {
-            console.log(error);
-
-            // If Http NOT_FOUND status is returned
-            if (error.httpStatus === 404) {
-               this.userHasNetwork = false;
-            }
-         }
-
-      );
-   }
-
-
-   ensureNetworksDBsConnect(userNetworks:NetworkInfo[])
-   {
-      if (userNetworks.length > 0)
+      if (this.userHasNetwork) 
       {
-         userNetworks.forEach(async network => {
+         // Set user networks array
+         this.userNetworks = this.networkService.userNetworks;
 
-            try 
-            {
-               await this.databaseService.createNetworkDbConnection(network.networkUUID);
-            }
-            catch(error)
-            {
-               // If a connection for the network has already been established before
-               if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
-                  return;
-               }
-               else {
-                  console.log(error);
-               }
-            
-            }
-            
-         });
+         // Set selected network
+         this.selectedNetwork = this.userNetworks[0];
+
+         // Set selected network UUID
+         this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
       }
    }
 
@@ -142,7 +101,7 @@ export class NetworkManagerComponent implements OnInit
    generateNetwork(networkName:string):void
    {
 
-      this.nodeNetworkService.generateNetwork(networkName).subscribe(
+      this.networkService.generateNetwork(networkName).subscribe(
 
          (response:BlockResponse) => {   
             
@@ -151,7 +110,7 @@ export class NetworkManagerComponent implements OnInit
 
             // Update page contents with the newly added network
             // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
-            this.getUserNetworks();
+            this.networkService.checkUserNetworks();
 
          },
 
@@ -167,7 +126,7 @@ export class NetworkManagerComponent implements OnInit
    private saveNetworkGenesisBlock(networkName:string, genesisBlock:BlockResponse): void
    {
       // Get network UUID of network with network name of the recently created network
-      this.nodeNetworkService.getNetworkUuidByName(networkName).subscribe(
+      this.networkService.getNetworkUuidByName(networkName).subscribe(
 
          async (response:SimpleStringResponse) => {
             // UUID response
@@ -232,7 +191,7 @@ export class NetworkManagerComponent implements OnInit
          invitationToken: null // Invitation token is created on server-side
       }
 
-      this.nodeNetworkService.sendNetworkInvitationRequest(invitationRequest).subscribe(
+      this.networkService.sendNetworkInvitationRequest(invitationRequest).subscribe(
 
          response => {
             console.log(response);

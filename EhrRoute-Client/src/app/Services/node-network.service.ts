@@ -1,10 +1,13 @@
-import { UserInfo } from './../Models/Payload/Responses/UserInfo';
+import { DatabaseService } from './../DataAccess/database.service';
+import { UserNetworks } from './../Models/Payload/Responses/UserNetworks';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment.prod';
 import { catchError, first, tap } from 'rxjs/operators';
 import { throwError, Observable } from 'rxjs';
 import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvitationRequest';
+import { NetworkInfo } from '../Models/Payload/Responses/NetworkInfo';
+import { ErrorResponse } from '../Models/Payload/Responses/ErrorResponse';
 
 
 @Injectable({
@@ -12,7 +15,7 @@ import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvi
 })
 
 
-export class NodeNetworkService
+export class NodeNetworkService implements OnInit
 {
    
    private userNetworkUrl:string = environment.apiUrl + '/users/current/networks';
@@ -23,8 +26,74 @@ export class NodeNetworkService
    private searchNetworksByNameUrl:string = environment.apiUrl + '/network/search-by-name';
    private getNetworkUuidByNameUrl:string = environment.apiUrl + '/network/uuid'
 
+   public userNetworks:NetworkInfo[];
+   public userHasNetwork:boolean = false;
+
    
-   constructor(private http:HttpClient) { }
+   constructor(private http:HttpClient, private dbService:DatabaseService) { }
+
+
+   ngOnInit() 
+   {
+      // this.checkUserNetworks();
+   }
+
+
+   checkUserNetworks():void 
+   {
+
+      this.getUserNetworks().subscribe(
+
+         (response:UserNetworks) => {
+            // If network response is received then user has a network or more.
+            this.userHasNetwork = true;
+
+            // Networks the user joined
+            this.userNetworks = response.userNetworks;
+
+            // Ensure that a connection is established for each network's database
+            this.ensureNetworksDBsConnection(this.userNetworks);
+         },
+
+         (error:ErrorResponse) => {
+            // If Http NOT_FOUND status is returned
+            if (error.httpStatus === 404) {
+               this.userHasNetwork = false;
+            }
+         }
+
+      );
+
+   }
+
+
+   ensureNetworksDBsConnection(userNetworks:NetworkInfo[])
+   {
+      // If user has networks
+      if (this.userHasNetwork)
+      {
+         userNetworks.forEach(async network => {
+
+            // Get the DB connection of network's DB
+            try
+            {
+               await this.dbService.getNetworkDbConnection(network.networkUUID);
+            }
+            catch (error)
+            {
+               // If no connection for network's DB is available, then create a connection
+               if ( (<Error>error).name == 'ConnectionNotFoundError' ) {
+                  await this.dbService.createNetworkDbConnection(network.networkUUID);
+               }
+               else {
+                  console.log(error);
+               }
+
+            }
+            
+         });
+      }
+   }
 
 
    public getUserNetworks(): Observable<any> {

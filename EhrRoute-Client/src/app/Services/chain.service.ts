@@ -1,3 +1,4 @@
+import { Block } from './../DataAccess/entities/Core/Block';
 import { Connection } from 'typeorm';
 import { DatabaseService } from 'src/app/DataAccess/database.service';
 import { Injectable } from '@angular/core';
@@ -16,23 +17,43 @@ export class ChainService
    { }
 
 
-   public async generateNetworkMerkleRoot(networkUUID:string): string
+   public async generateNetworkMerkleRoot(networkUUID:string)
    {
       // Make sure that a connection for the network DB exists
-      try {
-         await this.dbService.createNetworkDbConnection(networkUUID);
-      }
-      catch (error) { // If connection already exists
-         console.log(error);
-      }
+      await this.isNetworkDbConnectioAvailable(networkUUID)
       
-
       // Get network's DB conneciton
       let db:Connection = this.dbService.getNetworkDbConnection(networkUUID);
 
-
-      const numberOfBlocks = db.manager.query("SELECT COUNT * FROM BLOCK");
+      const numberOfBlocks = await db.manager.count(Block);
     
       console.log("NUMBER OF BLOCKS: " + numberOfBlocks);
+      
+   }
+
+
+   private async isNetworkDbConnectioAvailable(networkUUID:string)
+   {
+      
+      try {
+
+         // Create connection
+         await this.dbService.createNetworkDbConnection(networkUUID);
+
+      }
+      catch (error) { 
+
+         // If connection already exists
+         if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
+            return;
+         }
+         // Any other error
+         else {
+            console.log(error);
+            return;
+         }
+
+      }
+
    }
 }
