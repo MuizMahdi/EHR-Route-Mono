@@ -20,37 +20,39 @@ export class ChainService
    public async generateNetworkMerkleRoot(networkUUID:string)
    {
       // Make sure that a connection for the network DB exists
-      await this.isNetworkDbConnectioAvailable(networkUUID)
+      await this.ensureNetworkDbConnection(networkUUID);
       
       // Get network's DB conneciton
       let db:Connection = this.dbService.getNetworkDbConnection(networkUUID);
 
-      const numberOfBlocks = await db.manager.count(Block);
+      const numberOfBlocks:number = await db.manager.count(Block);
     
       console.log("NUMBER OF BLOCKS: " + numberOfBlocks);
       
    }
 
 
-   private async isNetworkDbConnectioAvailable(networkUUID:string)
+   private async ensureNetworkDbConnection(networkUUID:string)
    {
       
-      try {
-
-         // Create connection
-         await this.dbService.createNetworkDbConnection(networkUUID);
-
+      try 
+      {
+         // Get network DB connection
+         await this.dbService.getNetworkDbConnection(networkUUID);
       }
-      catch (error) { 
+      catch (error) 
+      { 
 
-         // If connection already exists
-         if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
-            return;
+         // If connection doesn't exists
+         if ( (<Error>error).name == 'ConnectionNotFoundError' ) {
+
+            // Create connection
+            await this.dbService.createNetworkDbConnection(networkUUID);
+
          }
          // Any other error
          else {
             console.log(error);
-            return;
          }
 
       }

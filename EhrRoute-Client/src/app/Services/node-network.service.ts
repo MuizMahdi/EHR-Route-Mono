@@ -35,11 +35,10 @@ export class NodeNetworkService implements OnInit
 
    ngOnInit() 
    {
-      // this.checkUserNetworks();
    }
 
 
-   checkUserNetworks():void 
+   checkUserNetworks() 
    {
 
       this.getUserNetworks().subscribe(
@@ -73,14 +72,15 @@ export class NodeNetworkService implements OnInit
       if (this.userHasNetwork)
       {
          userNetworks.forEach(async network => {
-
+ 
             // Get the DB connection of network's DB
             try
             {
-               await this.dbService.getNetworkDbConnection(network.networkUUID);
+               this.dbService.getNetworkDbConnection(network.networkUUID);
             }
             catch (error)
             {
+
                // If no connection for network's DB is available, then create a connection
                if ( (<Error>error).name == 'ConnectionNotFoundError' ) {
                   await this.dbService.createNetworkDbConnection(network.networkUUID);
@@ -90,7 +90,7 @@ export class NodeNetworkService implements OnInit
                }
 
             }
-            
+                       
          });
       }
    }

@@ -46,11 +46,13 @@ export class NetworkManagerComponent implements OnInit
    ) { }
 
 
-   ngOnInit():void 
+   async ngOnInit() 
    {
       this.mainLayout.show();
+      this.networkService.checkUserNetworks();
       this.initUserRole();
       this.initUserNetworks();
+      //this.chainService.generateNetworkMerkleRoot('3ab5fb1b-49e2-4c1e-8a99-32c6d14743ba');
    }
 
 

@@ -18,14 +18,13 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 export class MainComponent implements OnInit
 {
    
-   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
-   private nodeNetworkService:NodeNetworkService, private databaseService:DatabaseService) 
-   { 
+   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService) 
+   {
       this.mainLayout.show();
    }
 
 
-   ngOnInit() 
+   async ngOnInit() 
    {
       // Handles when user reloads page after loggin in, to show a prompt, which 
       // allows for a request to be made, unsubscribing the node from clusters.
@@ -34,9 +33,6 @@ export class MainComponent implements OnInit
       // Subscribe to providers and consumers cluster
       //this.clustersService.subscribeProvider();
       //this.clustersService.subscribeConsumer();
-
-      // Establishes a connection for each user network database
-      this.initializeNetworksDBs();
    }
 
 
@@ -67,51 +63,6 @@ export class MainComponent implements OnInit
          // Subscribe to clusters again
          clusterService.subscribeClusters();
       }
-   }
-
-
-   async initializeNetworksDBs()
-   {
-      // Get logged in user's networks
-      this.nodeNetworkService.getUserNetworks().subscribe(
-        
-         (response:UserNetworks) => {
-
-            let userNetworks:NetworkInfo[] = response.userNetworks;
-
-            // If the user has networks
-            if (userNetworks.length > 0) 
-            {
-               // Establish a connection for each network DB (creates a DB file if its first time)
-               userNetworks.forEach(async network => {
-
-                  try {
-                     await this.databaseService.createNetworkDbConnection(network.networkUUID);
-                  }
-                  catch(error) {
-                     // If a connection for the network has already been established before
-                     if ( (<Error>error).name == 'AlreadyHasActiveConnectionError' ) {
-                        return;
-                     }
-                     else {
-                        console.log(error);
-                     }
-                  }
-
-               });
-            }
-
-         },
-
-         (error:ErrorResponse) => {
-            // If no networks are found for user
-            if (error.httpStatus === 404) {
-               console.log("[ User has no networks ]");
-               // TODO: Set the network-manager userHasNetworks boolean to false
-            }
-         }
-
-      );
    }
 
 }
