@@ -52,7 +52,6 @@ export class NetworkManagerComponent implements OnInit
       this.networkService.checkUserNetworks();
       this.initUserRole();
       this.initUserNetworks();
-      //this.chainService.generateNetworkMerkleRoot('3ab5fb1b-49e2-4c1e-8a99-32c6d14743ba');
    }
 
 
@@ -106,14 +105,8 @@ export class NetworkManagerComponent implements OnInit
       this.networkService.generateNetwork(networkName).subscribe(
 
          (response:BlockResponse) => {   
-            
             // Save the received genesis block
             this.saveNetworkGenesisBlock(networkName, response);
-
-            // Update page contents with the newly added network
-            // Also establishes a connection to the newly added network via ensureNetworksDBsConnect()
-            this.networkService.checkUserNetworks();
-
          },
 
          (error:ErrorResponse) => {
@@ -133,7 +126,7 @@ export class NetworkManagerComponent implements OnInit
          async (response:SimpleStringResponse) => {
             // UUID response
             let networkUUID = response.payload;
-            
+
             // Create a DB connection for the recently added network
             await this.databaseService.createNetworkDbConnection(networkUUID);
 

@@ -20,7 +20,7 @@ export class Block
    timeStamp:string;
 
    @Column()
-   merkleRoot:string;
+   merkleLeafHash:string;
 
    @Column()
    networkUUID:string;

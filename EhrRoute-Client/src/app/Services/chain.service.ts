@@ -25,9 +25,25 @@ export class ChainService
       // Get network's DB conneciton
       let db:Connection = this.dbService.getNetworkDbConnection(networkUUID);
 
+      // Get number of blocks in chain
       const numberOfBlocks:number = await db.manager.count(Block);
-    
-      console.log("NUMBER OF BLOCKS: " + numberOfBlocks);
+
+      // Blocks hashes (merkle tree leaves) array
+      let leaves:string[];
+
+      // TODO: THIS :- 
+
+      // For each block
+      for (let i = 0; i<=numberOfBlocks; i++) 
+      {
+         // Get DB connection for the network, then get the block with ID = i
+         //await this.dbService.getNetworkDbConnection(networkUUID).manager.find({select: ""})
+
+         // Push the block's hash into the leaves array
+         
+      }
+
+      // Generate merkle root from leaves
       
    }
 

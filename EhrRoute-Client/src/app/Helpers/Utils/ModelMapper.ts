@@ -68,7 +68,7 @@ export default class ModelMapper
       block.hash = blockResponse.blockHeader.hash;
       block.previousHash = blockResponse.blockHeader.previousHash;
       block.timeStamp = blockResponse.blockHeader.timeStamp;
-      block.merkleRoot = blockResponse.blockHeader.merkleRoot;
+      block.merkleLeafHash = blockResponse.blockHeader.merkleLeafHash;
       block.networkUUID = blockResponse.blockHeader.networkUUID;
       block.transactionId = blockResponse.transaction.transactionId;
       block.senderPubKey = blockResponse.transaction.senderPubKey;

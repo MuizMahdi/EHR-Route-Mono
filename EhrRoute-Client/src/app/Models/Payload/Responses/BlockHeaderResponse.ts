@@ -4,6 +4,6 @@ export interface BlockHeaderResponse
    previousHash: string;
    timeStamp: string;
    index: number;
-   merkleRoot: string;
+   merkleLeafHash: string;
    networkUUID: string;
 }
