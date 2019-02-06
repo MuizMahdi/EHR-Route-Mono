@@ -135,6 +135,9 @@ export class NetworkManagerComponent implements OnInit
 
             // Get DB connection for the network, then save the block
             await this.databaseService.getNetworkDbConnection(networkUUID).manager.save(block);
+
+            // Update networks with the newly added network
+            this.updateNetworks();
          },
 
          (error:ErrorResponse) => {
@@ -143,6 +146,25 @@ export class NetworkManagerComponent implements OnInit
 
       );
 
+   }
+
+
+   private updateNetworks(): void
+   {
+      this.networkService.getUserNetworks().subscribe(
+
+         (response:UserNetworks) => {
+            this.userHasNetwork = true;
+            this.userNetworks = response.userNetworks;
+         },
+
+         (error:ErrorResponse) => {
+            if (error.httpStatus === 404) {
+               this.userHasNetwork = false;
+            }
+         }
+
+      );
    }
 
 
