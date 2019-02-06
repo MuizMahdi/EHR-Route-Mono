@@ -29,9 +29,8 @@ export class NetworkManagerComponent implements OnInit
    isProvider:boolean = false;
 
    selectedNetwork:any = {};
-   selectedNetworkUUID:string;
    userNetworks:NetworkInfo[];
-   userHasNetwork:boolean = false;
+   userHasNetwork:boolean = true;
 
    newNetworkName:string;
    isNetworkCreationModalVisible:boolean = false;
@@ -49,9 +48,8 @@ export class NetworkManagerComponent implements OnInit
    async ngOnInit() 
    {
       this.mainLayout.show();
-      this.networkService.checkUserNetworks();
+      this.updateNetworks();
       this.initUserRole();
-      this.initUserNetworks();
    }
 
 
@@ -77,25 +75,6 @@ export class NetworkManagerComponent implements OnInit
          }
 
       );
-   }
-
-
-   initUserNetworks():void 
-   {
-      // Check if user has networks
-      this.userHasNetwork = this.networkService.userHasNetwork;
-
-      if (this.userHasNetwork) 
-      {
-         // Set user networks array
-         this.userNetworks = this.networkService.userNetworks;
-
-         // Set selected network
-         this.selectedNetwork = this.userNetworks[0];
-
-         // Set selected network UUID
-         this.selectedNetworkUUID = this.selectedNetwork.networkUUID;
-      }
    }
 
 
@@ -156,6 +135,7 @@ export class NetworkManagerComponent implements OnInit
          (response:UserNetworks) => {
             this.userHasNetwork = true;
             this.userNetworks = response.userNetworks;
+            this.selectedNetwork = this.userNetworks[0];
          },
 
          (error:ErrorResponse) => {
