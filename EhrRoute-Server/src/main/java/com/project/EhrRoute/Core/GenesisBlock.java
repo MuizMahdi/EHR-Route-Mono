@@ -55,7 +55,6 @@ public class GenesisBlock
 
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
 
-
         transaction.setRecipientAddress(recipientAddress);
         transaction.setSenderPubKey(keyPair.getPublic());
         transaction.setSenderAddress(senderAddress);
@@ -66,7 +65,7 @@ public class GenesisBlock
         blockHeader.setIndex(0);
         blockHeader.setTimeStamp(new Date().getTime());
         blockHeader.setNetworkUUID(uuidUtil.generateUUID());
-        blockHeader.setMerkleRoot(hashUtil.hashTransactionData(transaction));
+        blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
         blockHeader.setPreviousHash(hashUtil.SHA256("0".getBytes()));
         blockHeader.generateHeaderHash();
 

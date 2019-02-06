@@ -18,7 +18,7 @@ public class ConsentRequestBlock {
 
     @NotNull @NotBlank private String hash;
     @NotNull @NotBlank private String previousHash;
-    @NotNull @NotBlank private String merkleRoot;
+    @NotNull @NotBlank private String merkleLeafHash;
     @NotNull @NotBlank private String transactionId;
     @NotNull @NotBlank private String senderPubKey;
     @NotNull @NotBlank private String senderAddress;
@@ -45,12 +45,12 @@ public class ConsentRequestBlock {
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleRoot, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID, @NotBlank String chainRootWithBlock) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID, @NotBlank String chainRootWithBlock) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
         this.blockIndex = blockIndex;
-        this.merkleRoot = merkleRoot;
+        this.merkleLeafHash = merkleLeafHash;
         this.transactionId = transactionId;
         this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
@@ -103,9 +103,6 @@ public class ConsentRequestBlock {
     public Long getBlockIndex() {
         return blockIndex;
     }
-    public String getMerkleRoot() {
-        return merkleRoot;
-    }
     public String getNetworkUUID() {
         return networkUUID;
     }
@@ -149,6 +146,9 @@ public class ConsentRequestBlock {
     public void setUserID(Long userID) {
         this.userID = userID;
     }
+    public String getMerkleLeafHash() {
+        return merkleLeafHash;
+    }
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
@@ -160,9 +160,6 @@ public class ConsentRequestBlock {
     }
     public void setBlockIndex(Long blockIndex) {
         this.blockIndex = blockIndex;
-    }
-    public void setMerkleRoot(String merkleRoot) {
-        this.merkleRoot = merkleRoot;
     }
     public void setProblems(Set<EhrProblems> problems) {
         this.problems = problems;
@@ -187,6 +184,9 @@ public class ConsentRequestBlock {
     }
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+    public void setMerkleLeafHash(String merkleLeafHash) {
+        this.merkleLeafHash = merkleLeafHash;
     }
     public void setRecipientAddress(String recipientAddress) {
         this.recipientAddress = recipientAddress;

@@ -53,7 +53,7 @@ public class ModelMapper
         serializableBlockHeader.setPreviousHash(stringUtil.getStringFromBytes(block.getBlockHeader().getPreviousHash()));
         serializableBlockHeader.setTimeStamp(block.getBlockHeader().getTimeStamp());
         serializableBlockHeader.setIndex(block.getBlockHeader().getIndex());
-        serializableBlockHeader.setMerkleRoot(stringUtil.getStringFromBytes(block.getBlockHeader().getMerkleRoot()));
+        serializableBlockHeader.setMerkleLeafHash(stringUtil.getStringFromBytes(block.getBlockHeader().getMerkleLeafHash()));
         serializableBlockHeader.setNetworkUUID(block.getBlockHeader().getNetworkUUID());
 
         serializableBlock.setBlockHeader(serializableBlockHeader);
@@ -92,8 +92,8 @@ public class ModelMapper
         String stringPreviousHash = serializableBlock.getBlockHeader().getPreviousHash();
         blockHeader.setPreviousHash(stringPreviousHash.getBytes());
 
-        String stringMerkleRoot = serializableBlock.getBlockHeader().getMerkleRoot();
-        blockHeader.setMerkleRoot(stringMerkleRoot.getBytes());
+        String stringMerkleLeafHash = serializableBlock.getBlockHeader().getMerkleLeafHash();
+        blockHeader.setMerkleLeafHash(stringMerkleLeafHash.getBytes());
 
         String networkUUID = serializableBlock.getBlockHeader().getNetworkUUID();
         blockHeader.setNetworkUUID(networkUUID);
@@ -140,7 +140,7 @@ public class ModelMapper
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
         consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());
         consentRequest.setTransactionId(block.getTransaction().getTransactionId());
-        consentRequest.setMerkleRoot(block.getBlockHeader().getMerkleRoot());
+        consentRequest.setMerkleLeafHash(block.getBlockHeader().getMerkleLeafHash());
         consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
         consentRequest.setTimeStamp(block.getBlockHeader().getTimeStamp());
         consentRequest.setPreviousHash(block.getBlockHeader().getPreviousHash());
@@ -254,7 +254,7 @@ public class ModelMapper
             consentRequestBlock.getPreviousHash(),
             consentRequestBlock.getTimeStamp(),
             consentRequestBlock.getBlockIndex(),
-            consentRequestBlock.getMerkleRoot(),
+            consentRequestBlock.getMerkleLeafHash(),
             consentRequestBlock.getNetworkUUID()
         );
 

@@ -6,16 +6,16 @@ public class SerializableBlockHeader
     private String previousHash;
     private long timeStamp;
     private long index;
-    private String merkleRoot;
+    private String merkleLeafHash;
     private String networkUUID;
 
     public SerializableBlockHeader() { }
-    public SerializableBlockHeader(String hash, String previousHash, long timeStamp, long index, String merkleRoot, String networkUUID) {
+    public SerializableBlockHeader(String hash, String previousHash, long timeStamp, long index, String merkleLeafHash, String networkUUID) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
         this.index = index;
-        this.merkleRoot = merkleRoot;
+        this.merkleLeafHash = merkleLeafHash;
         this.networkUUID = networkUUID;
     }
 
@@ -28,14 +28,14 @@ public class SerializableBlockHeader
     public long getTimeStamp() {
         return timeStamp;
     }
-    public String getMerkleRoot() {
-        return merkleRoot;
-    }
     public String getNetworkUUID() {
         return networkUUID;
     }
     public String getPreviousHash() {
         return previousHash;
+    }
+    public String getMerkleLeafHash() {
+        return merkleLeafHash;
     }
 
     public void setHash(String hash) {
@@ -47,13 +47,13 @@ public class SerializableBlockHeader
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
-    public void setMerkleRoot(String merkleRoot) {
-        this.merkleRoot = merkleRoot;
-    }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
     }
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;
+    }
+    public void setMerkleLeafHash(String merkleLeafHash) {
+        this.merkleLeafHash = merkleLeafHash;
     }
 }

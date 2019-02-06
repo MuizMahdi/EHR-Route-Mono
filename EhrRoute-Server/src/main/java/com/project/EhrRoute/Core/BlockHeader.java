@@ -25,7 +25,7 @@ public class BlockHeader
 
     // Hash of transaction in this block, used for calculating merkleRoot of
     // the whole Blockchain tree to validate the whole chain.
-    private byte[] merkleRoot;
+    private byte[] merkleLeafHash;
 
     // NetworkUUID of the network in which the chain is in
     private String networkUUID;
@@ -40,18 +40,18 @@ public class BlockHeader
     public BlockHeader() {
         this.timeStamp = new Date().getTime();
     }
-    public BlockHeader(long index, byte[] previousHash, byte[] merkleRoot) {
+    public BlockHeader(long index, byte[] previousHash, byte[] merkleLeafHash) {
         this.index = index;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
-        this.merkleRoot = merkleRoot;
+        this.merkleLeafHash = merkleLeafHash;
     }
-    public BlockHeader(byte[] hash, byte[] previousHash, long index, byte[] merkleRoot) {
+    public BlockHeader(byte[] hash, byte[] previousHash, long index, byte[] merkleLeafHash) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = new Date().getTime();
         this.index = index;
-        this.merkleRoot = merkleRoot;
+        this.merkleLeafHash = merkleLeafHash;
     }
 
     public void generateHeaderHash() {
@@ -62,7 +62,7 @@ public class BlockHeader
         // Add up all of the data
         String stringHeaderData =
         stringUtil.getStringFromBytes(previousHash) +
-        stringUtil.getStringFromBytes(merkleRoot) +
+        stringUtil.getStringFromBytes(merkleLeafHash) +
         TimeStamp.toString() + Index.toString() + networkUUID;
 
         // Block hash is the hash of the header data
@@ -79,15 +79,16 @@ public class BlockHeader
     public long getTimeStamp() {
         return timeStamp;
     }
-    public byte[] getMerkleRoot() {
-        return merkleRoot;
-    }
     public String getNetworkUUID() {
         return networkUUID;
     }
     public byte[] getPreviousHash() {
         return previousHash;
     }
+    public byte[] getMerkleLeafHash() {
+        return merkleLeafHash;
+    }
+
     public void setHash(byte[] hash) {
         this.hash = hash;
     }
@@ -97,13 +98,13 @@ public class BlockHeader
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
-    public void setMerkleRoot(byte[] merkleRoot) {
-        this.merkleRoot = merkleRoot;
-    }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
     }
     public void setPreviousHash(byte[] previousHash) {
         this.previousHash = previousHash;
+    }
+    public void setMerkleLeafHash(byte[] merkleLeafHash) {
+        this.merkleLeafHash = merkleLeafHash;
     }
 }
