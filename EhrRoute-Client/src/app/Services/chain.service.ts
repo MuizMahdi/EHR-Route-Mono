@@ -17,7 +17,7 @@ export class ChainService
    { }
 
 
-   public async generateNetworkMerkleRoot(networkUUID:string)
+   public async generateNetworkMerkleRoot(networkUUID:string): Promise<string>
    {
       // Make sure that a connection for the network DB exists
       await this.ensureNetworkDbConnection(networkUUID);
@@ -29,22 +29,38 @@ export class ChainService
       const numberOfBlocks:number = await db.manager.count(Block);
 
       // Blocks hashes (merkle tree leaves) array
-      let leaves:string[];
+      let leavesHexHashes:string[] = [];
 
-      // TODO: THIS :- 
+      // Get network's DB connection
+      const dbConnection:Connection = await this.dbService.getNetworkDbConnection(networkUUID);
 
       // For each block
-      for (let i = 0; i<=numberOfBlocks; i++) 
+      for (let i=1; i<=numberOfBlocks; i++) 
       {
-         // Get DB connection for the network, then get the block with ID = i
-         //await this.dbService.getNetworkDbConnection(networkUUID).manager.find({select: ""})
+         // Get the leaf hash of the block with index of i
+         const blockLeafHash:Block[] = await dbConnection.getRepository(Block).find({
+            select: ["merkleLeafHash"],
+            where: [{index : i}]
+         });
 
-         // Push the block's hash into the leaves array
-         
+         // Push the leaf hash into the leaves array
+         leavesHexHashes.push(blockLeafHash[0].merkleLeafHash);   
+      }
+      
+      // If there's only one leaf in the tree, return that leaf hash
+      if (leavesHexHashes.length < 2) 
+      {
+         return leavesHexHashes[0];
       }
 
-      // Generate merkle root from leaves
-      
+      // Get buffer array from each Hex hash string
+      let leavesBuffer:Buffer[] = leavesHexHashes.map(leaf => Buffer.from(leaf, 'hex'));
+
+      // Construct a merkle tree using the buffer array
+      let tree = new MerkleTree.default(leavesBuffer, sha256); 
+
+      // Return the root of the tree
+      return tree.getRoot().toString('hex');
    }
 
 

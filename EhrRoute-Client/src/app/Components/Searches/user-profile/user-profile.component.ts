@@ -95,8 +95,8 @@ export class UserProfileComponent implements OnInit
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
       let providerUUID = this.getCurrentProviderUUID(); // Check if null, before creating BlockAddition object
+      
 
-      console.log("Request Ehr Privilege Consent for user with ID: " + ehrUserID);
    }
 
 

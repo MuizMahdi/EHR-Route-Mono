@@ -1,4 +1,3 @@
-import { ChainService } from './../../../Services/chain.service';
 import { SimpleStringResponse } from './../../../Models/Payload/Responses/SimpleStringResponse';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
@@ -41,7 +40,7 @@ export class NetworkManagerComponent implements OnInit
    constructor(
       private networkService:NodeNetworkService, private authService:AuthService, 
       public mainLayout:MainLayoutService, private modalService:NzModalService,
-      private nodeClusterService:NodeClustersService, private databaseService:DatabaseService, private chainService:ChainService
+      private nodeClusterService:NodeClustersService, private databaseService:DatabaseService
    ) { }
 
 
