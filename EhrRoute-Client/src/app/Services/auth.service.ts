@@ -18,11 +18,13 @@ export class AuthService
 {
    registrationUrl:string = environment.apiUrl + '/auth/signup';
    loginUrl:string = environment.apiUrl + '/auth/signin';
-   getCurrentUserUrl:string = environment.apiUrl + '/users/current'
-   userRolesUrl: string = environment.apiUrl + '/users/current/roles'
+   getCurrentUserUrl:string = environment.apiUrl + '/users/current';
+   userRolesUrl: string = environment.apiUrl + '/users/current/roles';
+   
 
    currentUser: Subject<UserInfo> = new Subject<UserInfo>();
    isLoggedIn:boolean = false;
+
 
    constructor(private http:HttpClient, private clustersService:NodeClustersService) 
    { }

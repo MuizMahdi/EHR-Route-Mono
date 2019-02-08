@@ -1,3 +1,5 @@
+import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
+import { UsersService } from './../../../Services/users.service';
 import { UserLoginRequest } from '../../../Models/Payload/Requests/UserLoginRequest';
 import { AuthService } from './../../../Services/auth.service';
 import { Component } from '@angular/core';
@@ -23,9 +25,11 @@ export class LoginComponent
    loginUsernameOrEmail: string;
    loginPassword: string;
 
-   constructor(private router: Router, private authService: AuthService, private electron: ElectronService) {
+
+   constructor(private router:Router, private authService:AuthService, private electron:ElectronService, private userService:UsersService) {
       this.buildForm();
    }
+
 
    buildForm(): void
    {
@@ -34,6 +38,7 @@ export class LoginComponent
          passwordCtrl: new FormControl(null, Validators.required)
       });
    }
+
 
    onLogin()
    {
@@ -60,12 +65,31 @@ export class LoginComponent
          response => {
             // TODO: Navigate to main page after login
             this.router.navigate(['main']);
+            this.checkIfFirstLogin();
             this.checkIfUserIsAdmin();
          },
          
-         errorResponse => {
+         (error:ErrorResponse) => {
             // TODO: Handle error by showing a flash message to user
-            console.log(errorResponse);
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   checkIfFirstLogin(): void
+   {
+      this.userService.getCurrentUserFirstLoginStatus().subscribe(
+
+         response => {
+            console.log(response);
+            // If not first time login, then request for address generation
+            
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
          }
 
       );

@@ -18,7 +18,7 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 export class MainComponent implements OnInit
 {
    
-   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService) 
+   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService, private networkService:NodeNetworkService) 
    {
       this.mainLayout.show();
    }
@@ -33,6 +33,9 @@ export class MainComponent implements OnInit
       // Subscribe to providers and consumers cluster
       //this.clustersService.subscribeProvider();
       //this.clustersService.subscribeConsumer();
+
+      // Establish connections to all user networks DBs
+      this.networkService.checkUserNetworks();
    }
 
 

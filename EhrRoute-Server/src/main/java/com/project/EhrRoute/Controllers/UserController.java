@@ -162,6 +162,23 @@ public class UserController
     }
 
 
+    @GetMapping("/current/first-login-status")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity getCurrentUserFirstLoginStatus(@CurrentUser UserPrincipal currentUser)
+    {
+        if (currentUser == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        boolean isFirstLogin = userService.isUserFirstLogin(currentUser.getId());
+
+        return ResponseEntity.ok(isFirstLogin);
+    }
+
+
     @GetMapping("/search-by-username")
     public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username)
     {

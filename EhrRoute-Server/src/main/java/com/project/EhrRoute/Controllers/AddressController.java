@@ -2,10 +2,11 @@ package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
-import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Payload.Core.AddressResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
+import com.project.EhrRoute.Security.CurrentUser;
+import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -43,14 +43,14 @@ public class AddressController
 
     @GetMapping("/generate")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> generateUserAddress(@RequestParam("username") String username) throws GeneralSecurityException
+    public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException
     {
-        User user = userService.findUserByUsernameOrEmail(username);
+        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
 
         if (user == null)
         {
             return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid username"),
+                new ApiResponse(false, "User not logged in. Invalid user"),
                 HttpStatus.BAD_REQUEST
             );
         }
@@ -59,7 +59,7 @@ public class AddressController
         if (user.isNonFirstLogin())
         {
             return new ResponseEntity<>(
-                new ApiResponse(false, "Not the first user login, user already has an address"),
+                new ApiResponse(false, "Not the user's first login, user already has an address"),
                 HttpStatus.BAD_REQUEST
             );
         }

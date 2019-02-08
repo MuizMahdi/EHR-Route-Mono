@@ -18,6 +18,7 @@ export class UsersService
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
+   private userFirstLoginStatusUrl:string = environment.apiUrl + '/users/current/first-login-status';
 
 
    constructor(private http:HttpClient) {
@@ -63,6 +64,18 @@ export class UsersService
 
       );
 
+   }
+
+
+   getCurrentUserFirstLoginStatus(): Observable<any>
+   {
+      return this.http.get(this.userFirstLoginStatusUrl).pipe(first(),
+
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
    }
 
 

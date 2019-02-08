@@ -93,6 +93,12 @@ public class UserService
     }
 
     @Transactional
+    public boolean isUserFirstLogin(Long id)
+    {
+        return !(userRepository.getIsUserNonFirstLogin(id));
+    }
+
+    @Transactional
     public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
 
         // Find user by username

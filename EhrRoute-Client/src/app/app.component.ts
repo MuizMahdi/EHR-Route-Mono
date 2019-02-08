@@ -1,5 +1,4 @@
-import { NodeNetworkService } from 'src/app/Services/node-network.service';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MainLayoutService } from './Services/main-layout.service';
 
 
@@ -10,16 +9,8 @@ import { MainLayoutService } from './Services/main-layout.service';
 })
 
 
-export class AppComponent implements OnInit
+export class AppComponent
 {
-   constructor(public mainLayout:MainLayoutService, private networkService:NodeNetworkService) 
+   constructor(public mainLayout:MainLayoutService) 
    { }
-
-
-   ngOnInit()
-   {
-      // Establish connections to all user networks DBs
-      this.networkService.checkUserNetworks();
-   }
-
 }
