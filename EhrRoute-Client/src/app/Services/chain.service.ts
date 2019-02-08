@@ -19,6 +19,28 @@ export class ChainService
 
    public async generateNetworkMerkleRoot(networkUUID:string): Promise<string>
    {
+      // Get the network's leaves hashes for the construction of the merkle tree
+      let leavesHexHashes:string[] = await this.getNetworkLeavesHashes(networkUUID); 
+      
+      // If there's only one leaf in the tree, return that leaf hash
+      if (leavesHexHashes.length < 2) 
+      {
+         return leavesHexHashes[0];
+      }
+
+      // Get buffer array from each Hex hash string
+      let leavesBuffer:Buffer[] = leavesHexHashes.map(leaf => Buffer.from(leaf, 'hex'));
+
+      // Construct a merkle tree using the buffer array
+      let tree = new MerkleTree.default(leavesBuffer, sha256); 
+
+      // Return the root of the tree
+      return tree.getRoot().toString('hex');
+   }
+
+
+   private async getNetworkLeavesHashes(networkUUID:string): Promise<string[]>
+   {
       // Make sure that a connection for the network DB exists
       await this.ensureNetworkDbConnection(networkUUID);
       
@@ -46,21 +68,8 @@ export class ChainService
          // Push the leaf hash into the leaves array
          leavesHexHashes.push(blockLeafHash[0].merkleLeafHash);   
       }
-      
-      // If there's only one leaf in the tree, return that leaf hash
-      if (leavesHexHashes.length < 2) 
-      {
-         return leavesHexHashes[0];
-      }
 
-      // Get buffer array from each Hex hash string
-      let leavesBuffer:Buffer[] = leavesHexHashes.map(leaf => Buffer.from(leaf, 'hex'));
-
-      // Construct a merkle tree using the buffer array
-      let tree = new MerkleTree.default(leavesBuffer, sha256); 
-
-      // Return the root of the tree
-      return tree.getRoot().toString('hex');
+      return leavesHexHashes;
    }
 
 

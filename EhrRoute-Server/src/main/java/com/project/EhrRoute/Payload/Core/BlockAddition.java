@@ -4,7 +4,6 @@ public class BlockAddition
 {
     private SerializableBlock block;
     private String chainRootWithoutBlock;
-    private String chainRootWithBlock;
     private String providerUUID;
     private String networkUUID;
     private String ehrUserID;
@@ -13,7 +12,6 @@ public class BlockAddition
     public BlockAddition(SerializableBlock block, String chainRootWithoutBlock, String chainRootWithBlock, String providerUUID, String networkUUI, String ehrUserID) {
         this.block = block;
         this.chainRootWithoutBlock = chainRootWithoutBlock;
-        this.chainRootWithBlock = chainRootWithBlock;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUI;
         this.ehrUserID = ehrUserID;
@@ -30,9 +28,6 @@ public class BlockAddition
     }
     public String getProviderUUID() {
         return providerUUID;
-    }
-    public String getChainRootWithBlock() {
-        return chainRootWithBlock;
     }
     public String getChainRootWithoutBlock() {
         return chainRootWithoutBlock;
@@ -52,8 +47,5 @@ public class BlockAddition
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
-    }
-    public void setChainRootWithBlock(String chainRootWithBlock) {
-        this.chainRootWithBlock = chainRootWithBlock;
     }
 }

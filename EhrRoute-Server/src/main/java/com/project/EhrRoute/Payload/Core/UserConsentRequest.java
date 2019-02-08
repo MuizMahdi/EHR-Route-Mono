@@ -3,14 +3,12 @@ package com.project.EhrRoute.Payload.Core;
 public class UserConsentRequest
 {
     private SerializableBlock block;
-    private String chainRootWithBlock;
     private String providerUUID;
     private String networkUUID;
     private Long userID;
 
-    public UserConsentRequest(SerializableBlock block, String chainRootWithBlock, String providerUUID, String networkUUID, Long userID) {
+    public UserConsentRequest(SerializableBlock block,  String providerUUID, String networkUUID, Long userID) {
         this.block = block;
-        this.chainRootWithBlock = chainRootWithBlock;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUID;
         this.userID = userID;
@@ -28,9 +26,6 @@ public class UserConsentRequest
     public String getProviderUUID() {
         return providerUUID;
     }
-    public String getChainRootWithBlock() {
-        return chainRootWithBlock;
-    }
 
     public void setUserID(Long userID) {
         this.userID = userID;
@@ -43,8 +38,5 @@ public class UserConsentRequest
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
-    }
-    public void setChainRootWithBlock(String chainRootWithBlock) {
-        this.chainRootWithBlock = chainRootWithBlock;
     }
 }

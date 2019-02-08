@@ -1,3 +1,4 @@
+import { ChainService } from './../../../Services/chain.service';
 import { ProviderService } from './../../../Services/provider.service';
 import { UserNetworks } from './../../../Models/Payload/Responses/UserNetworks';
 import { NodeNetworkService } from './../../../Services/node-network.service';
@@ -31,7 +32,8 @@ export class UserProfileComponent implements OnInit
 
    constructor(
       private userService:UsersService, private modalService:NzModalService, 
-      private networkService:NodeNetworkService, private providerService:ProviderService
+      private networkService:NodeNetworkService, private providerService:ProviderService,
+      private chainService:ChainService
    ) { }
 
 
@@ -95,8 +97,6 @@ export class UserProfileComponent implements OnInit
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
       let providerUUID = this.getCurrentProviderUUID(); // Check if null, before creating BlockAddition object
-      
-
    }
 
 

@@ -154,10 +154,12 @@ public class TransactionController
         // Send a consent request for adding the block to chain to user
         try
         {
+            // TODO: Construct a block using data in block addition,
+            // TODO: then pass it in the GetUserConsentEvent object constructor.
+
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
                     this,
                     blockAddition.getBlock(),
-                    blockAddition.getChainRootWithBlock(),
                     providerUUID,
                     blockAddition.getNetworkUUID(),
                     userID
@@ -273,8 +275,7 @@ public class TransactionController
                 userID,
                 event.getProviderUUID(),
                 event.getNetworkUUID(), // NetworkUUID of the provider
-                event.getBlock(),
-                event.getChainRootWithBlock()
+                event.getBlock()
             );
 
             // Persist the consent request
@@ -287,7 +288,6 @@ public class TransactionController
 
         UserConsentRequest userConsentRequest = new UserConsentRequest(
             event.getBlock(),
-            event.getChainRootWithBlock(),
             event.getProviderUUID(),
             event.getNetworkUUID(),
             userID

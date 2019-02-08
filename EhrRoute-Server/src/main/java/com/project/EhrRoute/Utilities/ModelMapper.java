@@ -30,6 +30,7 @@ public class ModelMapper
     private BlockHeader blockHeader;
     private Transaction transaction;
 
+
     @Autowired
     public ModelMapper(StringUtil stringUtil, KeyUtil keyUtil, BlockHeader blockHeader, Transaction transaction) {
         this.stringUtil = stringUtil;
@@ -37,6 +38,7 @@ public class ModelMapper
         this.blockHeader = blockHeader;
         this.transaction = transaction;
     }
+
 
     public SerializableBlock mapBlockToSerializableBlock(Block block) throws GeneralSecurityException
     {
@@ -128,14 +130,13 @@ public class ModelMapper
         return block;
     }
 
-    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, String networkUUID, SerializableBlock block, String chainRootWithBlock)
+    public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, String networkUUID, SerializableBlock block)
     {
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
 
         consentRequest.setUserID(userID);
         consentRequest.setProviderUUID(providerUUID);
         consentRequest.setNetworkUUID(networkUUID);
-        consentRequest.setChainRootWithBlock(chainRootWithBlock);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
         consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());
@@ -262,7 +263,6 @@ public class ModelMapper
 
         return new UserConsentRequest(
             block,
-            consentRequestBlock.getChainRootWithBlock(),
             consentRequestBlock.getProviderUUID(),
             consentRequestBlock.getNetworkUUID(),
             consentRequestBlock.getUserID()

@@ -25,7 +25,6 @@ public class ConsentRequestBlock {
     @NotNull @NotBlank private String recipientAddress;
     @NotNull @NotBlank private String networkUUID;
     @NotNull @NotBlank private String providerUUID;
-    @NotNull @NotBlank private String chainRootWithBlock;
     @NotNull private Long userID;
     @NotNull private Long timeStamp;
     @NotNull private Long blockIndex;
@@ -45,7 +44,7 @@ public class ConsentRequestBlock {
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID, @NotBlank String chainRootWithBlock) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
         this.hash = hash;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
@@ -59,7 +58,6 @@ public class ConsentRequestBlock {
         this.signature = signature;
         this.userID = userID;
         this.providerUUID = providerUUID;
-        this.chainRootWithBlock = chainRootWithBlock;
     }
 
 
@@ -133,9 +131,6 @@ public class ConsentRequestBlock {
     public String getRecipientAddress() {
         return recipientAddress;
     }
-    public String getChainRootWithBlock() {
-        return chainRootWithBlock;
-    }
 
     public void setId(Long id) {
         this.id = id;
@@ -190,8 +185,5 @@ public class ConsentRequestBlock {
     }
     public void setRecipientAddress(String recipientAddress) {
         this.recipientAddress = recipientAddress;
-    }
-    public void setChainRootWithBlock(String chainRootWithBlock) {
-        this.chainRootWithBlock = chainRootWithBlock;
     }
 }
