@@ -90,13 +90,20 @@ export class UserProfileComponent implements OnInit
    }
 
 
-   private requestEhrPrivilege()
+   private async requestEhrPrivilege()
    {
       this.getCurrentProviderUUID();
 
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
       let providerUUID = this.getCurrentProviderUUID(); // Check if null, before creating BlockAddition object
+      let merkleRootWithoutBlock:string = "";
+
+      await this.chainService.generateNetworkMerkleRoot(networkUUID).then(root => {
+         merkleRootWithoutBlock = root;
+      });
+
+      
    }
 
 

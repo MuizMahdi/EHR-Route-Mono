@@ -157,8 +157,11 @@ public class TransactionController
             // TODO: Construct a block using data in block addition,
             // TODO: then pass it in the GetUserConsentEvent object constructor.
 
+            SerializableBlock block = new SerializableBlock();
+
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
                     this,
+                    block,
                     providerUUID,
                     blockAddition.getNetworkUUID(),
                     userID

@@ -3,18 +3,22 @@ package com.project.EhrRoute.Payload.Core;
 public class BlockAddition
 {
     private String chainRootWithoutBlock;
+    private String previousBlockIndex;
+    private String previousBlockHash;
+    private String senderAddress;
     private String providerUUID;
     private String networkUUID;
     private String ehrUserID;
 
+
     public BlockAddition() { }
-    public BlockAddition(String chainRootWithoutBlock, String providerUUID, String networkUUI, String ehrUserID) {
-        this.block = block;
+    public BlockAddition(String chainRootWithoutBlock, String previousBlockIndex, String previousBlockHash, String senderAddress, String providerUUID, String networkUUI, String ehrUserID) {
         this.chainRootWithoutBlock = chainRootWithoutBlock;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUI;
         this.ehrUserID = ehrUserID;
     }
+
 
     public String getEhrUserID() {
         return ehrUserID;
@@ -24,6 +28,15 @@ public class BlockAddition
     }
     public String getProviderUUID() {
         return providerUUID;
+    }
+    public String getSenderAddress() {
+        return senderAddress;
+    }
+    public String getPreviousBlockHash() {
+        return previousBlockHash;
+    }
+    public String getPreviousBlockIndex() {
+        return previousBlockIndex;
     }
     public String getChainRootWithoutBlock() {
         return chainRootWithoutBlock;
@@ -40,5 +53,14 @@ public class BlockAddition
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
+    }
+    public void setSenderAddress(String senderAddress) {
+        this.senderAddress = senderAddress;
+    }
+    public void setPreviousBlockHash(String previousBlockHash) {
+        this.previousBlockHash = previousBlockHash;
+    }
+    public void setPreviousBlockIndex(String previousBlockIndex) {
+        this.previousBlockIndex = previousBlockIndex;
     }
 }
