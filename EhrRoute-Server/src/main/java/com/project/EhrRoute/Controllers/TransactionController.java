@@ -159,7 +159,6 @@ public class TransactionController
 
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
                     this,
-                    blockAddition.getBlock(),
                     providerUUID,
                     blockAddition.getNetworkUUID(),
                     userID
