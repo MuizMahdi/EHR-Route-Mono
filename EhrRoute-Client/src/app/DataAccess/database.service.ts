@@ -25,7 +25,9 @@ export class DatabaseService
 {
    
    constructor() 
-   { }
+   { 
+      ElectronAppConfig.initialize();
+   }
 
 
    // Creates a connection to the network db with networkUUID

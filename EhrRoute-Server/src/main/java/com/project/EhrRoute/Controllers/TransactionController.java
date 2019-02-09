@@ -71,7 +71,7 @@ public class TransactionController
     }
 
     @PostMapping("/getConsent")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition)
     {
         String providerUUID = blockAddition.getProviderUUID();

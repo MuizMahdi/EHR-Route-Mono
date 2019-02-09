@@ -1,8 +1,5 @@
+import { AddressService } from './../../../Services/address.service';
 import { Component, OnInit } from '@angular/core';
-import { NetworkInfo } from './../../../Models/Payload/Responses/NetworkInfo';
-import { UserNetworks } from './../../../Models/Payload/Responses/UserNetworks';
-import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
-import { DatabaseService } from './../../../DataAccess/database.service';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
 import { MainLayoutService } from './../../../Services/main-layout.service';
 import { NodeClustersService } from 'src/app/Services/node-clusters.service';
@@ -18,13 +15,15 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 export class MainComponent implements OnInit
 {
    
-   constructor(public mainLayout:MainLayoutService, private clustersService:NodeClustersService, private networkService:NodeNetworkService) 
+   constructor(
+      public mainLayout:MainLayoutService, private clustersService:NodeClustersService, 
+      private networkService:NodeNetworkService, private addressService:AddressService) 
    {
       this.mainLayout.show();
    }
 
 
-   async ngOnInit() 
+   ngOnInit() 
    {
       // Handles when user reloads page after loggin in, to show a prompt, which 
       // allows for a request to be made, unsubscribing the node from clusters.
@@ -34,7 +33,10 @@ export class MainComponent implements OnInit
       //this.clustersService.subscribeProvider();
       //this.clustersService.subscribeConsumer();
 
-      // Establish connections to all user networks DBs
+      // Establish connection to user's address DB
+      this.addressService.ensureAddressDBsConnection();
+
+      // Establish connections to all of user's networks DBs
       this.networkService.checkUserNetworks();
    }
 

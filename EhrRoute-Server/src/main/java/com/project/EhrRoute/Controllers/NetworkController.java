@@ -114,7 +114,7 @@ public class NetworkController
 
 
     @GetMapping("/get-root")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getNetworkChainRoot(@RequestParam("networkuuid") String networkUUID)
     {
         Network network = networkService.findByNetUUID(networkUUID);
@@ -134,7 +134,7 @@ public class NetworkController
 
 
     @GetMapping("/uuid")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getNetworkUUID(@RequestParam("name") String networkName)
     {
         String networkUUID;
@@ -160,7 +160,7 @@ public class NetworkController
 
 
     @GetMapping("/search-by-name")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public List<String> searchNetworksByNetworkNames(@RequestParam("keyword") String networkName)
     {
         return networkService.searchNetworksByName(networkName);
@@ -168,7 +168,7 @@ public class NetworkController
 
 
     @PostMapping("/invite")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity sendNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationRequest)
     {
         // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
@@ -238,7 +238,7 @@ public class NetworkController
 
 
     @PostMapping("/invitation-accept")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationResponse)
     {
         NetworkInvitationRequest invitationRequest;

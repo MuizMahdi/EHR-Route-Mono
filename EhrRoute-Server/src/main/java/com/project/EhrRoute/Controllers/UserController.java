@@ -49,7 +49,7 @@ public class UserController
 
 
     @GetMapping("/current")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity<?> getCurrentUser(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -80,7 +80,7 @@ public class UserController
 
 
     @GetMapping("/current/roles")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -121,7 +121,7 @@ public class UserController
 
 
     @GetMapping("/current/networks")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -163,7 +163,7 @@ public class UserController
 
 
     @GetMapping("/current/first-login-status")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getCurrentUserFirstLoginStatus(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
@@ -187,7 +187,7 @@ public class UserController
 
 
     @GetMapping("/get-by-username/{username}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getUserByUsername(@PathVariable("username") String username)
     {
         User user = userService.findUserByUsernameOrEmail(username);

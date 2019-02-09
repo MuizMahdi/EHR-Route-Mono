@@ -16,4 +16,7 @@ public interface ProviderDetailsRepository extends JpaRepository<ProviderDetails
 
     @Query("SELECT p.providerUUID FROM ProviderDetails p INNER JOIN p.user u WHERE u.id = :userID")
     Optional<String> findProviderUUIDByUserID(@Param("userID") Long id);
+
+    @Query("SELECT p.providerAddress FROM ProviderDetails p INNER JOIN p.user u WHERE u.id = :userID")
+    Optional<String> findProviderAddressByUserID(@Param("userID") Long id);
 }

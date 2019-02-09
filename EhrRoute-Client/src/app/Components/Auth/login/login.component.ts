@@ -1,3 +1,4 @@
+import { ProviderService } from './../../../Services/provider.service';
 import { AddressResponse } from './../../../Models/Payload/Responses/AddressResponse';
 import { AddressService } from './../../../Services/address.service';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
@@ -9,7 +10,6 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { ElectronService } from 'ngx-electron';
 import { UserRole } from 'src/app/Models/UserRole';
 
 
@@ -30,14 +30,14 @@ export class LoginComponent
 
    constructor(
       private router:Router, private authService:AuthService, 
-      private electron:ElectronService, private userService:UsersService,
-      private addressService:AddressService
+      private userService:UsersService, private addressService:AddressService,
+      private providerService:ProviderService
    ) {
       this.buildForm();
    }
 
 
-   buildForm(): void
+   private buildForm(): void
    {
       this.loginFormGroup = new FormGroup({
          usernameOrEmailCtrl: new FormControl(null, [Validators.required]),
@@ -46,7 +46,7 @@ export class LoginComponent
    }
 
 
-   onLogin()
+   private onLogin(): void
    {
       // LoginFormGroup values
       this.loginUsernameOrEmail = this.loginFormGroup.get("usernameOrEmailCtrl").value;
@@ -57,10 +57,7 @@ export class LoginComponent
          password: this.loginPassword
       };
 
-      this.authService.login(userInfo)
-      .pipe( // Login and get response
-
-         first(), // Get first value in stream (The Token)
+      this.authService.login(userInfo).pipe(first(), 
 
          catchError(response => { // In case an error occurs
             return throwError(response) // Re-Throw the error to be handled on subscription
@@ -83,7 +80,7 @@ export class LoginComponent
    }
 
 
-   checkIfFirstLogin(): void
+   private checkIfFirstLogin(): void
    {
       this.userService.getCurrentUserFirstLoginStatus().subscribe(
 
@@ -118,21 +115,20 @@ export class LoginComponent
    }
 
 
-   checkIfIsProvider()
+   private checkIfIsProvider(): void
    {
       // Get user roles
       this.authService.getCurrentUserRoles().subscribe(
          
          (response:UserRole[]) => {
 
-            // Go through roles and check if user has a Provider role
+            // Go through roles and check if user is a Provider or Admin
             response.forEach((role:UserRole) => {
                
-               if (role.roleName.trim() === 'ROLE_PROVIDER') 
+               if (role.roleName.trim() === 'ROLE_PROVIDER' || role.roleName.trim() === 'ROLE_ADMIN') 
                {
-                  // Check if user has their provider details saved
-
-                  // If not, then send the provider's address to be saved
+                  // Check if user's address is saved
+                  this.checkProviderAddress();
                }
 
             });
@@ -143,6 +139,49 @@ export class LoginComponent
             console.log(errorResponse);
          }
       );
+   }
+
+
+   private checkProviderAddress(): void
+   {
+      this.providerService.checkProviderAddressExistence().subscribe(
+
+         (exists:boolean) => {
+            console.log(exists);
+
+            if (!exists) {
+               this.saveProviderAddress();
+            }
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   private saveProviderAddress(): void
+   {
+      // Get current user ID
+      let userID: number = this.authService.getCurrentUser().id;
+
+
+      // Get user address
+      this.addressService.getUserAddress(userID).then(address => {
+
+         console.log(address);
+
+         /*
+         // Save the address
+         this.providerService.saveProviderAddress(address.address).subscribe(
+
+         );
+         */
+
+      })
+
    }
 
 }

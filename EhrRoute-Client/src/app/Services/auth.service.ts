@@ -30,7 +30,7 @@ export class AuthService
    { }
 
 
-   register(userRegistrationInfo: UserRegistrationRequest) 
+   public register(userRegistrationInfo: UserRegistrationRequest): Observable<any>
    {
       return this.http.post(this.registrationUrl, userRegistrationInfo).pipe(
 
@@ -42,7 +42,7 @@ export class AuthService
    }
 
 
-   login(userLoginInfo: UserLoginRequest): Observable<any>
+   public login(userLoginInfo: UserLoginRequest): Observable<any>
    {
 
       return this.http.post(this.loginUrl, userLoginInfo).pipe(
@@ -68,20 +68,20 @@ export class AuthService
    }
 
 
-   getCurrentUser(): UserInfo
+   public getCurrentUser(): UserInfo
    {
       // Get user info from local storage
       return JSON.parse(localStorage.getItem('currentUser')) as UserInfo;
    }
 
 
-   getAccessToken():any
+   public getAccessToken():any
    {
       return localStorage.getItem('accessToken');
    }
 
    
-   getCurrentUserRoles()
+   public getCurrentUserRoles(): Observable<any>
    {
       return this.http.get(this.userRolesUrl).pipe(first(),
          catchError(error => {
@@ -91,7 +91,19 @@ export class AuthService
    }
 
 
-   logout()
+   public getCurrentUserInfo(): Observable<any>
+   {
+      return this.http.get(this.getCurrentUserUrl).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+   }
+
+
+   public logout(): void
    {
       // Unsubscribe user node from clusters
       this.clustersService.unsubscribeClusters();
@@ -107,7 +119,7 @@ export class AuthService
    }
 
 
-   saveSession(jwtToken)
+   private saveSession(jwtToken): void
    {
       if(jwtToken && jwtToken.accessToken)
       {
@@ -119,26 +131,26 @@ export class AuthService
    }
 
 
-   saveCurrentUserInfo()
+   private saveCurrentUserInfo(): void
    {
-      this.http.get(this.getCurrentUserUrl)
-      .pipe(
-         first() // Get first value received
-      )
-      .subscribe((user:UserInfo) => {
+      this.http.get(this.getCurrentUserUrl).pipe(first()).subscribe(
          
-         if(user) {
-            // Save the user info in local storage
-            localStorage.setItem('currentUser', JSON.stringify(user))
+         (user:UserInfo) => {
+         
+            if(user) {
+               // Save the user info in local storage
+               localStorage.setItem('currentUser', JSON.stringify(user))
 
-            // Then set the user in the user subject
-            this.currentUser.next(user);
-         }
+               // Then set the user in the user subject
+               this.currentUser.next(user);
+            }
 
-      },
+         },
+
          error => {
             console.log(error);
          }
+         
       );
    }
 

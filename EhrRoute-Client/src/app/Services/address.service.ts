@@ -1,3 +1,6 @@
+import { ErrorResponse } from './../Models/Payload/Responses/ErrorResponse';
+import { UserInfo } from './../Models/Payload/Responses/UserInfo';
+import { AuthService } from './auth.service';
 import { Address } from './../DataAccess/entities/Core/Address';
 import { Connection } from 'typeorm';
 import { AddressResponse } from './../Models/Payload/Responses/AddressResponse';
@@ -20,8 +23,48 @@ export class AddressService
    private addressGenerationUrl:string = environment.apiUrl + '/address/generate';
 
 
-   constructor(private dbService:DatabaseService, private http:HttpClient) 
+   constructor(
+      private dbService:DatabaseService, private http:HttpClient, 
+      private authService:AuthService) 
    { }
+
+
+   public async ensureAddressDBsConnection()
+   {
+      this.authService.getCurrentUserInfo().subscribe(
+
+         (userInfo:UserInfo) => {
+            // Get current user ID
+            let userID = userInfo.id;
+            this.checkAddressDbConnection(userID);
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
+         }
+
+      );
+   }
+
+
+   private async checkAddressDbConnection(userID:number)
+   {
+      // Get the DB connection of address's DB
+      try
+      {
+         this.dbService.getAddressDbConnection(userID);
+      }
+      catch (error)
+      {
+         // If no connection for network's DB is available, then create a connection
+         if ( (<Error>error).name == 'ConnectionNotFoundError' ) {
+            await this.dbService.createAddressDbConnection(userID);
+         }
+         else {
+            console.log(error);
+         }
+      }
+   }
 
 
    public generateUserAddress(): Observable<any>
@@ -38,15 +81,23 @@ export class AddressService
    
    public async getUserAddress(userID:number): Promise<Address>
    {
+      try
+      {
+         // Create an address DB/Connection
+         await this.dbService.createAddressDbConnection(userID);
+      }
+      catch(error)
+      {
+         // Create an address DB/Connection
+         await this.checkAddressDbConnection(userID);
+      }
+      
       // Get the address DB of user connection
       const dbConnection:Connection = await this.dbService.getAddressDbConnection(userID);
 
-      // Get the address object from DB
-      const address:Address[] = await dbConnection.getRepository(Address).find({
-         where: [{index : 1}]
-      });
+      const address:Address = await dbConnection.manager.findOne(Address, 1);
 
-      return address[0];
+      return address;
    }
 
 

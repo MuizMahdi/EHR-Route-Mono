@@ -68,6 +68,23 @@ public class ProviderController
     }
 
 
+    @GetMapping("/current/address/exists")
+    public ResponseEntity getCurrentProviderAddressExistence(@CurrentUser UserPrincipal currentUser)
+    {
+        // Validate authentication
+        if (currentUser == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        return ResponseEntity.ok(
+            providerService.providerAddressExists(currentUser.getId())
+        );
+    }
+
+
     @GetMapping("/search-providers-by-username")
     public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerUsername)
     {

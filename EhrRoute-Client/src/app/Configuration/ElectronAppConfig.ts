@@ -30,8 +30,7 @@ export class ElectronAppConfig
          this.applicationPath = remote.app.getAppPath();
       }
 
-      this.databaseFolderPath = path.join(this.applicationPath, this.dataFolderPath);
-      
+      this.databaseFolderPath = path.join(this.applicationPath, this.dataFolderPath); 
    }
 
    

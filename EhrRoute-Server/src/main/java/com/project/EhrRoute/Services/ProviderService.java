@@ -31,6 +31,9 @@ public class ProviderService
         // Create provider details for user
         ProviderDetails providerDetails = new ProviderDetails(user, providerUUID);
 
+        // Address is sent by user at login
+        providerDetails.setProviderAddress("");
+
         // Persist the provider details
         providerDetailsRepository.save(providerDetails);
     }
@@ -60,5 +63,13 @@ public class ProviderService
         return providerDetailsRepository.findProviderUUIDByUserID(userID).orElseThrow(() ->
             new ResourceNotFoundException("User", "ID", userID)
         );
+    }
+
+
+    @Transactional
+    public boolean providerAddressExists(Long userID)
+    {
+        String address = providerDetailsRepository.findProviderAddressByUserID(userID).orElse(null);
+        return !(address == null || address.isEmpty());
     }
 }
