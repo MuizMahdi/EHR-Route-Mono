@@ -23,27 +23,9 @@ import { Address } from "./entities/Core/Address";
 
 export class DatabaseService 
 {
-
-   public addressDbConnection: Promise<Connection>;
-   private readonly addressDbOptions: ConnectionOptions;
-
-
-   constructor() {
-
-      ElectronAppConfig.initialize();
-
-      // User address db connection is created on construction
-      this.addressDbOptions = {
-         name:"address-connection",
-         type: "sqlite",
-         database: ElectronAppConfig.addressDbPath,
-         entities: [Address],
-         synchronize: true,
-         logging: false
-      };
-
-      this.addressDbConnection = createConnection(this.addressDbOptions);
-   }
+   
+   constructor() 
+   { }
 
 
    // Creates a connection to the network db with networkUUID

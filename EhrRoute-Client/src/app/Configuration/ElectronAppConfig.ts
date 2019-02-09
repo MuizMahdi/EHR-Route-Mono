@@ -8,11 +8,6 @@ export class ElectronAppConfig
    public static databaseFolderPath: string;
    public static applicationPath: string;
    private static dataFolderPath: string;
-   public static addressDbPath: string
-   public static chainDbPath: string;
-
-   private static chainDbName = 'node-records.chain';
-   private static addressDbName = 'user-address.keys';
 
 
    public static initialize(): void 
@@ -36,12 +31,7 @@ export class ElectronAppConfig
       }
 
       this.databaseFolderPath = path.join(this.applicationPath, this.dataFolderPath);
-
-      // Path to the chain/records db file
-      this.chainDbPath = path.join(this.databaseFolderPath, this.chainDbName);
-
-      // Path to the address/keys db file
-      this.addressDbPath = path.join(this.databaseFolderPath, this.addressDbName);
+      
    }
 
    

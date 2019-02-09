@@ -65,8 +65,8 @@ public class AddressController
         }
 
         // Update user as NonFirstLogin
-        user.setNonFirstLogin(true);
-        userService.saveUser(user);
+        //user.setNonFirstLogin(true);
+        //userService.saveUser(user);
 
         // Generate address
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
