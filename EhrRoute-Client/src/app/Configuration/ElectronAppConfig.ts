@@ -51,4 +51,12 @@ export class ElectronAppConfig
 
       return path.join(this.databaseFolderPath, networkDbFileName);
    }
+
+   
+   public static getAddressDbPath(userID:number): string
+   {
+      let addressDbFileName:string = 'user-address-' + userID + '.address';
+
+      return path.join(this.databaseFolderPath, addressDbFileName);
+   }
 }

@@ -78,7 +78,7 @@ public class AddressController
         String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
         // Add address to provider details of user
-        providerService.setProviderAddress(user, address);
+        // providerService.setProviderAddress(user, address);
 
         // Return address
         return new ResponseEntity<>(

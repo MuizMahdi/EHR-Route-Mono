@@ -1,3 +1,5 @@
+import { Address } from './../../DataAccess/entities/Core/Address';
+import { AddressResponse } from './../../Models/Payload/Responses/AddressResponse';
 import { EhrAllergyAndReaction } from './../../DataAccess/entities/EHR/EhrAllergyAndReaction';
 import { EhrCondition } from './../../DataAccess/entities/EHR/EhrCondition';
 import { MedicalRecord } from './../../DataAccess/entities/EHR/MedicalRecord';
@@ -79,6 +81,18 @@ export default class ModelMapper
 
       
       return block;
+   }
+
+
+   public static mapAddressResponseToAddress(addressResponse:AddressResponse): Address
+   {
+      const address = new Address();
+
+      address.address = addressResponse.address;
+      address.publicKey = addressResponse.publicKey;
+      address.privateKey = addressResponse.privateKey;
+      
+      return address;
    }
 
 }

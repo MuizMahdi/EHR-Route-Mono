@@ -1,3 +1,5 @@
+import { AddressResponse } from './../../../Models/Payload/Responses/AddressResponse';
+import { AddressService } from './../../../Services/address.service';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { UsersService } from './../../../Services/users.service';
 import { UserLoginRequest } from '../../../Models/Payload/Requests/UserLoginRequest';
@@ -26,7 +28,11 @@ export class LoginComponent
    loginPassword: string;
 
 
-   constructor(private router:Router, private authService:AuthService, private electron:ElectronService, private userService:UsersService) {
+   constructor(
+      private router:Router, private authService:AuthService, 
+      private electron:ElectronService, private userService:UsersService,
+      private addressService:AddressService
+   ) {
       this.buildForm();
    }
 
@@ -63,10 +69,9 @@ export class LoginComponent
       ).subscribe(
 
          response => {
-            // TODO: Navigate to main page after login
             this.router.navigate(['main']);
             this.checkIfFirstLogin();
-            this.checkIfUserIsAdmin();
+            this.checkIfIsProvider();
          },
          
          (error:ErrorResponse) => {
@@ -82,10 +87,27 @@ export class LoginComponent
    {
       this.userService.getCurrentUserFirstLoginStatus().subscribe(
 
-         response => {
-            console.log(response);
-            // If not first time login, then request for address generation
-            
+         (isFirstLogin:boolean) => {
+            // If its the user's first time login, then request for address generation
+            if (isFirstLogin)
+            {
+               // Generate an address for the user to be saved on local DB
+               this.addressService.generateUserAddress().subscribe(
+
+                  (addressResponse:AddressResponse) => {
+                     // Get current user id
+                     let userID: number = this.authService.getCurrentUser().id;
+                     // Persist address locally
+                     this.addressService.saveUserAddress(addressResponse, userID);
+                  },
+
+                  (error:ErrorResponse) => {
+                     console.log(error);
+                  }
+
+               );
+            }
+
          },
 
          (error:ErrorResponse) => {
@@ -96,20 +118,21 @@ export class LoginComponent
    }
 
 
-   checkIfUserIsAdmin()
+   checkIfIsProvider()
    {
       // Get user roles
       this.authService.getCurrentUserRoles().subscribe(
          
          (response:UserRole[]) => {
 
-            // Go through roles and create EHRs chain databse if user has ADMIN role
+            // Go through roles and check if user has a Provider role
             response.forEach((role:UserRole) => {
                
-               if (role.roleName.trim() === 'ROLE_ADMIN') 
+               if (role.roleName.trim() === 'ROLE_PROVIDER') 
                {
-                  // Call electron's ipc renderer to create chain table
-                  this.electron.ipcRenderer.send('Create_Node_EHR_Chain_DB', '');
+                  // Check if user has their provider details saved
+
+                  // If not, then send the provider's address to be saved
                }
 
             });
