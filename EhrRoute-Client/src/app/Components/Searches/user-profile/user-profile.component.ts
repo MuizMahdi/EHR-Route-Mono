@@ -1,3 +1,6 @@
+import { BlockAdditionRequest } from './../../../Models/Payload/Requests/BlockAdditionRequest';
+import { AuthService } from 'src/app/Services/auth.service';
+import { AddressService } from './../../../Services/address.service';
 import { ChainService } from './../../../Services/chain.service';
 import { ProviderService } from './../../../Services/provider.service';
 import { UserNetworks } from './../../../Models/Payload/Responses/UserNetworks';
@@ -33,7 +36,8 @@ export class UserProfileComponent implements OnInit
    constructor(
       private userService:UsersService, private modalService:NzModalService, 
       private networkService:NodeNetworkService, private providerService:ProviderService,
-      private chainService:ChainService
+      private chainService:ChainService, private addressService:AddressService,
+      private authService:AuthService
    ) { }
 
 
@@ -64,7 +68,7 @@ export class UserProfileComponent implements OnInit
    }
 
 
-   private getCurrentUserNetworks():void 
+   private getCurrentUserNetworks(): void 
    {
       this.networkService.getUserNetworks().subscribe(
 
@@ -90,40 +94,89 @@ export class UserProfileComponent implements OnInit
    }
 
 
-   private async requestEhrPrivilege()
+   private requestEhrPrivilege(): void
    {
-      this.getCurrentProviderUUID();
+      this.getBlockAdditionRequest().then(blockAdditionRequest => {
+         
+         this.userService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
 
+            response => {
+               console.log(response);
+            },
+
+            (error:ErrorResponse) => {
+               console.log(error);
+            }
+
+         );
+         
+      })
+   }
+
+
+   private async getBlockAdditionRequest(): Promise<BlockAdditionRequest>
+   {
+      let userID = this.authService.getCurrentUser().id;
       let ehrUserID = this.searchedUser.id;
       let networkUUID = this.selectedNetwork.networkUUID;
-      let providerUUID = this.getCurrentProviderUUID(); // Check if null, before creating BlockAddition object
       let merkleRootWithoutBlock:string = "";
+      let previousBlockHash:string = "";
+      let previousBlockIndex:number;
+      let senderAddress:string = "";
+      let providerUUID:string = "";
 
+      // Get and set provider UUID
+      await this.getCurrentProviderUUID().then(uuid => {
+         providerUUID = uuid;
+      });
+
+      // Get and set merkle root
       await this.chainService.generateNetworkMerkleRoot(networkUUID).then(root => {
          merkleRootWithoutBlock = root;
       });
 
-      
+      // Get and set sender address
+      await this.addressService.getUserAddress(userID).then(address => {
+         senderAddress = address.address;
+      });
+
+      // Get and set block index and previous hash
+      await this.chainService.getNetworkLatestBlock(networkUUID).then(block => {
+         previousBlockIndex = block.index;
+         previousBlockHash = block.hash;
+      });
+
+      // Construct a block addition object
+      let blockAdditionRequest:BlockAdditionRequest = {
+         chainRootWithoutBlock:merkleRootWithoutBlock,
+         previousBlockIndex: previousBlockIndex.toString(),
+         previousBlockHash: previousBlockHash,
+         senderAddress: senderAddress,
+         providerUUID: providerUUID,
+         networkUUID: networkUUID,
+         ehrUserID: ehrUserID.toString()
+      }
+
+      return blockAdditionRequest;
    }
 
 
-   private getCurrentProviderUUID(): string
+   private async getCurrentProviderUUID(): Promise<string>
    {
       let providerUUID:string;
+      
+      await this.providerService.getCurrentProviderUUID().then(
+         
+         response => {
+            providerUUID = response.payload;
+         })
 
-      this.providerService.getCurrentProviderUUID().subscribe(
-
-         (response:string) => {
-            providerUUID = response;
-         },
-
-         (error:ErrorResponse) => {
+         .catch(error => {
             console.log(error);
-            providerUUID = null;
          }
 
-      )
-
+      );
+      
       return providerUUID;
    }
 

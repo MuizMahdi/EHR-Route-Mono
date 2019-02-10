@@ -1,4 +1,6 @@
 package com.project.EhrRoute.Core.Utilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -9,24 +11,43 @@ import java.util.Base64;
 @Component
 public class KeyUtil
 {
-    public PublicKey getPublicKeyFromString(String stringKey) throws GeneralSecurityException
+    private final Logger logger = LoggerFactory.getLogger(KeyUtil.class);
+
+    public PublicKey getPublicKeyFromString(String stringKey)
     {
-        byte[] keyBytes = Base64.getDecoder().decode(stringKey);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory factory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = factory.generatePublic(keySpec);
-        Arrays.fill(keyBytes, (byte) 0);
-        return publicKey;
+        PublicKey publicKey;
+
+        try
+        {
+            byte[] keyBytes = Base64.getDecoder().decode(stringKey);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            publicKey = factory.generatePublic(keySpec);
+            Arrays.fill(keyBytes, (byte) 0);
+            return publicKey;
+        }
+        catch (GeneralSecurityException Ex) {
+            logger.error(Ex.getMessage());
+        }
+
+        return null;
     }
 
-    public String getStringFromPublicKey(PublicKey key) throws GeneralSecurityException
+    public String getStringFromPublicKey(PublicKey key)
     {
-        KeyFactory factory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = factory.getKeySpec(key, X509EncodedKeySpec.class);
-        byte[] keyBytes = keySpec.getEncoded();
-        String stringKey = Base64.getEncoder().encodeToString(keyBytes);
-        Arrays.fill(keyBytes, (byte) 0);
-        return stringKey;
+        try {
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = factory.getKeySpec(key, X509EncodedKeySpec.class);
+            byte[] keyBytes = keySpec.getEncoded();
+            String stringKey = Base64.getEncoder().encodeToString(keyBytes);
+            Arrays.fill(keyBytes, (byte) 0);
+            return stringKey;
+        }
+        catch (GeneralSecurityException Ex) {
+            logger.error(Ex.getMessage());
+        }
+
+        return null;
     }
 
     public PrivateKey getPrivateKeyFromString(String stringKey) throws GeneralSecurityException

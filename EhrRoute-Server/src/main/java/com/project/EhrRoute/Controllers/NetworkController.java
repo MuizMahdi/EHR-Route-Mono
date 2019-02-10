@@ -85,8 +85,8 @@ public class NetworkController
         // A networkUUID is generated in every genesis block.
         String networkUUID = genesisBlock.getBlock().getBlockHeader().getNetworkUUID();
 
-        // Chain has only one block, so chainRoot is the hash of that block
-        String chainRoot = stringUtil.getStringFromBytes(genesisBlock.getBlock().getBlockHeader().getHash());
+        // Chain has only one block, so the merkle root is set to the first and only leaf hash of the tree
+        String chainRoot = stringUtil.getStringFromBytes(genesisBlock.getBlock().getBlockHeader().getMerkleLeafHash());
 
         // Generate a new network using the genesis block data
         Network network = new Network();

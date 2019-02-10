@@ -40,7 +40,7 @@ public class ProviderService
 
 
     @Transactional
-    public void setProviderAddress(User user, String address)
+    public void setProviderAddress(User user, String address) throws ResourceNotFoundException
     {
         // Get user's provider details
         ProviderDetails providerDetails = providerDetailsRepository.findProviderDetailsByUserID(
@@ -58,7 +58,7 @@ public class ProviderService
 
 
     @Transactional
-    public String getProviderUuidByUserID(Long userID)
+    public String getProviderUuidByUserID(Long userID) throws ResourceNotFoundException
     {
         return providerDetailsRepository.findProviderUUIDByUserID(userID).orElseThrow(() ->
             new ResourceNotFoundException("User", "ID", userID)
@@ -71,5 +71,14 @@ public class ProviderService
     {
         String address = providerDetailsRepository.findProviderAddressByUserID(userID).orElse(null);
         return !(address == null || address.isEmpty());
+    }
+
+
+    @Transactional
+    public String getProviderAddress(Long userID) throws ResourceNotFoundException
+    {
+        return providerDetailsRepository.findProviderAddressByUserID(userID).orElseThrow(() ->
+            new ResourceNotFoundException("Address for a provider", "user ID", userID)
+        );
     }
 }

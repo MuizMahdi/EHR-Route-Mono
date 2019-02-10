@@ -41,14 +41,6 @@ public class ProviderController
             );
         }
 
-        // Validate user
-        if (userService.isValidUserUsername(currentUser.getUsername())) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not found; Invalid user"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
         String providerUUID;
 
         // Get provider UUID
@@ -62,9 +54,8 @@ public class ProviderController
             );
         }
 
-        return new ResponseEntity<>(
-            providerUUID,
-            HttpStatus.OK
+        return ResponseEntity.ok(
+            new SimpleStringPayload(providerUUID)
         );
     }
 

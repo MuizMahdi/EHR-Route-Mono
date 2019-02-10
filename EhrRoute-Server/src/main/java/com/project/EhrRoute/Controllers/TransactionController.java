@@ -41,34 +41,38 @@ import java.util.List;
 @RequestMapping("/transaction")
 public class TransactionController
 {
-    private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
+    private ApplicationEventPublisher eventPublisher;
+
     private UserService userService;
-    private ChainRootUtil chainRootUtil;
     private ConsentRequestBlockService consentRequestService;
+
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private UuidUtil uuidUtil;
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
+    private ChainRootUtil chainRootUtil;
     private SimpleStringUtil simpleStringUtil;
     private BlockBroadcaster blockBroadcaster;
+
 
     @Autowired
     public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
-        this.chainRootUtil = chainRootUtil;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.uuidUtil = uuidUtil;
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
+        this.chainRootUtil = chainRootUtil;
         this.simpleStringUtil = simpleStringUtil;
         this.blockBroadcaster = blockBroadcaster;
     }
+
 
     @PostMapping("/getConsent")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
@@ -95,8 +99,6 @@ public class TransactionController
             );
         }
 
-        // Get provider network uuid
-        //String providerNetworkUUID = clustersContainer.getChainProviders().getNode(providerUUID).getNetworkUUID();
 
         // Check if provider's network uuid is valid
         if (networkUUID == null || networkUUID.isEmpty()) {
@@ -157,17 +159,24 @@ public class TransactionController
             // TODO: Construct a block using data in block addition,
             // TODO: then pass it in the GetUserConsentEvent object constructor.
 
-            SerializableBlock block = new SerializableBlock();
+            // Generate and construct a block using data in block addition request
+            Block block = modelMapper.mapAdditionRequestToBlock(blockAddition);
+
+            // Convert the block into a serializable block
+            SerializableBlock sBlock = modelMapper.mapBlockToSerializableBlock(block);
 
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
-                    this,
-                    block,
-                    providerUUID,
-                    blockAddition.getNetworkUUID(),
-                    userID
+                this,
+                sBlock,
+                providerUUID,
+                blockAddition.getNetworkUUID(),
+                userID
             );
 
-            eventPublisher.publishEvent(getUserConsent);
+            System.out.println(getUserConsent.toString());
+
+            // TODO: COMMENTED FOR DEBUGGING
+            //eventPublisher.publishEvent(getUserConsent);
         }
         catch (Exception Ex)
         {

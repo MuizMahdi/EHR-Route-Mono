@@ -39,15 +39,15 @@ export class ProviderService
    }
 
 
-   public getCurrentProviderUUID(): Observable<any> {
+   public async getCurrentProviderUUID(): Promise<any> {
 
-      return this.http.get(this.currentProviderUuidUrl).pipe(first(),
+      return await this.http.get(this.currentProviderUuidUrl).pipe(first(),
       
          catchError(error => {
             return throwError(error);
          })
 
-      );
+      ).toPromise();
 
    }
 

@@ -1,8 +1,11 @@
 package com.project.EhrRoute.Entities.Core;
+import com.project.EhrRoute.Entities.Auth.User;
 import org.hibernate.annotations.NaturalId;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -27,6 +30,9 @@ public class Network
             inverseJoinColumns = @JoinColumn(name = "root_id")
     )
     private ChainRoot chainRoot;
+
+    @ManyToMany(mappedBy = "networks")
+    private Set<User> users = new HashSet<>();
 
 
     public Network() { }
@@ -73,6 +79,9 @@ public class Network
     public void setId(Long id) {
         this.id = id;
     }
+    public Set<User> getUsers() {
+        return users;
+    }
     public ChainRoot getChainRoot() {
         return chainRoot;
     }
@@ -81,6 +90,9 @@ public class Network
     }
     public String getNetworkUUID() {
         return networkUUID;
+    }
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
     public void setChainRoot(ChainRoot chainRoot) {
         this.chainRoot = chainRoot;

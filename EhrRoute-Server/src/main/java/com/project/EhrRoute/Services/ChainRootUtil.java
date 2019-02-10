@@ -42,6 +42,9 @@ public class ChainRootUtil
 
         String root = networkCurrentChainRoot.getRoot();
 
+        System.out.println("[ Latest chain root on DB: (" + root + ") ]");
+        System.out.println("[ Validating against: (" + chainRoot + ") ]");
+
         if (!root.equals(chainRoot)) {
             return false;
         }

@@ -48,6 +48,8 @@
       <nz-select *ngIf="userHasNetwork" nzShowSearch [(ngModel)]="selectedNetwork" nzPlaceHolder="Select a network" id="network-selector" style="width:18vw;">
          <nz-option *ngFor="let n of userNetworks" [nzValue]="n" [nzLabel]="n.name"></nz-option>
       </nz-select>
+
+      <button (click)="requestEhrPrivilege()">Request EHR</button>
    </div>
 
 </ng-template>

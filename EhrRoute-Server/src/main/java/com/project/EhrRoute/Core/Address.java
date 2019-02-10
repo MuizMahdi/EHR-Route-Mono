@@ -19,6 +19,9 @@ public class Address
     }
 
     public Address() {}
+    public Address(String address) {
+        this.address = address;
+    }
 
     // Generates a Base58Check encoded address from public key
     public void generateAddress(PublicKey publicKey) throws GeneralSecurityException

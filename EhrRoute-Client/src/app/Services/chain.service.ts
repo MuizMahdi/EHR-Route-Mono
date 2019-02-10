@@ -99,4 +99,22 @@ export class ChainService
       }
 
    }
+
+
+   public async getNetworkLatestBlock(networkUUID:string): Promise<Block>
+   {
+      // Make sure that a connection for the network DB exists
+      await this.ensureNetworkDbConnection(networkUUID);
+
+      // Get network's DB conneciton
+      let dbConnection:Connection = this.dbService.getNetworkDbConnection(networkUUID);
+
+      let blocksCount:number = await dbConnection.manager.count(Block);
+
+      const latestBlock:Block[] = await dbConnection.getRepository(Block).find({
+         where: [{index : blocksCount}]
+      });
+
+      return latestBlock[0];
+   }
 }

@@ -1,6 +1,7 @@
 package com.project.EhrRoute.Core.Utilities;
 import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,14 +42,14 @@ public class HashUtil
         }
     }
 
-    public byte[] hashTransactionData(Transaction transaction) throws Exception
+    public byte[] hashTransactionData(Transaction transaction) throws ResourceEmptyException
     {
         if (transaction.getTransactionData() == null)
         {
             transaction.setRecord(new MedicalRecord());
 
             if (transaction.getSenderAddress() == null || transaction.getRecipientAddress() == null) {
-                throw new Exception("Transaction Sender or Recipient not found");
+                throw new ResourceEmptyException("Transaction data hashing failed, transaction Sender or Recipient not found");
             }
         }
 

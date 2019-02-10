@@ -37,7 +37,7 @@ public class Transaction
         this.senderAddress.generateAddress(senderPubKey);
     }
 
-    public String getTransactionData() throws GeneralSecurityException
+    public String getTransactionData()
     {
         String data =
         jsonUtil.createJson(record) +

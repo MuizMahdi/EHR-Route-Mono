@@ -1,3 +1,4 @@
+import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
 import { first, catchError } from 'rxjs/operators';
 import { RoleChangeRequest } from './../Models/Payload/Requests/RoleChangeRequest';
 import { HttpClient } from '@angular/common/http';
@@ -67,7 +68,7 @@ export class UsersService
    }
 
 
-   getCurrentUserFirstLoginStatus(): Observable<any>
+   public getCurrentUserFirstLoginStatus(): Observable<any>
    {
       return this.http.get(this.userFirstLoginStatusUrl).pipe(first(),
 
@@ -79,12 +80,8 @@ export class UsersService
    }
 
 
-   public sendUserEhrConsentRequest(): Observable<any>
+   public sendUserEhrConsentRequest(blockAdditionRequest:BlockAdditionRequest): Observable<any>
    {
-      let blockAdditionRequest = {
-         
-      }
-
       return this.http.post(this.getUserEhrConsentUrl, blockAdditionRequest).pipe(first(),
       
          catchError(error => {

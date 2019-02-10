@@ -1,9 +1,11 @@
 package com.project.EhrRoute.Utilities;
 import com.project.EhrRoute.Core.*;
+import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.App.Notification;
+import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Entities.EHR.*;
@@ -12,10 +14,13 @@ import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
 import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.Core.*;
+import com.project.EhrRoute.Services.NetworkService;
+import com.project.EhrRoute.Services.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,18 +30,25 @@ import java.util.stream.Collectors;
 @Component
 public class ModelMapper
 {
-    private StringUtil stringUtil;
+
     private KeyUtil keyUtil;
+    private HashUtil hashUtil;
+    private StringUtil stringUtil;
     private BlockHeader blockHeader;
     private Transaction transaction;
+    private NetworkService networkService;
+    private ProviderService providerService;
 
 
     @Autowired
-    public ModelMapper(StringUtil stringUtil, KeyUtil keyUtil, BlockHeader blockHeader, Transaction transaction) {
-        this.stringUtil = stringUtil;
+    public ModelMapper(KeyUtil keyUtil, HashUtil hashUtil, StringUtil stringUtil, BlockHeader blockHeader, Transaction transaction, NetworkService networkService, ProviderService providerService) {
         this.keyUtil = keyUtil;
+        this.hashUtil = hashUtil;
+        this.stringUtil = stringUtil;
         this.blockHeader = blockHeader;
         this.transaction = transaction;
+        this.networkService = networkService;
+        this.providerService = providerService;
     }
 
 
@@ -126,6 +138,44 @@ public class ModelMapper
         transaction.setSenderPubKey(senderPubKey);
 
         block.setTransaction(transaction);
+
+        return block;
+    }
+
+    public Block mapAdditionRequestToBlock(BlockAddition blockAdditionRequest)
+    {
+        Block block = new Block();
+
+        String networkUUID = blockAdditionRequest.getNetworkUUID();
+
+        User networkRandUser = networkService.getNetworkRandomMember(networkUUID);
+
+        String randUserProviderAddress = providerService.getProviderAddress(networkRandUser.getId());
+
+        Address senderAddress = new Address(blockAdditionRequest.getSenderAddress());
+        Address recipientAddress = new Address(randUserProviderAddress);
+
+
+        transaction.setRecipientAddress(recipientAddress);
+        transaction.setSenderAddress(senderAddress);
+        PublicKey senderPubKey = keyUtil.getPublicKeyFromString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1bYsqwRE7Yj5y9C3Ahv2vcr7NMYGU2us23tlGbEpogrPbilirid4gRnjZXLNZdgDyTmtxiBFa5WT9nC1kuxrdbFcMIBECCkeTcJL3Zlv3iY5c4DmCMKwf4jBm4gCeXWan8PccrsruDNxP5u2rkj6ywSVDrvRobhXGL9i/IuqoSwIDAQAB");
+        transaction.setSenderPubKey(senderPubKey);
+        transaction.setRecord(new MedicalRecord());
+
+        // Signature is added when patient gives consent for block addition (sharing their EHR)
+        transaction.setSignature("".getBytes());
+
+        transaction.setTransactionId(hashUtil.hashTransactionData(transaction));
+
+        blockHeader.setIndex(Long.parseLong(blockAdditionRequest.getPreviousBlockIndex() + 1));
+        blockHeader.setPreviousHash(blockAdditionRequest.getPreviousBlockHash().getBytes());
+        blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
+        blockHeader.setNetworkUUID(blockAdditionRequest.getNetworkUUID());
+        blockHeader.setTimeStamp(new Date().getTime());
+        blockHeader.generateHeaderHash();
+
+        block.setTransaction(transaction);
+        block.setBlockHeader(blockHeader);
 
         return block;
     }
