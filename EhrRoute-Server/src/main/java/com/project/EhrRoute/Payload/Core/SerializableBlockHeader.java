@@ -56,4 +56,16 @@ public class SerializableBlockHeader
     public void setMerkleLeafHash(String merkleLeafHash) {
         this.merkleLeafHash = merkleLeafHash;
     }
+
+    @Override
+    public String toString() {
+        return "SerializableBlockHeader{" +
+                "hash='" + hash + '\'' +
+                ", previousHash='" + previousHash + '\'' +
+                ", timeStamp=" + timeStamp +
+                ", index=" + index +
+                ", merkleLeafHash='" + merkleLeafHash + '\'' +
+                ", networkUUID='" + networkUUID + '\'' +
+                '}';
+    }
 }

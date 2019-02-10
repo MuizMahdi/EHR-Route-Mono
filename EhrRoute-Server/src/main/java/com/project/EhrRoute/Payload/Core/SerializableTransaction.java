@@ -56,4 +56,16 @@ public class SerializableTransaction
     public void setRecipientAddress(String recipientAddress) {
         this.recipientAddress = recipientAddress;
     }
+
+    @Override
+    public String toString() {
+        return "SerializableTransaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", record=" + record +
+                ", senderPubKey='" + senderPubKey + '\'' +
+                ", senderAddress='" + senderAddress + '\'' +
+                ", recipientAddress='" + recipientAddress + '\'' +
+                ", signature='" + signature + '\'' +
+                '}';
+    }
 }

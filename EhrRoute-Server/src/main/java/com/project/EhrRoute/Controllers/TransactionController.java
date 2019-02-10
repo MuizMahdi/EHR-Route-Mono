@@ -173,7 +173,7 @@ public class TransactionController
                 userID
             );
 
-            System.out.println(getUserConsent.toString());
+            System.out.println(sBlock.toString());
 
             // TODO: COMMENTED FOR DEBUGGING
             //eventPublisher.publishEvent(getUserConsent);

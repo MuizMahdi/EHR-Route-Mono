@@ -1,3 +1,4 @@
+import { ProviderService } from './provider.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { EventSourcePolyfill } from 'ng-event-source';
@@ -28,7 +29,7 @@ export class NodeClustersService implements OnInit
    consumersEventSource:EventSourcePolyfill;
    
 
-   constructor(private http:HttpClient) { }
+   constructor(private http:HttpClient, private providerService:ProviderService) { }
 
    
    ngOnInit() {
@@ -36,19 +37,45 @@ export class NodeClustersService implements OnInit
    }
 
 
-   subscribeClusters(): void
+   private async getCurrentProviderUUID(): Promise<string>
    {
-      // Subscribe node as a provider
-      this.subscribeProvider();
+      let providerUUID:string;
+      
+      await this.providerService.getCurrentProviderUUID().then(
+         
+         response => {
+            providerUUID = response.payload;
+         })
 
-      // Subscribe node as a consumer
-      this.subscribeConsumer();
+         .catch(error => {
+            console.log(error);
+         }
+
+      );
+      
+      return providerUUID;
    }
 
 
-   subscribeProvider(): void
+   public async subscribeClusters()
    {
-      let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
+      // Subscribe node as a provider
+      await this.subscribeProvider();
+
+      // Subscribe node as a consumer
+      await this.subscribeConsumer();
+   }
+
+
+   public async subscribeProvider()
+   {
+      let nodeUUID:string = "";
+
+      // Get and set node UUID as the current provider UUID
+      await this.getCurrentProviderUUID().then(uuid => {
+         nodeUUID = uuid;
+      });
+
       let url:string = this.providerSubscriptionUrl + nodeUUID;
 
       let Jwt = localStorage.getItem('accessToken');
@@ -72,9 +99,15 @@ export class NodeClustersService implements OnInit
    }
 
    
-   subscribeConsumer(): void
+   public async subscribeConsumer()
    {
-      let nodeUUID:string = "a906c224-f882-4cc7-bf48-31ece53765fa";
+      let nodeUUID:string = "";
+
+      // Get and set node UUID as the current provider UUID
+      await this.getCurrentProviderUUID().then(uuid => {
+         nodeUUID = uuid;
+      });
+
       let url:string = this.consumerSubscriptionUrl + nodeUUID;
 
       let Jwt = localStorage.getItem('accessToken');

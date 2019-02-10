@@ -23,4 +23,12 @@ public class SerializableBlock
     public void setTransaction(SerializableTransaction transaction) {
         this.transaction = transaction;
     }
+
+    @Override
+    public String toString() {
+        return "SerializableBlock { " +
+                "blockHeader:" + blockHeader +
+                ", transaction:" + transaction +
+                " }";
+    }
 }
