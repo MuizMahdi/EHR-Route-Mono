@@ -167,7 +167,7 @@ public class ModelMapper
 
         transaction.setTransactionId(hashUtil.hashTransactionData(transaction));
 
-        blockHeader.setIndex(Long.parseLong(blockAdditionRequest.getPreviousBlockIndex() + 1));
+        blockHeader.setIndex(Long.parseLong(blockAdditionRequest.getPreviousBlockIndex()) + 1);
         blockHeader.setPreviousHash(blockAdditionRequest.getPreviousBlockHash().getBytes());
         blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
         blockHeader.setNetworkUUID(blockAdditionRequest.getNetworkUUID());

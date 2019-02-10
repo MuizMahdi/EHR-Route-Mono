@@ -26,12 +26,8 @@ public class ChainUtil
 
     public void fetchChainForNode(String nodeUUID, String networkUUID) throws ResourceEmptyException
     {
-        System.out.println("[ Getting node networks ]");
-
         // Get node networks set using node in providers cluster
         Set<String> nodeNetworks = clustersContainer.getChainProviders().getNode(nodeUUID).getNetworksUUIDs();
-
-        System.out.println("[ Got node networks ]");
 
         // If node fetched from providers cluster has no networks
         if (nodeNetworks == null || nodeNetworks.isEmpty()) {
