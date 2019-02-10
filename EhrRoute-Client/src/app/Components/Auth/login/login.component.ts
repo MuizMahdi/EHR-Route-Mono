@@ -171,14 +171,19 @@ export class LoginComponent
       // Get user address
       this.addressService.getUserAddress(userID).then(address => {
 
-         console.log(address);
-
-         /*
-         // Save the address
+         // Save/set the address
          this.providerService.saveProviderAddress(address.address).subscribe(
 
+            response => {
+               console.log(response);
+            },
+
+            (error:ErrorResponse) => {
+               console.log(error);
+            }
+
          );
-         */
+         
 
       })
 

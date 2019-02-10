@@ -1,4 +1,4 @@
-import { SimpleStringResponse } from './../../../Models/Payload/Responses/SimpleStringResponse';
+import { SimpleStringPayload } from './../../../Models/Payload/Responses/SimpleStringPayload';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
 import { UserNetworks } from '../../../Models/Payload/Responses/UserNetworks';
@@ -101,7 +101,7 @@ export class NetworkManagerComponent implements OnInit
       // Get network UUID of network with network name of the recently created network
       this.networkService.getNetworkUuidByName(networkName).subscribe(
 
-         async (response:SimpleStringResponse) => {
+         async (response:SimpleStringPayload) => {
             // UUID response
             let networkUUID = response.payload;
 

@@ -11,7 +11,7 @@ import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
-import com.project.EhrRoute.Payload.App.SimpleStringResponse;
+import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Security.CurrentUser;
@@ -127,7 +127,7 @@ public class NetworkController
         }
 
         return new ResponseEntity<>(
-            new SimpleStringResponse(network.getChainRoot().getRoot()),
+            new SimpleStringPayload(network.getChainRoot().getRoot()),
             HttpStatus.OK
         );
     }
@@ -153,7 +153,7 @@ public class NetworkController
         System.out.println(networkUUID);
 
         return new ResponseEntity<>(
-            new SimpleStringResponse(networkUUID),
+            new SimpleStringPayload(networkUUID),
             HttpStatus.OK
         );
     }

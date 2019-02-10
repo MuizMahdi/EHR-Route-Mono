@@ -1,5 +1,7 @@
 package com.project.EhrRoute.Controllers;
+import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
@@ -8,10 +10,9 @@ import com.project.EhrRoute.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -64,6 +65,32 @@ public class ProviderController
         return new ResponseEntity<>(
             providerUUID,
             HttpStatus.OK
+        );
+    }
+
+
+    @PostMapping("/current/address")
+    public ResponseEntity setCurrentProviderAddress(@Valid @RequestBody SimpleStringPayload address, @CurrentUser UserPrincipal currentUser)
+    {
+        // Validate authentication
+        if (currentUser == null) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "User not logged in"),
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
+
+        if (user != null && !(address.getPayload().isEmpty()))
+        {
+            String providerAddress = address.getPayload();
+            System.out.println("Address payload: " + address.getPayload());
+            providerService.setProviderAddress(user, providerAddress);
+        }
+
+        return ResponseEntity.ok(
+            new ApiResponse(true, "Address was saved successfully")
         );
     }
 

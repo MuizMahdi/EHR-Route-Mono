@@ -1,3 +1,4 @@
+import { SimpleStringPayload } from './../Models/Payload/Responses/SimpleStringPayload';
 import { first, catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -66,7 +67,11 @@ export class ProviderService
 
    public saveProviderAddress(address:string): Observable<any> {
 
-      return this.http.post(this.providerAddressUrl, address).pipe(first(),
+      let addressPayload:SimpleStringPayload = {
+         payload: address
+      };
+
+      return this.http.post(this.providerAddressUrl, addressPayload).pipe(first(),
       
          catchError(error => {
             return throwError(error);
