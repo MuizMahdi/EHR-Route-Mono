@@ -3,6 +3,8 @@ import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -61,12 +63,14 @@ public class BlockHeader
 
         // Add up all of the data
         String stringHeaderData =
-        stringUtil.getStringFromBytes(previousHash) +
-        stringUtil.getStringFromBytes(merkleLeafHash) +
-        TimeStamp.toString() + Index.toString() + networkUUID;
+        stringUtil.base64EncodeBytes(previousHash) +
+        stringUtil.base64EncodeBytes(merkleLeafHash) +
+        TimeStamp.toString() +
+        Index.toString() +
+        networkUUID;
 
         // Block hash is the hash of the header data
-        hash = hashUtil.SHA256(stringHeaderData.getBytes());
+        hash = hashUtil.SHA256(stringHeaderData.getBytes(StandardCharsets.UTF_8));
     }
 
 

@@ -86,7 +86,7 @@ public class NetworkController
         String networkUUID = genesisBlock.getBlock().getBlockHeader().getNetworkUUID();
 
         // Chain has only one block, so the merkle root is set to the first and only leaf hash of the tree
-        String chainRoot = stringUtil.getStringFromBytes(genesisBlock.getBlock().getBlockHeader().getMerkleLeafHash());
+        String chainRoot = stringUtil.base64EncodeBytes(genesisBlock.getBlock().getBlockHeader().getMerkleLeafHash());
 
         // Generate a new network using the genesis block data
         Network network = new Network();

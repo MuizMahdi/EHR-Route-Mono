@@ -6,7 +6,7 @@ import java.util.Base64;
 @Component
 public class StringUtil
 {
-    // For converting hash bytes to String
+    // For converting hash bytes to hex string
     public String getStringFromBytes(byte[] bytes) {
         StringBuffer hexString = new StringBuffer();
 
@@ -20,15 +20,15 @@ public class StringUtil
         return hexString.toString();
     }
 
-    // For converting bytes of primitive types strings to String
+    // For converting bytes of primitive types bytes to String
     public String getUTF8StringFromBytes(byte[] bytes)
     {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    // For base64 encoding of bytes to string
+    // For base64 encoding of bytes hashes to strings
     public String base64EncodeBytes(byte[] bytes) { return Base64.getEncoder().encodeToString(bytes); }
 
-    // For base64 decoding string to bytes
+    // For base64 decoding string hashes to bytes
     public byte[] base64DecodeString(String string) { return Base64.getDecoder().decode(string); }
 }

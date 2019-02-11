@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 public class StringUtilTest
 {
     private final StringUtil stringUtil = new StringUtil();
+    private final KeyUtil keyUtil = new KeyUtil();
     private final byte[] bytes = "String".getBytes();
 
     @Test
@@ -19,15 +20,15 @@ public class StringUtilTest
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
 
-        assertNotNull(stringUtil.getStringFromKey(publicKey));
-        assertTrue(stringUtil.getStringFromKey(publicKey) instanceof String);
+        assertNotNull(keyUtil.getStringFromPublicKey(publicKey));
+        assertTrue(keyUtil.getStringFromPublicKey(publicKey) instanceof String);
     }
 
     @Test
     public void getStringFromBytes() throws Exception
     {
-        assertNotNull(stringUtil.getStringFromBytes(bytes));
-        assertTrue(stringUtil.getStringFromBytes(bytes) instanceof String);
+        assertNotNull(stringUtil.base64EncodeBytes(bytes));
+        assertTrue(stringUtil.base64EncodeBytes(bytes) instanceof String);
     }
 
     @Test

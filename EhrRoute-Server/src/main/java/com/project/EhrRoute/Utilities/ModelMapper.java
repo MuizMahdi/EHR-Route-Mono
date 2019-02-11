@@ -18,6 +18,8 @@ import com.project.EhrRoute.Services.NetworkService;
 import com.project.EhrRoute.Services.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.Date;
@@ -63,17 +65,17 @@ public class ModelMapper
         SerializableBlockHeader serializableBlockHeader = new SerializableBlockHeader();
         SerializableTransaction serializableTransaction = new SerializableTransaction();
 
-        serializableBlockHeader.setHash(stringUtil.getStringFromBytes(block.getBlockHeader().getHash()));
-        serializableBlockHeader.setPreviousHash(stringUtil.getStringFromBytes(block.getBlockHeader().getPreviousHash()));
+        serializableBlockHeader.setHash(stringUtil.base64EncodeBytes(block.getBlockHeader().getHash()));
+        serializableBlockHeader.setPreviousHash(stringUtil.base64EncodeBytes(block.getBlockHeader().getPreviousHash()));
         serializableBlockHeader.setTimeStamp(block.getBlockHeader().getTimeStamp());
         serializableBlockHeader.setIndex(block.getBlockHeader().getIndex());
-        serializableBlockHeader.setMerkleLeafHash(stringUtil.getStringFromBytes(block.getBlockHeader().getMerkleLeafHash()));
+        serializableBlockHeader.setMerkleLeafHash(stringUtil.base64EncodeBytes(block.getBlockHeader().getMerkleLeafHash()));
         serializableBlockHeader.setNetworkUUID(block.getBlockHeader().getNetworkUUID());
 
         serializableBlock.setBlockHeader(serializableBlockHeader);
 
         byte[] blockTxID = block.getTransaction().getTransactionId();
-        serializableTransaction.setTransactionId(stringUtil.getStringFromBytes(blockTxID));
+        serializableTransaction.setTransactionId(stringUtil.base64EncodeBytes(blockTxID));
         serializableTransaction.setRecord(block.getTransaction().getRecord());
 
         PublicKey publicKey = block.getTransaction().getSenderPubKey();
@@ -101,13 +103,13 @@ public class ModelMapper
         blockHeader.setTimeStamp(serializableBlock.getBlockHeader().getTimeStamp());
 
         String stringHash = serializableBlock.getBlockHeader().getHash();
-        blockHeader.setHash(stringHash.getBytes());
+        blockHeader.setHash(stringUtil.base64DecodeString(stringHash));
 
         String stringPreviousHash = serializableBlock.getBlockHeader().getPreviousHash();
-        blockHeader.setPreviousHash(stringPreviousHash.getBytes());
+        blockHeader.setPreviousHash(stringUtil.base64DecodeString(stringPreviousHash));
 
         String stringMerkleLeafHash = serializableBlock.getBlockHeader().getMerkleLeafHash();
-        blockHeader.setMerkleLeafHash(stringMerkleLeafHash.getBytes());
+        blockHeader.setMerkleLeafHash(stringUtil.base64DecodeString(stringMerkleLeafHash));
 
         String networkUUID = serializableBlock.getBlockHeader().getNetworkUUID();
         blockHeader.setNetworkUUID(networkUUID);
@@ -120,7 +122,7 @@ public class ModelMapper
         transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
 
 
-        transaction.setTransactionId(serializableBlock.getTransaction().getTransactionId().getBytes());
+        transaction.setTransactionId(stringUtil.base64DecodeString(serializableBlock.getTransaction().getTransactionId()));
         transaction.setRecord(serializableBlock.getTransaction().getRecord());
 
         String stringRecipientAddress = serializableBlock.getTransaction().getRecipientAddress();
@@ -163,12 +165,13 @@ public class ModelMapper
         transaction.setRecord(new MedicalRecord());
 
         // Signature is added when patient gives consent for block addition (sharing their EHR)
-        transaction.setSignature("".getBytes());
+        transaction.setSignature("".getBytes(StandardCharsets.UTF_8));
 
         transaction.setTransactionId(hashUtil.hashTransactionData(transaction));
 
         blockHeader.setIndex(Long.parseLong(blockAdditionRequest.getPreviousBlockIndex()) + 1);
-        blockHeader.setPreviousHash(blockAdditionRequest.getPreviousBlockHash().getBytes());
+        blockHeader.setPreviousHash(stringUtil.base64DecodeString(blockAdditionRequest.getPreviousBlockHash()));
+
         blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
         blockHeader.setNetworkUUID(blockAdditionRequest.getNetworkUUID());
         blockHeader.setTimeStamp(new Date().getTime());

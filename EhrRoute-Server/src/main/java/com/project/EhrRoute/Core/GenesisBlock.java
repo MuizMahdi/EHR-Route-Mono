@@ -6,6 +6,7 @@ import com.project.EhrRoute.Entities.EHR.PatientInfo;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,10 +48,10 @@ public class GenesisBlock
 
         // Empty record
         MedicalRecord record = new MedicalRecord(
-                new PatientInfo("", "", "", 0, "", "", "", "", 0),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new HashMap<>()
+            new PatientInfo("", "", "", 0, "", "", "", "", 0),
+            new ArrayList<>(),
+            new ArrayList<>(),
+            new HashMap<>()
         );
 
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
@@ -66,7 +67,7 @@ public class GenesisBlock
         blockHeader.setTimeStamp(new Date().getTime());
         blockHeader.setNetworkUUID(uuidUtil.generateUUID());
         blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
-        blockHeader.setPreviousHash(hashUtil.SHA256("0".getBytes()));
+        blockHeader.setPreviousHash(hashUtil.SHA256("0".getBytes(StandardCharsets.UTF_8)));
         blockHeader.generateHeaderHash();
 
         block.setTransaction(transaction);
@@ -82,5 +83,4 @@ public class GenesisBlock
     public void setBlock(Block block) {
         this.block = block;
     }
-
 }

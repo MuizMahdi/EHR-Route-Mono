@@ -99,7 +99,6 @@ public class TransactionController
             );
         }
 
-
         // Check if provider's network uuid is valid
         if (networkUUID == null || networkUUID.isEmpty()) {
             return new ResponseEntity<>(
@@ -110,7 +109,6 @@ public class TransactionController
 
         // Chain root from addition request payload
         String chainRoot = blockAddition.getChainRootWithoutBlock();
-
 
         /*
         *   Check if provider's chain is valid by Comparing sent chainRoot
@@ -156,9 +154,6 @@ public class TransactionController
         // Send a consent request for adding the block to chain to user
         try
         {
-            // TODO: Construct a block using data in block addition,
-            // TODO: then pass it in the GetUserConsentEvent object constructor.
-
             // Generate and construct a block using data in block addition request
             Block block = modelMapper.mapAdditionRequestToBlock(blockAddition);
 
