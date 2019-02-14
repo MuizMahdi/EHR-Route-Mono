@@ -4,19 +4,18 @@ import com.project.EhrRoute.Core.BlockBroadcaster;
 import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
+import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Events.GetUserConsentEvent;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Exceptions.BadRequestException;
+import com.project.EhrRoute.Exceptions.GeneralAppException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.BlockAddition;
 import com.project.EhrRoute.Payload.Core.UserConsentRequest;
 import com.project.EhrRoute.Payload.Core.UserConsentResponse;
-import com.project.EhrRoute.Services.ConsentRequestBlockService;
-import com.project.EhrRoute.Services.UserService;
-import com.project.EhrRoute.Services.ChainRootUtil;
-import com.project.EhrRoute.Services.ClustersContainer;
+import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import com.project.EhrRoute.Utilities.ChainUtil;
@@ -45,6 +44,7 @@ public class TransactionController
     private ApplicationEventPublisher eventPublisher;
 
     private UserService userService;
+    private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
 
     private RsaUtil rsaUtil;
@@ -58,10 +58,11 @@ public class TransactionController
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
+        this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
@@ -80,16 +81,20 @@ public class TransactionController
     {
         String providerUUID = blockAddition.getProviderUUID();
         String networkUUID = blockAddition.getNetworkUUID();
+
+        // The ID of the user to get consent from
         String userID = blockAddition.getEhrUserID();
 
         // Check if Provider UUID and User ID are valid
-        if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID))
-        {
+        if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Invalid Provider UUID or User ID"),
                 HttpStatus.BAD_REQUEST
             );
         }
+
+        // Validate userID (exception thrown if not found)
+        userService.findUserById(Long.parseLong(userID));
 
         // Check if provider exists in providers cluster
         if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
@@ -107,7 +112,7 @@ public class TransactionController
             );
         }
 
-        // Chain root from addition request payload
+        // Get chain root from addition request payload
         String chainRoot = blockAddition.getChainRootWithoutBlock();
 
         /*
@@ -168,10 +173,7 @@ public class TransactionController
                 userID
             );
 
-            System.out.println(sBlock.toString());
-
-            // TODO: COMMENTED FOR DEBUGGING
-            //eventPublisher.publishEvent(getUserConsent);
+            eventPublisher.publishEvent(getUserConsent);
         }
         catch (Exception Ex)
         {
@@ -265,11 +267,7 @@ public class TransactionController
             throw new BadRequestException("Invalid user ID");
         }
 
-        // If user with userID was not found on DB
-        if (userService.findUserById(userID) == null) {
-            throw new ResourceNotFoundException("User", "userID", userID);
-        }
-
+        // Check if user is registered/subscribed to app users cluster
         boolean isUserExists = clustersContainer.getAppUsers().existsInCluster(stringUserID);
 
         // If user doesn't exist in users cluster (user offline or wrong userID)
@@ -287,7 +285,10 @@ public class TransactionController
             // Persist the consent request
             consentRequestService.saveConsentRequest(consentRequest);
 
-            throw new BadRequestException("User offline, a consent request notification was sent to user");
+            // Send a notification to the user
+            notificationService.notifyUser(consentRequest);
+
+            throw new GeneralAppException("User offline, a consent request notification was sent to user");
         }
 
         // If user exists (online) then send it as a notification through a server sent event.

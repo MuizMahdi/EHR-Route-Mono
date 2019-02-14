@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long>
 
     @Query("SELECT u.isNonFirstLogin FROM User u WHERE u.id = :userID")
     Boolean getIsUserNonFirstLogin(@Param("userID") Long id);
+
+    @Query("SELECT u FROM ProviderDetails p INNER JOIN p.user u WHERE p.providerUUID = :providerUUID")
+    Optional<User> findUserByProviderUUID(@Param("providerUUID") String uuid);
 }

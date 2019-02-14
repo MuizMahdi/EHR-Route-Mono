@@ -30,7 +30,7 @@ public class ConsentRequestBlock {
     @NotNull private Long blockIndex;
 
 
-    // Transaction signature is blank when saved on patient consent requests because the patient is the one that signs it
+    // Transaction signature is blank when saved on patient consent requests because the patient signs and then adds it
     private String signature;
 
     @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)

@@ -83,8 +83,9 @@ public class UserService
 
     @Transactional
     public User findUserById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return user;
+        return userRepository.findById(id).orElseThrow(() ->
+            new ResourceNotFoundException("User", "userID", id)
+        );
     }
 
     @Transactional
@@ -165,7 +166,13 @@ public class UserService
 
     @Transactional
     public List<String> searchProviderUsername(String usernameKeyword) {
-        System.out.println(userRepository.searchProvidersUsernamesByUsername(usernameKeyword).get(0));
         return userRepository.searchProvidersUsernamesByUsername(usernameKeyword);
+    }
+
+    @Transactional
+    public User getUserByProviderUUID(String providerUUID) {
+        return userRepository.findUserByProviderUUID(providerUUID).orElseThrow(() ->
+            new ResourceNotFoundException("You are not a provider. User", "Provider UUID", providerUUID)
+        );
     }
 }

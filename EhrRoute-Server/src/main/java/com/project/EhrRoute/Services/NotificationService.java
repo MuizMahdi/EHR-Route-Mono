@@ -110,7 +110,7 @@ public class NotificationService
                     throw new InvalidNotificationException("Invalid NetworkInvitationRequest notification reference.");
                 }
 
-                // Set the notification reference object as a UserConsentRequest
+                // Set the notification reference object as a Network invitation request payload
                 notificationReference = modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientUsername);
             }
 
@@ -149,6 +149,30 @@ public class NotificationService
             notificationsPage.isFirst(),
             notificationsPage.isLast()
         );
+    }
+
+
+    public void notifyUser(ConsentRequestBlock consentRequest)
+    {
+        // Get notification recipient User using notification recipient ID (userID)
+        User recipient = userService.findUserById(consentRequest.getUserID());
+
+        // Get notification sender User using provider UUID
+        User sender = userService.getUserByProviderUUID(consentRequest.getProviderUUID());
+
+        // Generate a notification
+        Notification notification = new Notification();
+
+        // Add the generated NetworkInvitationRequest to Notification object as reference
+        notification.setReference(consentRequest);
+
+        // Set notification data
+        notification.setRecipient(recipient);
+        notification.setSender(sender);
+        notification.setType(NotificationType.CONSENT_REQUEST);
+
+        // Persist notification
+        saveNotification(notification);
     }
 
 

@@ -22,6 +22,7 @@ public class NotificationController
         this.notificationService = notificationService;
     }
 
+
     @GetMapping("/current-user")
     public ResponseEntity getCurrentUserNotifications(
             @CurrentUser UserPrincipal currentUser,

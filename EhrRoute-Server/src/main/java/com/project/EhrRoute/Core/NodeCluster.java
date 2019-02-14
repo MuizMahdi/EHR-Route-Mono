@@ -3,6 +3,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+*   A node cluster is a group of users, each with a unique UUID or an ID (for 'User' role users)
+*   which is mapped with a SSE emitter.
+*/
 
 public class NodeCluster
 {
