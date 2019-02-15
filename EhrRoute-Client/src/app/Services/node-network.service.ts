@@ -24,7 +24,9 @@ export class NodeNetworkService implements OnInit
    private networkInviteUrl:string = environment.apiUrl + '/network/invite';
    private networkInvitationAcceptUrl:string = environment.apiUrl + '/network/invitation-accept';
    private searchNetworksByNameUrl:string = environment.apiUrl + '/network/search-by-name';
-   private getNetworkUuidByNameUrl:string = environment.apiUrl + '/network/uuid'
+   private getNetworkUuidByNameUrl:string = environment.apiUrl + '/network/uuid';
+   private networkDetailsUrl:string = environment.apiUrl + '/network/details';
+
 
    public userNetworks:NetworkInfo[];
    public userHasNetwork:boolean = false;
@@ -34,8 +36,7 @@ export class NodeNetworkService implements OnInit
 
 
    ngOnInit() 
-   {
-   }
+   { }
 
 
    checkUserNetworks() 
@@ -111,7 +112,9 @@ export class NodeNetworkService implements OnInit
 
    public getNetworkRoot(networkUUID:string): Observable<any> {
 
-      return this.http.get(this.networkRootUrl + '?networkuuid=' + networkUUID).pipe(first(),
+      let url:string = this.networkRootUrl + '?networkuuid=' + networkUUID;
+
+      return this.http.get(url).pipe(first(),
 
          catchError(error => {
             return throwError(error);
@@ -120,6 +123,22 @@ export class NodeNetworkService implements OnInit
       );
 
    }
+
+
+   public getNetworkDetails(networkUUID:string): Observable<any> {
+
+      let url:string = this.networkDetailsUrl + '?networkuuid=' + networkUUID;
+
+      return this.http.get(url).pipe(first(),
+
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+
+   }
+
 
 
    public getNetworkUuidByName(networkName:string): Observable<any> {

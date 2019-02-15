@@ -22,10 +22,12 @@ export class NetworkInvitationComponent implements OnInit
    invitationRequest:NetworkInvitationRequest;
 
 
-   constructor(private notificationService:NotificationService, 
+   constructor(
+      private notificationService:NotificationService, 
       private networkService:NodeNetworkService, 
       private authService:AuthService, 
-      private modal:NzModalRef) 
+      private modal:NzModalRef
+   ) 
    { }
 
 

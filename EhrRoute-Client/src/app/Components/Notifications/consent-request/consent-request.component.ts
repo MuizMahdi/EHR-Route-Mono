@@ -1,3 +1,6 @@
+import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
+import { NetworkDetails } from './../../../Models/Payload/Responses/NetworkDetails';
+import { NodeNetworkService } from './../../../Services/node-network.service';
 import { NotificationService } from './../../../Services/notification.service';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
 import { NzModalRef } from 'ng-zorro-antd';
@@ -17,16 +20,38 @@ export class ConsentRequestComponent implements OnInit
 
    @Input() notification: Notification;
    consentRequest: ConsentRequest;
+   requesterNetworkDetails: NetworkDetails;
 
 
-   constructor(private notificationService:NotificationService, private modal:NzModalRef) 
+   constructor(
+      private notificationService:NotificationService,
+      private networkService:NodeNetworkService,
+      private modal:NzModalRef,
+   ) 
    { }
 
 
    ngOnInit() {
       if (this.notification) {
          this.consentRequest = this.notification.reference;
+         this.getRequesterNetworkDetails(this.consentRequest.networkUUID);
       }
+   }
+
+
+   getRequesterNetworkDetails(networkUUID:string): void
+   {
+      this.networkService.getNetworkDetails(networkUUID).subscribe(
+
+         (response:NetworkDetails) => {
+            this.requesterNetworkDetails = response;
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
+         }
+
+      );
    }
 
 
