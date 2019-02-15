@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
 
@@ -19,4 +18,7 @@ public interface ProviderDetailsRepository extends JpaRepository<ProviderDetails
 
     @Query("SELECT p.providerAddress FROM ProviderDetails p INNER JOIN p.user u WHERE u.id = :userID")
     Optional<String> findProviderAddressByUserID(@Param("userID") Long id);
+
+    @Query("SELECT p.providerInstitution FROM ProviderDetails p INNER JOIN p.user u WHERE u.id = :userID")
+    Optional<String> findProviderInstitutionByUserID(@Param("userID") Long id);
 }

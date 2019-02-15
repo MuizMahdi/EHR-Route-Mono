@@ -81,4 +81,31 @@ public class ProviderService
             new ResourceNotFoundException("Address for a provider", "user ID", userID)
         );
     }
+
+
+    @Transactional
+    public String getProviderInstitution(Long userID) throws ResourceNotFoundException
+    {
+        return providerDetailsRepository.findProviderInstitutionByUserID(userID).orElseThrow(() ->
+            new ResourceNotFoundException("Institution of a provider", "user ID", userID)
+        );
+    }
+
+
+    @Transactional
+    public void setProviderInstitution(Long userID, String institutionName) throws ResourceNotFoundException
+    {
+        // Get provider details of user with user ID
+        ProviderDetails providerDetails = providerDetailsRepository.findProviderDetailsByUserID(userID).orElseThrow(() ->
+            new ResourceNotFoundException(
+                "User is not a provider, or has no provider details. Provider details", "user ID", userID
+            )
+        );
+
+        // Set the provider institution
+        providerDetails.setProviderInstitution(institutionName);
+
+        // Persist changes
+        providerDetailsRepository.save(providerDetails);
+    }
 }

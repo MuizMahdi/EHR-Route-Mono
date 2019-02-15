@@ -3,23 +3,29 @@ import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Repositories.NetworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
 public class NetworkService
 {
     private NetworkRepository networkRepository;
+    private ProviderService providerService;
 
     @Autowired
-    public NetworkService(NetworkRepository networkRepository) {
+    public NetworkService(NetworkRepository networkRepository, ProviderService providerService) {
         this.networkRepository = networkRepository;
+        this.providerService = providerService;
     }
 
 
@@ -56,7 +62,7 @@ public class NetworkService
 
 
     @Transactional
-    public User getNetworkRandomMember(String networkUUID) throws NullUserNetworkException
+    public User getNetworkRandomMember(String networkUUID)
     {
         // Get the network using the UUID
         Network network = findByNetUUID(networkUUID);
@@ -88,4 +94,51 @@ public class NetworkService
         // If couldn't pick a random user
         return null;
     }
+
+
+    @Transactional
+    public List<String> getNetworkInstitutions(String networkUUID)
+    {
+        List<String> networkMembersInstitutions = new ArrayList<>();
+
+        Set<User> networkProviders = getNetworkMembers(networkUUID);
+
+        networkProviders.forEach(user -> {
+
+            try {
+                networkMembersInstitutions.add(providerService.getProviderInstitution(user.getId()));
+            }
+            catch (ResourceNotFoundException Ex) {
+                // If one of the network users is not a provider, has no provider details, or no institution, then simply ignore them.
+            }
+
+        });
+
+        return networkMembersInstitutions;
+    }
+
+
+    @Transactional
+    public List<String> getNetworkMembersNames(String networkUUID)
+    {
+        Set<User> networkMembers = getNetworkMembers(networkUUID);
+        return networkMembers.stream().map(User::getName).collect(Collectors.toList());
+    }
+
+
+    @Transactional
+    private Set<User> getNetworkMembers(String networkUUID)
+    {
+        // Get the network using the UUID
+        Network network = findByNetUUID(networkUUID);
+
+        // Validate network
+        if (network == null) {
+            throw new NullUserNetworkException("Network with UUID: " + networkUUID + ", was not found");
+        }
+
+        return network.getUsers();
+    }
+
+
 }

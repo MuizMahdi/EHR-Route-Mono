@@ -8,7 +8,9 @@ import com.project.EhrRoute.Exceptions.InternalErrorException;
 import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Auth.*;
 import com.project.EhrRoute.Repositories.RoleRepository;
+import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.JwtTokenProvider;
+import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Services.VerificationTokenService;
@@ -163,36 +165,41 @@ public class AuthController
 
 
     @PostMapping("/user-role-change")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> roleChangeToken(@Valid @RequestBody RoleChangeRequest roleChangeRequest)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    public ResponseEntity<?> roleChangeToken(@Valid @RequestBody RoleChangeRequest roleChangeRequest, @CurrentUser UserPrincipal currentUser)
     {
+        // User who's role is going to be changed
         User user = userService.findUserByUsernameOrEmail(roleChangeRequest.getUsername());
 
         if (user == null) {
             return new ResponseEntity<>(
-                    new ApiResponse(false, "User doesn't exists"),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "User doesn't exists"),
+                HttpStatus.BAD_REQUEST
             );
         }
 
         // Get current app url
         String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
 
-        String role = roleChangeRequest.getRole(); // Role to be added
+        // Role to be added
+        String role = roleChangeRequest.getRole();
+
+        // Get the institution name of the current provider, the user who's role is going to change will have this institution
+        String providerInstitution = providerService.getProviderInstitution(currentUser.getId());
 
         // Send a role change token to the user's email
-        eventPublisher.publishEvent(new RoleChangeEvent(user, appUrl, role));
+        eventPublisher.publishEvent(new RoleChangeEvent(user, appUrl, role, providerInstitution));
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/users/{username}")
-                .buildAndExpand(user.getUsername()).toUri();
+        .fromCurrentContextPath().path("/users/{username}")
+        .buildAndExpand(user.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "Role change token sent successfully"));
     }
 
 
     @RequestMapping("/role-change/{verificationToken}")
-    public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role)
+    public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role, @RequestParam("institution") String institution)
     {
         // Check if role is a valid role
         if (!isRoleValid(role)) {
@@ -240,12 +247,15 @@ public class AuthController
         // Create provider details for user
         providerService.generateProviderDetails(user);
 
+        // Set the institution of the provider in the provider details
+        providerService.setProviderInstitution(user.getId(), institution);
+
         // Persist the user updates to DB
         userService.saveUser(user);
 
         return new ResponseEntity<>(
-                new ApiResponse(true, "User Role Was Added Successfully."),
-                HttpStatus.OK
+            new ApiResponse(true, "User Role Was Added Successfully."),
+            HttpStatus.OK
         );
     }
 

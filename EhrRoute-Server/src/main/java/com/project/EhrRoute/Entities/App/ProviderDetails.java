@@ -19,7 +19,10 @@ public class ProviderDetails
 
     @NotNull
     private String providerAddress;
-    
+
+    @NotNull
+    private String providerInstitution;
+
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -38,6 +41,9 @@ public class ProviderDetails
     public User getUser() {
         return user;
     }
+    public String getProviderInstitution() {
+        return providerInstitution;
+    }
     public String getProviderUUID() {
         return providerUUID;
     }
@@ -50,6 +56,9 @@ public class ProviderDetails
     }
     public void setUser(User user) {
         this.user = user;
+    }
+    public void setProviderInstitution(String providerInstitution) {
+        this.providerInstitution = providerInstitution;
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;

@@ -57,6 +57,7 @@ public class VerificationTokenListener
     {
         User user = event.getUser();
         String role = event.getRole();
+        String institution = event.getInstitution();
 
         String verificationToken = UUID.randomUUID().toString();
 
@@ -66,7 +67,10 @@ public class VerificationTokenListener
         // Email with link containing the token
         String recipientAddress = user.getEmail();
         String subject = "Role Change Confirmation";
-        String confirmationUrl = event.getAppUrl() + "/auth/role-change/" + verificationToken + "?role=" + role;
+
+        String confirmationUrl = event.getAppUrl() + "/auth/role-change/" + verificationToken +
+        "?role=" + role + "&institution=" + institution;
+
         String message = "Role Change Confirmation Link: " + confirmationUrl;
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
