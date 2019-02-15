@@ -1,11 +1,11 @@
 package com.project.EhrRoute.Entities.EHR;
-import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+
 @Entity
-@Table(name = "consent_ehr_allergies")
+@Table(name = "ehr_allergies")
 public class EhrAllergies
 {
     @Id
@@ -15,8 +15,8 @@ public class EhrAllergies
     @NotNull @NotBlank private String allergy;
 
     @ManyToOne(fetch=FetchType.LAZY, optional = false)
-    @JoinColumn(name = "consent_request_id", nullable = false)
-    private ConsentRequestBlock consentRequestBlock;
+    @JoinColumn(name = "ehr_details_id", nullable = false)
+    private EhrDetails ehrDetails;
 
 
     public EhrAllergies() { }
@@ -31,8 +31,8 @@ public class EhrAllergies
     public String getAllergy() {
         return allergy;
     }
-    public ConsentRequestBlock getConsentRequestBlock() {
-        return consentRequestBlock;
+    public EhrDetails getEhrDetails() {
+        return ehrDetails;
     }
 
     public void setId(Long id) {
@@ -41,7 +41,7 @@ public class EhrAllergies
     public void setAllergy(String allergy) {
         this.allergy = allergy;
     }
-    public void setConsentRequestBlock(ConsentRequestBlock consentRequestBlock) {
-        this.consentRequestBlock = consentRequestBlock;
+    public void setEhrDetails(EhrDetails ehrDetails) {
+        this.ehrDetails = ehrDetails;
     }
 }

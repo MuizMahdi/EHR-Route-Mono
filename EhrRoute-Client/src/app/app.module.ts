@@ -34,6 +34,7 @@ import { registerLocaleData } from '@angular/common';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
+import { ConsentRequestComponent } from './Components/Notifications/consent-request/consent-request.component';
 
 registerLocaleData(en);
 
@@ -43,7 +44,8 @@ registerLocaleData(en);
 
    entryComponents: [ 
       NetworkInvitationComponent,
-      UserProfileComponent
+      UserProfileComponent,
+      ConsentRequestComponent
    ],
 
    declarations: [
@@ -61,7 +63,8 @@ registerLocaleData(en);
       AdminPanelComponent,
       NetworkInvitationComponent,
       HealthRecordsManagerComponent,
-      UserProfileComponent
+      UserProfileComponent,
+      ConsentRequestComponent
    ],
 
    imports: [

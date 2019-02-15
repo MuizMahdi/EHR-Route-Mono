@@ -22,10 +22,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -290,9 +287,10 @@ public class ModelMapper
         // when the user accepts the consent request as a consent response.
         medicalRecord.setPatientInfo(new PatientInfo());
 
-        medicalRecord.setProblems(mapEhrProblemsToList(consentRequestBlock.getProblems()));
-        medicalRecord.setHistory(mapEhrHistoryToMap(consentRequestBlock.getHistory()));
-        medicalRecord.setAllergiesAndReactions(mapEhrAllergiesToList(consentRequestBlock.getAllergies()));
+        // Record data is added after getting user consent
+        medicalRecord.setProblems(new ArrayList<>());
+        medicalRecord.setHistory(new HashMap<>());
+        medicalRecord.setAllergiesAndReactions(new ArrayList<>());
 
         SerializableTransaction transaction = new SerializableTransaction(
             consentRequestBlock.getTransactionId(),

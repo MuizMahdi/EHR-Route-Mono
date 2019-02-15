@@ -17,6 +17,7 @@ import { NodeNetworkService } from 'src/app/Services/node-network.service';
 
 export class NetworkInvitationComponent implements OnInit 
 {
+   
    @Input() notification: Notification;
    invitationRequest:NetworkInvitationRequest;
 

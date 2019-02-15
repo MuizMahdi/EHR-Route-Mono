@@ -1,11 +1,10 @@
 package com.project.EhrRoute.Entities.EHR;
-import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "consent_ehr_history")
+@Table(name = "ehr_history")
 public class EhrHistory
 {
     @Id
@@ -15,9 +14,9 @@ public class EhrHistory
     @NotNull @NotBlank private String ehrCondition;
     @NotNull @NotBlank private boolean ehrOccurrence;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "consent_request_id", nullable = false)
-    private ConsentRequestBlock consentRequestBlock;
+    @ManyToOne(fetch=FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ehr_details_id", nullable = false)
+    private EhrDetails ehrDetails;
 
 
     public EhrHistory() { }
@@ -36,8 +35,8 @@ public class EhrHistory
     public boolean isOccurrence() {
         return ehrOccurrence;
     }
-    public ConsentRequestBlock getConsentRequestBlock() {
-        return consentRequestBlock;
+    public EhrDetails getEhrDetails() {
+        return ehrDetails;
     }
 
     public void setId(Long id) {
@@ -49,7 +48,7 @@ public class EhrHistory
     public void setOccurrence(boolean occurrence) {
         this.ehrOccurrence = occurrence;
     }
-    public void setConsentRequestBlock(ConsentRequestBlock consentRequestBlock) {
-        this.consentRequestBlock = consentRequestBlock;
+    public void setEhrDetails(EhrDetails ehrDetails) {
+        this.ehrDetails = ehrDetails;
     }
 }

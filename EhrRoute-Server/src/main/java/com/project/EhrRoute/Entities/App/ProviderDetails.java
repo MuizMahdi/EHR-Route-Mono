@@ -19,7 +19,7 @@ public class ProviderDetails
 
     @NotNull
     private String providerAddress;
-
+    
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

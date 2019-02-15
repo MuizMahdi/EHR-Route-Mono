@@ -1,12 +1,7 @@
 package com.project.EhrRoute.Entities.Core;
-import com.project.EhrRoute.Entities.EHR.EhrHistory;
-import com.project.EhrRoute.Entities.EHR.EhrProblems;
-import com.project.EhrRoute.Entities.EHR.EhrAllergies;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
-import java.util.HashSet;
 
 
 @Entity
@@ -33,15 +28,6 @@ public class ConsentRequestBlock {
     // Transaction signature is blank when saved on patient consent requests because the patient signs and then adds it
     private String signature;
 
-    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
-    private Set<EhrProblems> problems = new HashSet<>();
-
-    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
-    private Set<EhrAllergies> allergies = new HashSet<>();
-
-    @OneToMany(mappedBy = "consentRequestBlock", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
-    private Set<EhrHistory> history = new HashSet<>();
-
 
     public ConsentRequestBlock() { }
     public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
@@ -58,28 +44,6 @@ public class ConsentRequestBlock {
         this.signature = signature;
         this.userID = userID;
         this.providerUUID = providerUUID;
-    }
-
-
-    public void addProblem(EhrProblems problem) {
-        problems.add(problem);
-    }
-    public void removeProblem(EhrProblems problem) {
-        problems.remove(problem);
-    }
-
-    public void addAllergy(EhrAllergies allergy) {
-        allergies.add(allergy);
-    }
-    public void removeAllergy(EhrAllergies allergy) {
-        allergies.remove(allergy);
-    }
-
-    public void addHistory(EhrHistory historicalCondition) {
-        history.add(historicalCondition);
-    }
-    public void removeHistory(EhrHistory historicalCondition) {
-        history.remove(historicalCondition);
     }
 
 
@@ -104,9 +68,6 @@ public class ConsentRequestBlock {
     public String getNetworkUUID() {
         return networkUUID;
     }
-    public Set<EhrHistory> getHistory() {
-        return history;
-    }
     public String getProviderUUID() {
         return providerUUID;
     }
@@ -121,12 +82,6 @@ public class ConsentRequestBlock {
     }
     public String getSenderAddress() {
         return senderAddress;
-    }
-    public Set<EhrProblems> getProblems() {
-        return problems;
-    }
-    public Set<EhrAllergies> getAllergies() {
-        return allergies;
     }
     public String getRecipientAddress() {
         return recipientAddress;
@@ -150,20 +105,11 @@ public class ConsentRequestBlock {
     public void setSignature(String signature) {
         this.signature = signature;
     }
-    public void setHistory(Set<EhrHistory> history) {
-        this.history = history;
-    }
     public void setBlockIndex(Long blockIndex) {
         this.blockIndex = blockIndex;
     }
-    public void setProblems(Set<EhrProblems> problems) {
-        this.problems = problems;
-    }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
-    }
-    public void setAllergies(Set<EhrAllergies> allergies) {
-        this.allergies = allergies;
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;

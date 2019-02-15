@@ -1,3 +1,5 @@
+import { ConsentRequestComponent } from './../../Notifications/consent-request/consent-request.component';
+import { ConsentRequest } from './../../../Models/Payload/Responses/ConsentRequest';
 import { NetworkInvitationComponent } from '../../Notifications/network-invitation/network-invitation.component';
 import { NetworkInvitationRequest } from './../../../Models/Payload/Requests/NetworkInvitationRequest';
 import { Component, OnInit } from '@angular/core';
@@ -77,7 +79,7 @@ export class NavUserNotificationsComponent implements OnInit
       {
          let title = "Network Invitation Request";
 
-         // View MetworkInviteNotification component within modal
+         // View NetworkInviteNotification component within modal
          this.createNotificationComponentModal(
             notification, title, NetworkInvitationComponent
          );
@@ -85,15 +87,13 @@ export class NavUserNotificationsComponent implements OnInit
 
       if (notification.notificationType === NotificationType.CONSENT_REQUEST)
       {
-         let title = "User Info Exchange Consent Request";
+         let title = "Medical Record Exchange Consent Request";
 
-         /* Todo: add InformationExchangeRequestComponent and consent request handling
-
-         this.createComponentModal(
-            notification, title, InformationExchangeRequestComponent
+          // View Consent request info within modal
+         this.createNotificationComponentModal(
+            notification, title, ConsentRequestComponent
          );
 
-         */
       }
    }
 
@@ -105,7 +105,7 @@ export class NavUserNotificationsComponent implements OnInit
       {
          let invitationRequest:NetworkInvitationRequest = notification.reference;
 
-         let message:string = 
+         let message:string =
          invitationRequest.senderUsername + " has invited you to join their network, " +
          invitationRequest.networkName;
 
@@ -114,7 +114,17 @@ export class NavUserNotificationsComponent implements OnInit
 
       if (notification.notificationType === NotificationType.CONSENT_REQUEST) 
       {
-         // TODO: ADD CONSENT REQUEST NOTIFICATION [SERVER-END] AND ITS HANDLING [CLIENT-END]
+         // TODO:
+         // TODO: Get info about the network where the EHR is shared on consent request
+         // TODO:
+
+         let ehrExchangeConsentRequest: ConsentRequest = notification.reference;
+         
+         let message:string =
+         notification.senderName + 
+         " is asking for consent to use and share your medical record";
+
+         return message;
       }
    }
 

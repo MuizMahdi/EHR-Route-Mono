@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "consent_ehr_problems")
+@Table(name = "ehr_problems")
 public class EhrProblems
 {
     @Id
@@ -15,8 +15,8 @@ public class EhrProblems
     @NotNull @NotBlank private String problem;
 
     @ManyToOne(fetch=FetchType.LAZY, optional = false)
-    @JoinColumn(name = "consent_request_id", nullable = false)
-    private ConsentRequestBlock consentRequestBlock;
+    @JoinColumn(name = "ehr_details_id", nullable = false)
+    private EhrDetails ehrDetails;
 
 
     public EhrProblems() { }
@@ -31,8 +31,8 @@ public class EhrProblems
     public String getProblem() {
         return problem;
     }
-    public ConsentRequestBlock getConsentRequestBlock() {
-        return consentRequestBlock;
+    public EhrDetails getEhrDetails() {
+        return ehrDetails;
     }
 
     public void setId(Long id) {
@@ -41,7 +41,7 @@ public class EhrProblems
     public void setProblem(String problem) {
         this.problem = problem;
     }
-    public void setConsentRequestBlock(ConsentRequestBlock consentRequestBlock) {
-        this.consentRequestBlock = consentRequestBlock;
+    public void setEhrDetails(EhrDetails ehrDetails) {
+        this.ehrDetails = ehrDetails;
     }
 }

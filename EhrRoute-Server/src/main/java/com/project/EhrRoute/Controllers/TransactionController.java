@@ -228,7 +228,6 @@ public class TransactionController
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
-
         try
         {
             // Broadcast the signed block to the other provider nodes in network.

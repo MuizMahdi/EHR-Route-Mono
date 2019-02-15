@@ -6,15 +6,17 @@ public class UserConsentResponse
     private SerializableBlock block;
     private String chainRootWithBlock;
     private String userPrivateKey;
+    private String userAddress;
     private String providerUUID;
     private String networkUUID;
     private String userID;
 
     public UserConsentResponse() { }
-    public UserConsentResponse(SerializableBlock block, String chainRootWithBlock, String userPrivateKey, String providerUUID, String networkUUID, String userID) {
+    public UserConsentResponse(SerializableBlock block, String chainRootWithBlock, String userPrivateKey, String userAddress, String providerUUID, String networkUUID, String userID) {
         this.block = block;
         this.chainRootWithBlock = chainRootWithBlock;
         this.userPrivateKey = userPrivateKey;
+        this.userAddress = userAddress;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUID;
         this.userID = userID;
@@ -28,6 +30,9 @@ public class UserConsentResponse
     }
     public String getNetworkUUID() {
         return networkUUID;
+    }
+    public String getUserAddress() {
+        return userAddress;
     }
     public String getProviderUUID() {
         return providerUUID;
@@ -47,6 +52,9 @@ public class UserConsentResponse
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
+    }
+    public void setUserAddress(String userAddress) {
+        this.userAddress = userAddress;
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
