@@ -16,6 +16,12 @@ public interface NetworkRepository extends JpaRepository<Network, Long>
     @Query("SELECT n.name FROM Network n WHERE n.name LIKE CONCAT('%', :keyword, '%')")
     List<String> searchNetworksByName(@Param("keyword") String keyword);
 
+    @Query("SELECT n.name FROM Network n WHERE n.networkUUID = :networkUUID")
+    Optional<String> getNetworkNameByNetworkUUID(@Param("networkUUID") String uuid);
+
     @Query("SELECT n.networkUUID FROM Network n WHERE n.name = :networkName")
     Optional<String> getNetworkUUIDByName(@Param("networkName") String name);
+
+    @Query("SELECT r.root FROM Network n INNER JOIN n.chainRoot r WHERE n.networkUUID = :networkUUID")
+    Optional<String> getNetworkChainRootByNetworkUUID(@Param("networkUUID") String uuid);
 }

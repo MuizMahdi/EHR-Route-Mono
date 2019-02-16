@@ -23,12 +23,8 @@ public class Network
     @NaturalId
     private String networkUUID;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "network_root",
-            joinColumns = @JoinColumn(name = "network_id"),
-            inverseJoinColumns = @JoinColumn(name = "root_id")
-    )
+    @OneToOne(targetEntity = ChainRoot.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "root_id", nullable = false)
     private ChainRoot chainRoot;
 
     @ManyToMany(mappedBy = "networks")

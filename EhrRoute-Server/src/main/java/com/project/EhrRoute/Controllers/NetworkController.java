@@ -10,6 +10,7 @@ import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
+import com.project.EhrRoute.Payload.App.NetworkDetails;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
 import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
@@ -155,6 +156,27 @@ public class NetworkController
         return new ResponseEntity<>(
             new SimpleStringPayload(networkUUID),
             HttpStatus.OK
+        );
+    }
+
+
+    @GetMapping("/details")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    public ResponseEntity getNetworkDetails(@RequestParam("networkuuid") String networkUUID)
+    {
+        NetworkDetails networkDetails;
+
+        try {
+            networkDetails = networkService.getNetworkDetails(networkUUID);
+        }
+        catch (Exception Ex) {
+            return ResponseEntity.badRequest().body(
+                new ApiResponse(false, Ex.getMessage())
+            );
+        }
+
+        return ResponseEntity.ok(
+            networkDetails
         );
     }
 

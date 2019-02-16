@@ -236,7 +236,7 @@ public class AuthController
 
         // Get the role
         Role userRole = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(() ->
-                new InternalErrorException("Invalid Role")
+            new InternalErrorException("Invalid Role")
         );
 
         // Update the user roles set
@@ -258,6 +258,9 @@ public class AuthController
             HttpStatus.OK
         );
     }
+
+
+
 
 
     private boolean isRoleValid(String role)

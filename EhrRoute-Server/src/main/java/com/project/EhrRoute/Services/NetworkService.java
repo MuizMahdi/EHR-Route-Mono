@@ -4,11 +4,11 @@ import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Payload.App.NetworkDetails;
 import com.project.EhrRoute.Repositories.NetworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,15 +42,17 @@ public class NetworkService
 
 
     @Transactional
-    public String getNetworkChainRoot(Network network) {
-        return network.getChainRoot().getRoot();
+    private String getNetworkNameByUuid(String networkUUID) {
+        return networkRepository.getNetworkNameByNetworkUUID(networkUUID).orElseThrow(() ->
+            new NullUserNetworkException("Network name for a network with UUID " + networkUUID + " was not found")
+        );
     }
 
 
     @Transactional
     public String getNetworkUuidByName(String networkName) {
         return networkRepository.getNetworkUUIDByName(networkName).orElseThrow(() ->
-            new NullUserNetworkException("A network with name " + networkName + " was not found")
+            new NullUserNetworkException("Network UUID for a network with name " + networkName + " was not found")
         );
     }
 
@@ -58,6 +60,14 @@ public class NetworkService
     @Transactional
     public List<String> searchNetworksByName(String networkNameKeyword) {
         return networkRepository.searchNetworksByName(networkNameKeyword);
+    }
+
+
+    @Transactional
+    private String getNetworkChainRoot(String networkUUID) {
+        return networkRepository.getNetworkChainRootByNetworkUUID(networkUUID).orElseThrow(() ->
+            new NullUserNetworkException("Chain root for a network with UUID " + networkUUID + " was not found")
+        );
     }
 
 
@@ -97,7 +107,7 @@ public class NetworkService
 
 
     @Transactional
-    public List<String> getNetworkInstitutions(String networkUUID)
+    private List<String> getNetworkInstitutions(String networkUUID)
     {
         List<String> networkMembersInstitutions = new ArrayList<>();
 
@@ -119,7 +129,7 @@ public class NetworkService
 
 
     @Transactional
-    public List<String> getNetworkMembersNames(String networkUUID)
+    private List<String> getNetworkMembersNames(String networkUUID)
     {
         Set<User> networkMembers = getNetworkMembers(networkUUID);
         return networkMembers.stream().map(User::getName).collect(Collectors.toList());
@@ -141,4 +151,15 @@ public class NetworkService
     }
 
 
+    @Transactional
+    public NetworkDetails getNetworkDetails(String networkUUID)
+    {
+        return new NetworkDetails(
+            networkUUID,
+            getNetworkNameByUuid(networkUUID),
+            getNetworkChainRoot(networkUUID),
+            getNetworkMembersNames(networkUUID),
+            getNetworkInstitutions(networkUUID)
+        );
+    }
 }
