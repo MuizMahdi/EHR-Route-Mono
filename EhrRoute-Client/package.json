@@ -14,7 +14,10 @@
       "electron-build": "npm run postinstall:electron && ng build",
       "electron-start": "npm run postinstall:electron && npm-run-all -p start electron-run",
       "postinstall": "npm run postinstall:electron && npx electron-builder install-app-deps",
-      "postinstall:electron": "node postinstall"
+      "postinstall:electron": "node postinstall",
+      "pack": "electron-builder --dir",
+      "dist": "electron-builder",
+      "electron-pack": "electron-packager ."
    },
    "private": true,
    "dependencies": {
@@ -33,17 +36,19 @@
       "@ng-bootstrap/ng-bootstrap": "^4.0.0",
       "@types/es6-shim": "^0.31.39",
       "@webcomponents/custom-elements": "^1.0.0",
-      "bootstrap": "^4.2.1",
+      "bootstrap": "^4.3.1",
       "core-js": "^2.5.4",
       "crypto-js": "^3.1.9-1",
       "electron-reload": "^1.4.0",
       "hammerjs": "^2.0.8",
+      "jquery": "^3.3.1",
       "linvodb3": "^3.26.0",
       "merkletreejs": "0.0.22",
       "ng-click-outside": "^4.0.0",
       "ng-event-source": "^1.0.14",
       "ng-zorro-antd": "^7.0.0-rc.1",
       "ngx-electron": "^2.0.0",
+      "popper.js": "^1.14.7",
       "reflect-metadata": "^0.1.12",
       "rxjs": "~6.3.3",
       "sqlite3": "^4.0.4",
@@ -61,6 +66,8 @@
       "@types/node": "^8.9.5",
       "codelyzer": "~4.5.0",
       "electron": "^3.0.13",
+      "electron-builder": "^20.38.5",
+      "electron-packager": "^13.0.1",
       "electron-rebuild": "^1.8.2",
       "jasmine-core": "~2.99.1",
       "jasmine-spec-reporter": "~4.2.1",
@@ -74,5 +81,26 @@
       "ts-node": "~7.0.0",
       "tslint": "~5.11.0",
       "typescript": "~3.1.1"
+   },
+   "build": {
+      "appId": "edu.project.ehroute",
+      "productName": "EHRoute",
+      "files": [
+         "**/*",
+         "dist/**/*"
+      ],
+      "directories": {
+         "output": "release",
+         "buildResources": "dist"
+      },
+      "asar": false,
+      "win": {
+         "target": "nsis",
+         "icon": "build/icon.ico"
+      },
+      "nsis": {
+         "runAfterFinish": true,
+         "license": "LICENSE"
+      }
    }
 }

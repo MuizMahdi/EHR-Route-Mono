@@ -52,11 +52,12 @@ function createWindow()
    
    win.loadURL('http://localhost:4200');
 
+
 /*
    // load the index.html from the dist folder of Angular
    win.loadURL(
       url.format({
-         pathname: path.join(__dirname, 'dist/index.html'),
+         pathname: path.join(__dirname, '/dist/index.html'),
          protocol: 'file:',
          slashes: true
       })
