@@ -48,7 +48,7 @@ public class ClustersController
 
     // Creates a node for current user and adds it to the chain providers cluster (used to receive a ChainSend SSE)
     @GetMapping("/chainprovider")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public SseEmitter subscribeProvider(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser) throws IOException
     {
         // Create an emitter for the subscribed client node
@@ -81,7 +81,7 @@ public class ClustersController
 
     // Creates a node for current user and adds it to the chain consumers cluster (used to receive the chain from a provider)
     @GetMapping("/chainconsumer")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public SseEmitter chainConsumers(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser) throws IOException
     {
         SseEmitter emitter = new SseEmitter(2592000000L);
@@ -111,7 +111,7 @@ public class ClustersController
 
     // Called when client closes app (ngOnDestroy) to remove node from clusters
     @GetMapping("/close")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity closeConnection(@RequestParam("nodeuuid") String nodeUUID)
     {
         // Remove the client from clusters

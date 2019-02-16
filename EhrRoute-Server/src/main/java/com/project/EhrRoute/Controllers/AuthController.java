@@ -199,7 +199,7 @@ public class AuthController
 
 
     @RequestMapping("/role-change/{verificationToken}")
-    public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role, @RequestParam("institution") String institution)
+    public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role, @RequestParam("institution") String institutionName)
     {
         // Check if role is a valid role
         if (!isRoleValid(role)) {
@@ -244,11 +244,8 @@ public class AuthController
         userRoles.add(userRole);
         user.setRoles(userRoles);
 
-        // Create provider details for user
-        providerService.generateProviderDetails(user);
-
-        // Set the institution of the provider in the provider details
-        providerService.setProviderInstitution(user.getId(), institution);
+        // Create provider details for user, then find institution by name and set it as this user's institution
+        providerService.generateUserProviderDetails(user, institutionName);
 
         // Persist the user updates to DB
         userService.saveUser(user);

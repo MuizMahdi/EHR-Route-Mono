@@ -1,3 +1,4 @@
+import { ProviderAdditionRequest } from './../Models/Payload/Requests/ProviderAdditionRequest';
 import { SimpleStringPayload } from './../Models/Payload/Responses/SimpleStringPayload';
 import { first, catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
@@ -18,6 +19,7 @@ export class ProviderService
    private currentProviderUuidUrl:string = environment.apiUrl + '/providers/current/uuid';
    private checkProviderAddressExistenceUrl:string = environment.apiUrl + '/providers/current/address/exists';
    private providerAddressUrl:string = environment.apiUrl + '/providers/current/address';
+   private registerInstitutionProviderUrl:string = environment.apiUrl + '/users/providers'
 
 
    constructor(private http:HttpClient) 
@@ -72,6 +74,19 @@ export class ProviderService
       };
 
       return this.http.post(this.providerAddressUrl, addressPayload).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+      
+      );
+
+   }
+
+
+   public registerInstitutionProvider(providerAdditionRequest:ProviderAdditionRequest) {
+
+      return this.http.post(this.registerInstitutionProviderUrl, providerAdditionRequest).pipe(first(),
       
          catchError(error => {
             return throwError(error);

@@ -26,19 +26,24 @@ public class ProviderService
 
 
     @Transactional
-    public void generateProviderDetails(User user)
+    public void generateUserProviderDetails(User user, String institutionName)
     {
-        // Generate UUID
-        String providerUUID = uuidUtil.generateUUID();
+        // Find an institution with the given institution name
+        Institution institution = institutionService.getInstitutionByName(institutionName);
 
-        // Create provider details for user
-        ProviderDetails providerDetails = new ProviderDetails(user, providerUUID);
+        // Set the found institution of the user that sent the role change token as this users's institution
+        setProviderInstitution(user, institution);
+    }
 
-        // Address is sent by user at login
-        providerDetails.setProviderAddress("");
 
-        // Persist the provider details
-        providerDetailsRepository.save(providerDetails);
+    @Transactional
+    public void generateInstitutionProviderDetails(User user, String institutionName)
+    {
+        // Generate and save an institution using given name
+        Institution institution = institutionService.generateInstitution(institutionName);
+
+        // Set the generated institution as the provider's institution
+        setProviderInstitution(user, institution);
     }
 
 
@@ -96,22 +101,21 @@ public class ProviderService
 
 
     @Transactional
-    public void setProviderInstitution(Long userID, String institutionName) throws ResourceNotFoundException
+    private void setProviderInstitution(User user, Institution institution) throws ResourceNotFoundException
     {
-        // Get provider details of user with user ID
-        ProviderDetails providerDetails = providerDetailsRepository.findProviderDetailsByUserID(userID).orElseThrow(() ->
-            new ResourceNotFoundException(
-                "User is not a provider, or has no provider details. Provider details", "user ID", userID
-            )
-        );
+        // Generate UUID
+        String providerUUID = uuidUtil.generateUUID();
 
-        // Find an institution with institution name
-        Institution institution = institutionService.getInstitutionByName(institutionName);
+        // Create provider details for user
+        ProviderDetails providerDetails = new ProviderDetails(user, providerUUID);
 
-        // Set is as the provider's institution
+        // Address is sent by user at login
+        providerDetails.setProviderAddress("");
+
+        // Set the institution as the provider's institution
         providerDetails.setProviderInstitution(institution);
 
-        // Persist changes
+        // Persist the provider details
         providerDetailsRepository.save(providerDetails);
     }
 }

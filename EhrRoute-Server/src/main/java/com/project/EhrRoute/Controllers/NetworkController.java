@@ -59,7 +59,7 @@ public class NetworkController
 
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
         if (currentUser == null) {
@@ -161,7 +161,7 @@ public class NetworkController
 
 
     @GetMapping("/details")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER') or hasRole('USER')")
     public ResponseEntity getNetworkDetails(@RequestParam("networkuuid") String networkUUID)
     {
         NetworkDetails networkDetails;

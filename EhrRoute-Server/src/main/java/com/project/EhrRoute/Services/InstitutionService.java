@@ -19,6 +19,12 @@ public class InstitutionService
 
 
     @Transactional
+    public Institution generateInstitution(String institutionName) {
+        return institutionRepository.save(new Institution(institutionName));
+    }
+
+
+    @Transactional
     public Institution getInstitutionByName(String institutionName) {
         return institutionRepository.findByName(institutionName).orElseThrow(() ->
             new ResourceNotFoundException("An institution", "name", institutionName)

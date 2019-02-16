@@ -4,15 +4,20 @@ import com.project.EhrRoute.Entities.Auth.Role;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Events.SseKeepAliveEvent;
+import com.project.EhrRoute.Exceptions.InternalErrorException;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Models.RoleName;
+import com.project.EhrRoute.Payload.App.ProviderAdditionRequest;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
 import com.project.EhrRoute.Payload.Auth.UserRoleResponse;
 import com.project.EhrRoute.Payload.Core.UserNetworksResponse;
+import com.project.EhrRoute.Repositories.RoleRepository;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
 import com.project.EhrRoute.Services.ClustersContainer;
+import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.SimpleStringUtil;
@@ -24,6 +29,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -35,14 +42,18 @@ import java.util.Set;
 public class UserController
 {
     private UserService userService;
+    private RoleRepository roleRepository;
+    private ProviderService providerService;
     private ClustersContainer clustersContainer;
     private SimpleStringUtil simpleStringUtil;
     private ModelMapper modelMapper;
 
     @Autowired
-    public UserController(SimpleStringUtil simpleStringUtil, ClustersContainer clustersContainer, UserService userService, ModelMapper modelMapper) {
+    public UserController(SimpleStringUtil simpleStringUtil, ClustersContainer clustersContainer, UserService userService, ModelMapper modelMapper, RoleRepository roleRepository, ProviderService providerService) {
         this.simpleStringUtil = simpleStringUtil;
         this.userService = userService;
+        this.providerService = providerService;
+        this.roleRepository = roleRepository;
         this.clustersContainer = clustersContainer;
         this.modelMapper = modelMapper;
     }
@@ -245,7 +256,43 @@ public class UserController
 
         return userNotificationEmitter;
     }
-    
+
+
+    @PostMapping("/providers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity addProvider(@Valid @RequestBody ProviderAdditionRequest providerAdditionRequest)
+    {
+        /* Get and validate user with username */
+        User user = userService.findUserByUsernameOrEmail(providerAdditionRequest.getUsername());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().body(
+                new ApiResponse(false, "Invalid username in provider addition request")
+            );
+        }
+
+        /* Set user's role to Provider */
+        // Get the role
+        Role userRole = roleRepository.findByName(RoleName.ROLE_PROVIDER).orElseThrow(() ->
+            new InternalErrorException("Invalid Role")
+        );
+
+        // Update the user roles set
+        Set<Role> userRoles = user.getRoles();
+        userRoles.add(userRole);
+        user.setRoles(userRoles);
+
+        // Persist changes of user roles
+        userService.saveUser(user);
+
+        // Create an institution and generate provider details for user
+        providerService.generateInstitutionProviderDetails(user, providerAdditionRequest.getInstitutionName());
+
+        return ResponseEntity.ok(
+            new ApiResponse(true, "Provider has been successfully added")
+        );
+    }
+
 
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
