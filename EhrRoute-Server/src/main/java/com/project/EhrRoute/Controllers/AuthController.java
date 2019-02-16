@@ -260,9 +260,6 @@ public class AuthController
     }
 
 
-
-
-
     private boolean isRoleValid(String role)
     {
         for (RoleName roleName : RoleName.values())
@@ -274,5 +271,4 @@ public class AuthController
 
         return false;
     }
-
 }

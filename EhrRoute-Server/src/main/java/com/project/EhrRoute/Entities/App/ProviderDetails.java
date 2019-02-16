@@ -20,8 +20,9 @@ public class ProviderDetails
     @NotNull
     private String providerAddress;
 
-    @NotNull
-    private String providerInstitution;
+    @OneToOne(targetEntity = Institution.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "institution_id", nullable = false)
+    private Institution providerInstitution;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -41,7 +42,7 @@ public class ProviderDetails
     public User getUser() {
         return user;
     }
-    public String getProviderInstitution() {
+    public Institution getProviderInstitution() {
         return providerInstitution;
     }
     public String getProviderUUID() {
@@ -57,7 +58,7 @@ public class ProviderDetails
     public void setUser(User user) {
         this.user = user;
     }
-    public void setProviderInstitution(String providerInstitution) {
+    public void setProviderInstitution(Institution providerInstitution) {
         this.providerInstitution = providerInstitution;
     }
     public void setProviderUUID(String providerUUID) {

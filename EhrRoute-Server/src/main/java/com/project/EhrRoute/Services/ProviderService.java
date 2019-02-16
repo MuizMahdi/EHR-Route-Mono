@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Services;
+import com.project.EhrRoute.Entities.App.Institution;
 import com.project.EhrRoute.Entities.App.ProviderDetails;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
@@ -14,11 +15,13 @@ public class ProviderService
 {
     private UuidUtil uuidUtil;
     private ProviderDetailsRepository providerDetailsRepository;
+    private InstitutionService institutionService;
 
     @Autowired
-    public ProviderService(UuidUtil uuidUtil, ProviderDetailsRepository providerDetailsRepository) {
+    public ProviderService(UuidUtil uuidUtil, ProviderDetailsRepository providerDetailsRepository, InstitutionService institutionService) {
         this.uuidUtil = uuidUtil;
         this.providerDetailsRepository = providerDetailsRepository;
+        this.institutionService = institutionService;
     }
 
 
@@ -102,8 +105,11 @@ public class ProviderService
             )
         );
 
-        // Set the provider institution
-        providerDetails.setProviderInstitution(institutionName);
+        // Find an institution with institution name
+        Institution institution = institutionService.getInstitutionByName(institutionName);
+
+        // Set is as the provider's institution
+        providerDetails.setProviderInstitution(institution);
 
         // Persist changes
         providerDetailsRepository.save(providerDetails);

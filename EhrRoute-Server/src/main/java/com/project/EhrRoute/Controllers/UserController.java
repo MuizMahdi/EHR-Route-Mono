@@ -245,7 +245,7 @@ public class UserController
 
         return userNotificationEmitter;
     }
-
+    
 
     @EventListener
     protected void SseKeepAlive(SseKeepAliveEvent event)
