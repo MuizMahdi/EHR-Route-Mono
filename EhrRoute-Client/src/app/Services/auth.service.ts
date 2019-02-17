@@ -142,7 +142,7 @@ export class AuthService
 
             // Check if user has a provider role
             userInfo.roles.forEach(role => {
-               if (role == RoleName.ROLE_PROVIDER.toString()) {
+               if (role == RoleName.PROVIDER) {
                   // Subscribe user node to providers and consumers cluster
                   this.clustersService.subscribeProvider();
                   this.clustersService.subscribeConsumer();
@@ -167,16 +167,14 @@ export class AuthService
 
       if (userInfo) {
          // Go through user roles
-         userInfo.roles.forEach(role => {
+         userInfo.roles.forEach(role => {;
             // If user has a ROLE_PROVIDER role
-            if (role == RoleName.ROLE_PROVIDER.toString()) {
+            if (role === RoleName.PROVIDER) {
                return true;
             }
          });
-
       }
 
       return false;
    }
-
 }

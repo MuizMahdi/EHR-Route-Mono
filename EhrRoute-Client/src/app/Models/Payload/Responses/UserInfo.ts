@@ -4,5 +4,5 @@ export interface UserInfo
    username: string;
    name: string;
    roles: string[];
-   isFirstLogin: boolean;
+   firstLogin: boolean;
 }

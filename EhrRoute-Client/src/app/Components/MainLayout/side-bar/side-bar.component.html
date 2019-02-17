@@ -12,7 +12,7 @@
             </a>
          </li>
 
-         <li *ngIf="isUserProvider">
+         <li *ngIf="isUserProviderOrAdmin">
             <a href="javascript:void(0)" routerLink='/ehrs' routerLinkActive='active'>
                <i class="fa fa-list fa-2x"></i>
                <span class="nav-text">
@@ -21,7 +21,7 @@
             </a>
          </li>
 
-         <li *ngIf="isUserProvider">
+         <li *ngIf="isUserProviderOrAdmin">
             <a href="javascript:void(0)" routerLink='/network' routerLinkActive='active'>
                <i class="fa fa-network-wired fa-2x"></i>
                <span class="nav-text">
@@ -30,7 +30,7 @@
             </a>
          </li>
          
-         <li *ngIf="isUserProvider">
+         <li *ngIf="isUserProviderOrAdmin">
             <a href="javascript:void(0)" routerLink='/panel' routerLinkActive='active'>
                <i class="fa fa-toolbox fa-2x"></i>
                <span class="nav-text">

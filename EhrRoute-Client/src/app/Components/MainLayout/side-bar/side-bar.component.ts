@@ -1,3 +1,5 @@
+import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
+import { RoleName } from './../../../Models/RoleName';
 import { AuthService } from './../../../Services/auth.service';
 import { Component, OnInit } from '@angular/core';
 
@@ -11,15 +13,30 @@ import { Component, OnInit } from '@angular/core';
 
 export class SideBarComponent implements OnInit 
 {
-   isUserProvider: boolean = false;
+   isUserProviderOrAdmin: boolean = false;
 
 
    constructor(private authService:AuthService) { }
 
 
    ngOnInit() {
-      if (this.authService.isUserProvider()) {
-         this.isUserProvider = true;
-      }
+      this.checkUserRoles();
+   }
+
+
+   private checkUserRoles(): void
+   {
+      this.authService.currentUser.subscribe((userInfo:UserInfo) => {
+
+         userInfo.roles.forEach(role => {
+
+            // If user has a provider or an admin role
+            if (role === RoleName.PROVIDER || role === RoleName.ADMIN) {
+               this.isUserProviderOrAdmin = true;
+            }
+
+         });
+         
+      });
    }
 }

@@ -93,13 +93,87 @@ export class LoginComponent
          if (userInfo) 
          {
             // check if its the user's first time login
-            if (userInfo.isFirstLogin) {
+            if (userInfo.firstLogin) {
+               console.log("[ user's first login ]");
                // Generate an address for the user
                this.generateUserAddress();
-            }
+            } 
          }
 
       });
+   }
+
+
+   private saveProviderAddress(): void
+   {
+      console.log("[ Adding the provider's address to provider details.. ]");
+
+      // Get current user ID
+      let userID: number = this.authService.getCurrentUser().id;
+
+
+      // Get user address
+      this.addressService.getUserAddress(userID).then(address => {
+
+         // If found
+         if (address)
+         {
+            // Save/set the address to provider details
+            this.providerService.saveProviderAddress(address.address).subscribe(
+
+               response => {
+                  console.log("[ Provider's address has been added successfully! .. All good!!! ]");
+                  console.log(response);
+               },
+
+               (error:ErrorResponse) => {
+                  console.log(error);
+               }
+
+            );
+         }
+
+
+      });
+
+   }
+
+
+   private generateUserAddress(): void
+   {
+      console.log("[ Generating an address for user.. ]");
+
+      // Generate an address for the user to be saved on local DB
+      this.addressService.generateUserAddress().subscribe(
+
+         async (addressResponse:AddressResponse) => {
+
+            console.log("[ An address has been generated! ]");
+            // Get current user id
+            let userID: number = this.authService.getCurrentUser().id;
+
+            // Persist address locally
+            console.log("[ Saving the address in local DB.. ]");
+            await this.addressService.saveUserAddress(addressResponse, userID);
+
+            // If user is a provider, then add the generated address to their provider details
+            if (this.authService.isUserProvider()) {
+               // Add the generated address to the provider's details
+               this.saveProviderAddress();
+            }
+         },
+
+         (error:ErrorResponse) => {
+            // If user already has an address (HTTP 409 Conflict)
+            if (error.httpStatus == 409) {
+               // Do nothing
+            }
+            else {
+               console.log(error);
+            }
+         }
+
+      );
    }
 
 
@@ -110,11 +184,13 @@ export class LoginComponent
          // If user is logged in
          if (userInfo) 
          {
-            // And if user has provider role
-            if (this.authService.isUserProvider()) {
-               // Check if user's address is saved
-               this.checkProviderAddress();
-            }
+            userInfo.roles.forEach(role => {
+               // If user has a ROLE_PROVIDER role
+               if (role === RoleName.PROVIDER) {
+                  // Check if user's address is saved
+                  this.checkProviderAddress();
+               }
+            });
          }
 
       });
@@ -127,66 +203,15 @@ export class LoginComponent
 
          (exists:boolean) => {
             if (!exists) {
-               this.saveProviderAddress();
+               //console.log("[ The user(Provider)'s address is not added to their provider details! ]");
+               //this.saveProviderAddress();
+            } else {
+               console.log("[ The user(Provider)'s address is already added to their provider details ]");
             }
          },
 
          (error:ErrorResponse) => {
             console.log(error);
-         }
-
-      );
-   }
-
-
-   private saveProviderAddress(): void
-   {
-      // Get current user ID
-      let userID: number = this.authService.getCurrentUser().id;
-
-
-      // Get user address
-      this.addressService.getUserAddress(userID).then(address => {
-
-         // Save/set the address
-         this.providerService.saveProviderAddress(address.address).subscribe(
-
-            response => {
-               console.log(response);
-            },
-
-            (error:ErrorResponse) => {
-               console.log(error);
-            }
-
-         );
-         
-
-      })
-
-   }
-
-
-   private generateUserAddress(): void
-   {
-      // Generate an address for the user to be saved on local DB
-      this.addressService.generateUserAddress().subscribe(
-
-         (addressResponse:AddressResponse) => {
-            // Get current user id
-            let userID: number = this.authService.getCurrentUser().id;
-            // Persist address locally
-            this.addressService.saveUserAddress(addressResponse, userID);
-         },
-
-         (error:ErrorResponse) => {
-            // If user already has an address (HTTP 409 Conflict)
-            if (error.httpStatus == 409) {
-               // Do nothing
-            }
-            else {
-               console.log(error);
-            }
          }
 
       );
