@@ -126,8 +126,6 @@ export class LoginComponent
       this.providerService.checkProviderAddressExistence().subscribe(
 
          (exists:boolean) => {
-            console.log(exists);
-
             if (!exists) {
                this.saveProviderAddress();
             }

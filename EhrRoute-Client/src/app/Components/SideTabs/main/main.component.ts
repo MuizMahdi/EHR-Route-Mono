@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/Services/auth.service';
 import { AddressService } from './../../../Services/address.service';
 import { Component, OnInit } from '@angular/core';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
@@ -17,8 +18,9 @@ export class MainComponent implements OnInit
    
    constructor(
       public mainLayout:MainLayoutService, private clustersService:NodeClustersService, 
-      private networkService:NodeNetworkService, private addressService:AddressService) 
-   {
+      private networkService:NodeNetworkService, private addressService:AddressService,
+      private authService:AuthService
+   ) {
       this.mainLayout.show();
    }
 
@@ -29,15 +31,16 @@ export class MainComponent implements OnInit
       // allows for a request to be made, unsubscribing the node from clusters.
       //this.handleReloads();
 
-      // Subscribe to providers and consumers cluster
-      //this.clustersService.subscribeProvider();
-      //this.clustersService.subscribeConsumer();
+      // If user has provider role
+      if (this.authService.isUserProvider()) {
 
-      // Establish connection to user's address DB
-      this.addressService.ensureAddressDBsConnection();
+         // Establish connection to user's address DB
+         this.addressService.ensureAddressDBsConnection();
 
-      // Establish connections to all of user's networks DBs
-      this.networkService.checkUserNetworks();
+         // Establish connections to all of user's networks DBs if they exist
+         this.networkService.checkUserNetworks();
+
+      }
    }
 
 
