@@ -61,7 +61,7 @@ public class UserController
 
     @GetMapping("/current")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity<?> getCurrentUser(@CurrentUser UserPrincipal currentUser)
+    public ResponseEntity getCurrentUser(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
             return new ResponseEntity<>(
@@ -70,22 +70,8 @@ public class UserController
             );
         }
 
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
-
-        if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not found; Invalid user"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        return ResponseEntity.ok (
-            new UserInfo(
-                user.getId(),
-                user.getUsername(),
-                user.getName(),
-                user.isNonFirstLogin()
-            )
+        return ResponseEntity.ok(
+            userService.getUserInfo(currentUser.getId())
         );
     }
 
@@ -211,12 +197,7 @@ public class UserController
         }
 
         return ResponseEntity.ok (
-            new UserInfo(
-                user.getId(),
-                user.getUsername(),
-                user.getName(),
-                user.isNonFirstLogin()
-            )
+            userService.getUserInfo(user.getId())
         );
     }
 

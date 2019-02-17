@@ -1,3 +1,5 @@
+import { RoleName } from './../Models/RoleName';
+import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { UserInfo } from '../Models/Payload/Responses/UserInfo';
 import { environment } from './../../environments/environment';
 import { UserLoginRequest } from '../Models/Payload/Requests/UserLoginRequest';
@@ -51,10 +53,6 @@ export class AuthService
 
             this.saveSession(tokenResponse);
             this.isLoggedIn = true;
-
-            // Subscribe user node to providers and consumers cluster
-            this.clustersService.subscribeProvider();
-            this.clustersService.subscribeConsumer();
             
             shareReplay()
 
@@ -80,7 +78,7 @@ export class AuthService
       return localStorage.getItem('accessToken');
    }
 
-   
+
    public getCurrentUserRoles(): Observable<any>
    {
       return this.http.get(this.userRolesUrl).pipe(first(),
@@ -133,24 +131,29 @@ export class AuthService
 
    private saveCurrentUserInfo(): void
    {
-      this.http.get(this.getCurrentUserUrl).pipe(first()).subscribe(
-         
-         (user:UserInfo) => {
-         
-            if(user) {
-               // Save the user info in local storage
-               localStorage.setItem('currentUser', JSON.stringify(user))
+      this.getCurrentUserInfo().subscribe(
 
-               // Then set the user in the user subject
-               this.currentUser.next(user);
-            }
+         (userInfo:UserInfo) => {
+            // Save the user info in local storage
+            localStorage.setItem('currentUser', JSON.stringify(userInfo));
 
+            // Check if user has a provider role
+            userInfo.roles.forEach(role => {
+               if (role == RoleName.ROLE_PROVIDER.toString()) {
+                  // Subscribe user node to providers and consumers cluster
+                  this.clustersService.subscribeProvider();
+                  this.clustersService.subscribeConsumer();
+               }
+            });
+
+            // Then set the user in the user subject, so subscribers will know when user info is received
+            this.currentUser.next(userInfo);
          },
 
-         error => {
+         (error:ErrorResponse) => {
             console.log(error);
          }
-         
+
       );
    }
 

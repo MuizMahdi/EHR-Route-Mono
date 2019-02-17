@@ -8,6 +8,7 @@ import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Auth.SignUpRequest;
+import com.project.EhrRoute.Payload.Auth.UserInfo;
 import com.project.EhrRoute.Repositories.RoleRepository;
 import com.project.EhrRoute.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -39,6 +41,7 @@ public class UserService
     {
         return userRepository.existsByEmail(email);
     }
+
 
     @Transactional
     public User createUser(SignUpRequest request) {
@@ -67,10 +70,30 @@ public class UserService
         return result;
     }
 
+
     @Transactional
     public void saveUser(User user) {
         userRepository.save(user);
     }
+
+
+    @Transactional
+    public UserInfo getUserInfo(Long userID) {
+        // Get user
+        User user = findUserById(userID);
+
+        // Get a string list of user roles names
+        List<String> userRoles = user.getRoles().stream().map(Role::getName).map(RoleName::toString).collect(Collectors.toList());
+
+        return new UserInfo(
+            userID,
+            user.getUsername(),
+            user.getName(),
+            userRoles,
+            user.isNonFirstLogin()
+        );
+    }
+
 
     @Transactional
     public User findUserByUsernameOrEmail(String usernameOrEmail) {
@@ -81,6 +104,7 @@ public class UserService
         return user;
     }
 
+
     @Transactional
     public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
@@ -88,10 +112,12 @@ public class UserService
         );
     }
 
+
     @Transactional
     public boolean isValidUserUsername(String username) {
         return findUserByUsernameOrEmail(username) != null;
     }
+
 
     @Transactional
     public boolean isUserFirstLogin(Long id)
@@ -99,9 +125,9 @@ public class UserService
         return !(userRepository.getIsUserNonFirstLogin(id));
     }
 
-    @Transactional
-    public Set<Role> findUserRoles(String username) throws ResourceNotFoundException {
 
+    @Transactional
+    public Set<Role> findUserRoles(String username) {
         // Find user by username
         User user = userRepository.findByUsername(username).orElseThrow(() ->
            new ResourceNotFoundException("User", "username", username)
@@ -111,8 +137,9 @@ public class UserService
         return user.getRoles();
     }
 
+
     @Transactional
-    public Set<Network> findUserNetworks(User user) throws NullUserNetworkException {
+    public Set<Network> findUserNetworks(User user) {
         //Network userNetwork = user.getNetwork();
 
         Set<Network> userNetworks = user.getNetworks();
@@ -128,8 +155,9 @@ public class UserService
         return userNetworks;
     }
 
+
     @Transactional
-    public void addUserNetwork(User user, Network network) throws BadRequestException {
+    public void addUserNetwork(User user, Network network) {
 
         if (user == null || network == null) {
             throw new BadRequestException("Invalid network or user");
@@ -140,8 +168,9 @@ public class UserService
         userRepository.save(user);
     }
 
+
     @Transactional
-    public boolean userHasNetwork(User user, Network network) throws BadRequestException {
+    public boolean userHasNetwork(User user, Network network) {
 
         boolean hasNetwork = false;
 
@@ -159,15 +188,18 @@ public class UserService
         return hasNetwork;
     }
 
+
     @Transactional
     public List<String> searchUsername(String usernameKeyword) {
         return userRepository.searchUsernamesByUsername(usernameKeyword);
     }
 
+
     @Transactional
     public List<String> searchProviderUsername(String usernameKeyword) {
         return userRepository.searchProvidersUsernamesByUsername(usernameKeyword);
     }
+
 
     @Transactional
     public User getUserByProviderUUID(String providerUUID) {

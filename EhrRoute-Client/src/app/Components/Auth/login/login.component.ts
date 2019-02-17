@@ -1,3 +1,4 @@
+import { RoleName } from './../../../Models/RoleName';
 import { ProviderService } from './../../../Services/provider.service';
 import { AddressResponse } from './../../../Models/Payload/Responses/AddressResponse';
 import { AddressService } from './../../../Services/address.service';
@@ -10,7 +11,8 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { UserRole } from 'src/app/Models/UserRole';
+import { UserRole } from 'src/app/Models/Payload/Responses/UserRole';
+import { userInfo } from 'os';
 
 
 @Component({
@@ -59,8 +61,9 @@ export class LoginComponent
 
       this.authService.login(userInfo).pipe(first(), 
 
-         catchError(response => { // In case an error occurs
-            return throwError(response) // Re-Throw the error to be handled on subscription
+         catchError(error => { 
+            // Return the error to be handled on subscription
+            return throwError(error);
          })
 
       ).subscribe(
@@ -82,6 +85,7 @@ export class LoginComponent
 
    private checkIfFirstLogin(): void
    {
+      
       this.userService.getCurrentUserFirstLoginStatus().subscribe(
 
          (isFirstLogin:boolean) => {
@@ -112,6 +116,7 @@ export class LoginComponent
          }
 
       );
+      
    }
 
 
