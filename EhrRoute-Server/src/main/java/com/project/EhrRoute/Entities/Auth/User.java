@@ -41,7 +41,7 @@ public class User extends DateAudit
     private boolean isEnabled;
 
     @Column(name = "firstLogin")
-    private boolean isNonFirstLogin;
+    private boolean isFirstLogin;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -66,7 +66,9 @@ public class User extends DateAudit
         this.email = email;
         this.password = password;
         this.isEnabled = false;
-        this.isNonFirstLogin = false;
+
+        // Gets changed to false after first login
+        this.isFirstLogin = true;
     }
 
     public void addNetwork(Network network) {
@@ -100,8 +102,8 @@ public class User extends DateAudit
     public Set<Network> getNetworks() {
         return networks;
     }
-    public boolean isNonFirstLogin() {
-        return isNonFirstLogin;
+    public boolean isFirstLogin() {
+        return isFirstLogin;
     }
 
     public void setId(Long id) {
@@ -128,7 +130,7 @@ public class User extends DateAudit
     public void setNetworks(Set<Network> networks) {
         this.networks = networks;
     }
-    public void setNonFirstLogin(boolean firstLogin) {
-        isNonFirstLogin = firstLogin;
+    public void setFirstLogin(boolean firstLogin) {
+        isFirstLogin = firstLogin;
     }
 }

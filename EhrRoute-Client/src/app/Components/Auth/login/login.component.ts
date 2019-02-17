@@ -1,3 +1,4 @@
+import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
 import { RoleName } from './../../../Models/RoleName';
 import { ProviderService } from './../../../Services/provider.service';
 import { AddressResponse } from './../../../Models/Payload/Responses/AddressResponse';
@@ -86,35 +87,16 @@ export class LoginComponent
    private checkIfFirstLogin(): void
    {
       // When user info is received from server
-      this.authService.currentUser.subscribe((userInfo) => {
-
-         console.log("[ is not first login: ]");
-         console.log(userInfo.isNonFirstLogin);
+      this.authService.currentUser.subscribe((userInfo:UserInfo) => {
          
-         // If its the user's first time login, then request for address generation
-         if (!userInfo.isNonFirstLogin)
+         // If user is logged in
+         if (userInfo) 
          {
-            // Generate an address for the user to be saved on local DB
-            this.addressService.generateUserAddress().subscribe(
-
-               (addressResponse:AddressResponse) => {
-                  // Get current user id
-                  let userID: number = this.authService.getCurrentUser().id;
-                  // Persist address locally
-                  this.addressService.saveUserAddress(addressResponse, userID);
-               },
-
-               (error:ErrorResponse) => {
-                  // If user already has an address (HTTP 409 Conflict)
-                  if (error.httpStatus == 409) {
-                     // Do nothing
-                  }
-                  else {
-                     console.log(error);
-                  }
-               }
-
-            );
+            // check if its the user's first time login
+            if (userInfo.isFirstLogin) {
+               // Generate an address for the user
+               this.generateUserAddress();
+            }
          }
 
       });
@@ -123,14 +105,19 @@ export class LoginComponent
 
    private checkIfIsProvider(): void
    {
-      this.authService.currentUser.subscribe((userInfo) => {
+      this.authService.currentUser.subscribe((userInfo:UserInfo) => {
 
-         userInfo.roles.forEach(role => {
-            if (role == RoleName.ROLE_PROVIDER.toString()) {
-               // Check if user's address is saved
-               this.checkProviderAddress();
-            }
-         })
+         // If user is logged in
+         if (userInfo) 
+         {
+            // Check if user has a provider role
+            userInfo.roles.forEach(role => {
+               if (role == RoleName.ROLE_PROVIDER.toString()) {
+                  // Check if user's address is saved
+                  this.checkProviderAddress();
+               }
+            })
+         }
 
       });
    }
@@ -181,6 +168,32 @@ export class LoginComponent
 
       })
 
+   }
+
+
+   private generateUserAddress(): void
+   {
+      // Generate an address for the user to be saved on local DB
+      this.addressService.generateUserAddress().subscribe(
+
+         (addressResponse:AddressResponse) => {
+            // Get current user id
+            let userID: number = this.authService.getCurrentUser().id;
+            // Persist address locally
+            this.addressService.saveUserAddress(addressResponse, userID);
+         },
+
+         (error:ErrorResponse) => {
+            // If user already has an address (HTTP 409 Conflict)
+            if (error.httpStatus == 409) {
+               // Do nothing
+            }
+            else {
+               console.log(error);
+            }
+         }
+
+      );
    }
 
 }

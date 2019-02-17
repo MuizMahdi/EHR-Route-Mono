@@ -90,7 +90,7 @@ public class UserService
             user.getUsername(),
             user.getName(),
             userRoles,
-            user.isNonFirstLogin()
+            user.isFirstLogin()
         );
     }
 
@@ -122,7 +122,7 @@ public class UserService
     @Transactional
     public boolean isUserFirstLogin(Long id)
     {
-        return !(userRepository.getIsUserNonFirstLogin(id));
+        return userRepository.getIsUserFirstLogin(id);
     }
 
 

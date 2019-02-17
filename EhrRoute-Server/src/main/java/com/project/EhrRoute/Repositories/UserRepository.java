@@ -26,8 +26,8 @@ public interface UserRepository extends JpaRepository<User, Long>
     @Query("SELECT u.username FROM User u INNER JOIN u.roles r WHERE r.name='ROLE_PROVIDER' AND u.username LIKE CONCAT('%', :keyword, '%')")
     List<String> searchProvidersUsernamesByUsername(@Param("keyword") String keyword);
 
-    @Query("SELECT u.isNonFirstLogin FROM User u WHERE u.id = :userID")
-    Boolean getIsUserNonFirstLogin(@Param("userID") Long id);
+    @Query("SELECT u.isFirstLogin FROM User u WHERE u.id = :userID")
+    Boolean getIsUserFirstLogin(@Param("userID") Long id);
 
     @Query("SELECT u FROM ProviderDetails p INNER JOIN p.user u WHERE p.providerUUID = :providerUUID")
     Optional<User> findUserByProviderUUID(@Param("providerUUID") String uuid);

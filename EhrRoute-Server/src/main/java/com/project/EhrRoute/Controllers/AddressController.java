@@ -53,16 +53,16 @@ public class AddressController
         }
 
         // Not first time login (default is false)
-        if (user.isNonFirstLogin())
+        if (!user.isFirstLogin())
         {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Not the user's first login, user already has an address"),
-                HttpStatus.BAD_REQUEST
+                HttpStatus.CONFLICT
             );
         }
 
-        // Update user as NonFirstLogin
-        user.setNonFirstLogin(true);
+        // Update user as non-first login
+        user.setFirstLogin(false);
         userService.saveUser(user);
 
         // Generate address
