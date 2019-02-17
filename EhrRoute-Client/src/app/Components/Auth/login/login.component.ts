@@ -85,65 +85,54 @@ export class LoginComponent
 
    private checkIfFirstLogin(): void
    {
-      
-      this.userService.getCurrentUserFirstLoginStatus().subscribe(
+      // When user info is received from server
+      this.authService.currentUser.subscribe((userInfo) => {
 
-         (isFirstLogin:boolean) => {
-            // If its the user's first time login, then request for address generation
-            if (isFirstLogin)
-            {
-               // Generate an address for the user to be saved on local DB
-               this.addressService.generateUserAddress().subscribe(
+         console.log("[ is not first login: ]");
+         console.log(userInfo.isNonFirstLogin);
+         
+         // If its the user's first time login, then request for address generation
+         if (!userInfo.isNonFirstLogin)
+         {
+            // Generate an address for the user to be saved on local DB
+            this.addressService.generateUserAddress().subscribe(
 
-                  (addressResponse:AddressResponse) => {
-                     // Get current user id
-                     let userID: number = this.authService.getCurrentUser().id;
-                     // Persist address locally
-                     this.addressService.saveUserAddress(addressResponse, userID);
-                  },
+               (addressResponse:AddressResponse) => {
+                  // Get current user id
+                  let userID: number = this.authService.getCurrentUser().id;
+                  // Persist address locally
+                  this.addressService.saveUserAddress(addressResponse, userID);
+               },
 
-                  (error:ErrorResponse) => {
+               (error:ErrorResponse) => {
+                  // If user already has an address (HTTP 409 Conflict)
+                  if (error.httpStatus == 409) {
+                     // Do nothing
+                  }
+                  else {
                      console.log(error);
                   }
+               }
 
-               );
-            }
-
-         },
-
-         (error:ErrorResponse) => {
-            console.log(error);
+            );
          }
 
-      );
-      
+      });
    }
 
 
    private checkIfIsProvider(): void
    {
-      // Get user roles
-      this.authService.getCurrentUserRoles().subscribe(
-         
-         (response:UserRole[]) => {
+      this.authService.currentUser.subscribe((userInfo) => {
 
-            // Go through roles and check if user is a Provider or Admin
-            response.forEach((role:UserRole) => {
-               
-               if (role.roleName.trim() === 'ROLE_PROVIDER' || role.roleName.trim() === 'ROLE_ADMIN') 
-               {
-                  // Check if user's address is saved
-                  this.checkProviderAddress();
-               }
+         userInfo.roles.forEach(role => {
+            if (role == RoleName.ROLE_PROVIDER.toString()) {
+               // Check if user's address is saved
+               this.checkProviderAddress();
+            }
+         })
 
-            });
-
-         },
-
-         errorResponse => {
-            console.log(errorResponse);
-         }
-      );
+      });
    }
 
 
