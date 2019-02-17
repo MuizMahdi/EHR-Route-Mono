@@ -103,8 +103,11 @@ export class AuthService
 
    public logout(): void
    {
-      // Unsubscribe user node from clusters
-      this.clustersService.unsubscribeClusters();
+      // If the user has provider role
+      if (this.isUserProvider()) {
+         // Unsubscribe user node from clusters
+         this.clustersService.unsubscribeClusters();
+      }
 
       // Remove user token
       localStorage.removeItem('accessToken');
@@ -155,6 +158,25 @@ export class AuthService
          }
 
       );
+   }
+
+
+   public isUserProvider(): boolean
+   {
+      let userInfo = this.getCurrentUser();
+
+      if (userInfo) {
+         // Go through user roles
+         userInfo.roles.forEach(role => {
+            // If user has a ROLE_PROVIDER role
+            if (role == RoleName.ROLE_PROVIDER.toString()) {
+               return true;
+            }
+         });
+
+      }
+
+      return false;
    }
 
 }

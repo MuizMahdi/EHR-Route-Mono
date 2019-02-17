@@ -110,13 +110,11 @@ export class LoginComponent
          // If user is logged in
          if (userInfo) 
          {
-            // Check if user has a provider role
-            userInfo.roles.forEach(role => {
-               if (role == RoleName.ROLE_PROVIDER.toString()) {
-                  // Check if user's address is saved
-                  this.checkProviderAddress();
-               }
-            })
+            // And if user has provider role
+            if (this.authService.isUserProvider()) {
+               // Check if user's address is saved
+               this.checkProviderAddress();
+            }
          }
 
       });
