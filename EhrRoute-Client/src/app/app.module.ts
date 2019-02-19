@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import en from '@angular/common/locales/en';
+import { registerLocaleData } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -27,17 +28,17 @@ import { NavUserMenuComponent } from './Components/MainLayout/nav-user-menu/nav-
 import { HealthRecordsManagerComponent } from './Components/SideTabs/health-records-manager/health-records-manager.component';
 import { NetworkInvitationComponent } from './Components/Notifications/network-invitation/network-invitation.component';
 import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
+import { ConsentRequestComponent } from './Components/Notifications/consent-request/consent-request.component';
+import { InformationInputComponent } from './Components/Modals/information-input/information-input.component';
 
 // External Modules
 import { NgxElectronModule } from 'ngx-electron';
-import { registerLocaleData } from '@angular/common';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
-import { ConsentRequestComponent } from './Components/Notifications/consent-request/consent-request.component';
+
 
 registerLocaleData(en);
-
 
 
 @NgModule({
@@ -45,7 +46,8 @@ registerLocaleData(en);
    entryComponents: [ 
       NetworkInvitationComponent,
       UserProfileComponent,
-      ConsentRequestComponent
+      ConsentRequestComponent,
+      InformationInputComponent
    ],
 
    declarations: [
@@ -64,7 +66,8 @@ registerLocaleData(en);
       NetworkInvitationComponent,
       HealthRecordsManagerComponent,
       UserProfileComponent,
-      ConsentRequestComponent
+      ConsentRequestComponent,
+      InformationInputComponent
    ],
 
    imports: [
@@ -88,7 +91,6 @@ registerLocaleData(en);
 
    bootstrap: [AppComponent]
 })
-
 
 
 export class AppModule { }
