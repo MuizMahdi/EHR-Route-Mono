@@ -12,8 +12,6 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { first, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { UserRole } from 'src/app/Models/Payload/Responses/UserRole';
-import { userInfo } from 'os';
 
 
 @Component({
@@ -94,9 +92,8 @@ export class LoginComponent
          {
             // check if its the user's first time login
             if (userInfo.firstLogin) {
-               console.log("[ user's first login ]");
                // Generate an address for the user
-               this.generateUserAddress();
+               this.generateUserAddress(userInfo);
             } 
          }
 
@@ -106,23 +103,19 @@ export class LoginComponent
 
    private saveProviderAddress(): void
    {
-      console.log("[ Adding the provider's address to provider details.. ]");
-
       // Get current user ID
       let userID: number = this.authService.getCurrentUser().id;
-
 
       // Get user address
       this.addressService.getUserAddress(userID).then(address => {
 
          // If found
-         if (address)
+         if (address) 
          {
             // Save/set the address to provider details
             this.providerService.saveProviderAddress(address.address).subscribe(
 
                response => {
-                  console.log("[ Provider's address has been added successfully! .. All good!!! ]");
                   console.log(response);
                },
 
@@ -133,34 +126,29 @@ export class LoginComponent
             );
          }
 
-
       });
-
    }
 
 
-   private generateUserAddress(): void
+   private generateUserAddress(userInfo:UserInfo): void
    {
-      console.log("[ Generating an address for user.. ]");
-
       // Generate an address for the user to be saved on local DB
       this.addressService.generateUserAddress().subscribe(
 
          async (addressResponse:AddressResponse) => {
-
-            console.log("[ An address has been generated! ]");
             // Get current user id
             let userID: number = this.authService.getCurrentUser().id;
 
             // Persist address locally
-            console.log("[ Saving the address in local DB.. ]");
             await this.addressService.saveUserAddress(addressResponse, userID);
 
             // If user is a provider, then add the generated address to their provider details
-            if (this.authService.isUserProvider()) {
-               // Add the generated address to the provider's details
-               this.saveProviderAddress();
-            }
+            userInfo.roles.forEach(role => {
+               if (role === RoleName.PROVIDER) {
+                  // Add the generated address to the provider's details
+                  this.saveProviderAddress();
+               }
+            });
          },
 
          (error:ErrorResponse) => {
@@ -203,10 +191,7 @@ export class LoginComponent
 
          (exists:boolean) => {
             if (!exists) {
-               //console.log("[ The user(Provider)'s address is not added to their provider details! ]");
                //this.saveProviderAddress();
-            } else {
-               console.log("[ The user(Provider)'s address is already added to their provider details ]");
             }
          },
 

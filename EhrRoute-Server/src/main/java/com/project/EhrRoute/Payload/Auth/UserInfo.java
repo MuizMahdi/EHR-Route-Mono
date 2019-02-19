@@ -9,14 +9,16 @@ public class UserInfo
     private String name;
     private List<String> roles;
     private boolean isFirstLogin;
+    private boolean hasAddedInfo;
 
 
-    public UserInfo(Long id, String username, String name, List<String> roles, boolean isFirstLogin) {
+    public UserInfo(Long id, String username, String name, List<String> roles, boolean isFirstLogin, boolean hasAddedInfo) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.roles = roles;
         this.isFirstLogin = isFirstLogin;
+        this.hasAddedInfo = hasAddedInfo;
     }
 
 
@@ -35,6 +37,9 @@ public class UserInfo
     public boolean isFirstLogin() {
         return isFirstLogin;
     }
+    public boolean isHasAddedInfo() {
+        return hasAddedInfo;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -50,5 +55,8 @@ public class UserInfo
     }
     public void setFirstLogin(boolean isFirstLogin) {
         this.isFirstLogin = isFirstLogin;
+    }
+    public void setHasAddedInfo(boolean hasAddedInfo) {
+        this.hasAddedInfo = hasAddedInfo;
     }
 }

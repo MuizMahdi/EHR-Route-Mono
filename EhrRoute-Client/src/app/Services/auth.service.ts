@@ -92,7 +92,7 @@ export class AuthService
    public getCurrentUserInfo(): Observable<any>
    {
       return this.http.get(this.getCurrentUserUrl).pipe(first(),
-      
+ 
          catchError(error => {
             return throwError(error);
          })
@@ -161,20 +161,21 @@ export class AuthService
    }
 
 
-   public isUserProvider(): boolean
+   public isUserProvider(): Boolean
    {
       let userInfo = this.getCurrentUser();
+      let isProvider:boolean = false;
 
       if (userInfo) {
          // Go through user roles
-         userInfo.roles.forEach(role => {;
+         userInfo.roles.forEach(role => {
             // If user has a ROLE_PROVIDER role
             if (role === RoleName.PROVIDER) {
-               return true;
+               isProvider = true;
             }
          });
       }
 
-      return false;
+      return isProvider;
    }
 }

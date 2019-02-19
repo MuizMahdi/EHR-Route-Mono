@@ -1,3 +1,5 @@
+import { UserInfo } from './../Models/Payload/Responses/UserInfo';
+import { RoleName } from './../Models/RoleName';
 import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
 import { first, catchError } from 'rxjs/operators';
 import { RoleChangeRequest } from './../Models/Payload/Requests/RoleChangeRequest';
@@ -91,4 +93,9 @@ export class UsersService
       );
    }
 
+
+   public setUserInfoAdditionStatus(): Observable<any>
+   {
+      return null;
+   }
 }

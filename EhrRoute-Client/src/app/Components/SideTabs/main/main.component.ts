@@ -1,3 +1,4 @@
+import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
 import { AuthService } from 'src/app/Services/auth.service';
 import { AddressService } from './../../../Services/address.service';
 import { Component, OnInit } from '@angular/core';
@@ -15,9 +16,12 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 
 export class MainComponent implements OnInit
 {
-   
+   isUserInfoModalVisible = false;
+   isUserInfoModalLoading = false;
+
+
    constructor(
-      public mainLayout:MainLayoutService, private clustersService:NodeClustersService, 
+      public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
       private networkService:NodeNetworkService, private addressService:AddressService,
       private authService:AuthService
    ) {
@@ -25,22 +29,14 @@ export class MainComponent implements OnInit
    }
 
 
-   ngOnInit() 
+   ngOnInit()
    {
       // Handles when user reloads page after loggin in, to show a prompt, which 
       // allows for a request to be made, unsubscribing the node from clusters.
       //this.handleReloads();
 
-      // If user has provider role
-      if (this.authService.isUserProvider()) {
-
-         // Establish connection to user's address DB
-         this.addressService.ensureAddressDBsConnection();
-
-         // Establish connections to all of user's networks DBs if they exist
-         this.networkService.checkUserNetworks();
-
-      }
+      this.checkIfHasAddedInfo();
+      this.initializeLocalDbs();
    }
 
 
@@ -71,6 +67,55 @@ export class MainComponent implements OnInit
          // Subscribe to clusters again
          clusterService.subscribeClusters();
       }
+   }
+
+
+   private initializeLocalDbs(): void
+   {
+      // If user has provider role
+      if (this.authService.isUserProvider()) {
+
+         // Establish connection to user's address DB
+         this.addressService.ensureAddressDBsConnection();
+
+         // Establish connections to all of user's networks DBs if they exist
+         this.networkService.checkUserNetworks();
+      }
+   }
+
+
+   private checkIfHasAddedInfo(): void
+   {
+      this.authService.currentUser.subscribe((userInfo:UserInfo) => {
+         // If user hasven't submitted their info
+         if (userInfo && !(userInfo.hasAddedInfo)) {
+            this.showUserInfoModal();
+         }
+         
+      });
+   }
+
+
+   showUserInfoModal(): void {
+      this.isUserInfoModalVisible = true;
+   }
+
+
+   onUserInfoSubmit(): void {
+      this.isUserInfoModalLoading = true;
+
+      // TODO: Get form data and save it on local DB
+      // TODO: Once successfully saved, send a post request that sets the user's hasAddedInfo boolean to true
+      // TODO: Once successfully set, close the modal
+
+      window.setTimeout(() => {
+         this.isUserInfoModalVisible = false;
+         this.isUserInfoModalLoading = false;
+      }, 3000);
+   }
+  
+   onUserInfoCancel(): void {
+      this.isUserInfoModalVisible = false;
    }
 
 }

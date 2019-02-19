@@ -5,4 +5,5 @@ export interface UserInfo
    name: string;
    roles: string[];
    firstLogin: boolean;
+   hasAddedInfo: boolean;
 }

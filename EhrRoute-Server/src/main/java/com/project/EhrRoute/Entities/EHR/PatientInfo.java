@@ -3,81 +3,59 @@ package com.project.EhrRoute.Entities.EHR;
 
 public class PatientInfo
 {
-    private String name;
-    private String gender;
-    private String address;
-    private long phone;
-    private String birthDate;
-    private String race;
-    private String email;
-    private String language;
-    private long patientId;
+    private String name; // Normal input
+    private String gender; // Radio buttons
+    private String address; // Use API
+    private String phone; // Phone input
+    private String birthDate; // Date pick
+    private String email; // Get it from user
+
 
     public PatientInfo() { }
-    public PatientInfo(String name, String gender, String address, long phone, String birthDate, String race, String email, String language, long patientId) {
+    public PatientInfo(String name, String gender, String address, String phone, String birthDate, String email) {
         this.name = name;
         this.gender = gender;
         this.address = address;
         this.phone = phone;
         this.birthDate = birthDate;
-        this.race = race;
         this.email = email;
-        this.language = language;
-        this.patientId = patientId;
     }
+
 
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getGender() {
-        return gender;
-    }
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-    public String getAddress() {
-        return address;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
-    public long getPhone() {
+    public String getPhone() {
         return phone;
-    }
-    public void setPhone(long phone) {
-        this.phone = phone;
-    }
-    public String getBirthDate() {
-        return birthDate;
-    }
-    public void setBirthDate(String birthDate) {
-        this.birthDate = birthDate;
-    }
-    public String getRace() {
-        return race;
-    }
-    public void setRace(String race) {
-        this.race = race;
     }
     public String getEmail() {
         return email;
     }
+    public String getGender() {
+        return gender;
+    }
+    public String getAddress() {
+        return address;
+    }
+    public String getBirthDate() {
+        return birthDate;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getLanguage() {
-        return language;
+    public void setGender(String gender) {
+        this.gender = gender;
     }
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setAddress(String address) {
+        this.address = address;
     }
-    public long getPatientId() {
-        return patientId;
-    }
-    public void setPatientId(long patientId) {
-        this.patientId = patientId;
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
     }
 }

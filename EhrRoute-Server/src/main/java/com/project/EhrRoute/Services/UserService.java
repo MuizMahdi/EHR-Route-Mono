@@ -90,7 +90,8 @@ public class UserService
             user.getUsername(),
             user.getName(),
             userRoles,
-            user.isFirstLogin()
+            user.isFirstLogin(),
+            user.hasAddedInfo()
         );
     }
 

@@ -57,6 +57,7 @@ export class ConsentRequestComponent implements OnInit
 
    onConsentRequestAccept(): void
    {
+      // Add user address, private key, and info into the Block in the ConsentRequest
       
    }
 

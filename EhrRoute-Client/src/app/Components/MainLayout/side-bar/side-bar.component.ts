@@ -28,14 +28,14 @@ export class SideBarComponent implements OnInit
    {
       this.authService.currentUser.subscribe((userInfo:UserInfo) => {
 
-         userInfo.roles.forEach(role => {
-
-            // If user has a provider or an admin role
-            if (role === RoleName.PROVIDER || role === RoleName.ADMIN) {
-               this.isUserProviderOrAdmin = true;
-            }
-
-         });
+         if (userInfo) {
+            userInfo.roles.forEach(role => {
+               // If user has a provider or an admin role
+               if (role === RoleName.PROVIDER || role === RoleName.ADMIN) {
+                  this.isUserProviderOrAdmin = true;
+               }
+            });
+         }
          
       });
    }
