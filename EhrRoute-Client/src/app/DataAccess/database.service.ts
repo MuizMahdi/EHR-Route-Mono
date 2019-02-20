@@ -29,7 +29,7 @@ export class DatabaseService
       ElectronAppConfig.initialize();
    }
 
-
+   /** Network DB **/
    // Creates a connection to the network db with networkUUID
    public async createNetworkDbConnection(networkUUID:string)
    {
@@ -68,6 +68,7 @@ export class DatabaseService
    }
 
 
+   /** Address DB **/
    // Creates a connection to the address db with user ID
    public async createAddressDbConnection(userID:number)
    {
@@ -97,6 +98,39 @@ export class DatabaseService
    private getAddressConnectionName(userID:number): string
    {
       return userID + "-address";
+   }
+
+
+   /** Patient Info DB **/
+   // Creates a connection to the pateint info db with user ID
+   public async createPatientInfoDbConnection(userID:number)
+   {
+      let dbOptions:ConnectionOptions = {
+         name: this.getPatientInfoConnectionName(userID),
+         type: "sqlite",
+         database: ElectronAppConfig.getPatientInfoDbPath(userID),
+         entities: [
+            EhrPatientInfo,
+         ],
+         synchronize: true,
+         logging: false
+      }
+
+      await createConnection(dbOptions);
+   }
+
+
+   // Returns a connection for pateint info DB of user with an ID
+   public getPatientInfoDbConnection(userID:number): Connection
+   {
+      return getConnectionManager().get(this.getPatientInfoConnectionName(userID));
+   }
+
+
+   // Attaches a "-info" prefix to a user ID to form connection name for a pateint info DB
+   private getPatientInfoConnectionName(userID:number): string
+   {
+      return userID + "-info";
    }
 
 }

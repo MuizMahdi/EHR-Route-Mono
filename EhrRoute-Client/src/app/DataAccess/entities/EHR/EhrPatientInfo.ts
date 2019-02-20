@@ -8,29 +8,26 @@ export class EhrPatientInfo
    id: number;
 
    @Column()
-   name: string;
+   name:string;
 
    @Column()
-   gender: string;
-   
-   @Column()
-   race: string;
-   
-   @Column()
-   birthDate: string;
+   gender:string;
 
    @Column()
-   language: string;
+   country:string;
 
    @Column()
-   address: string;
+   city:string;
 
    @Column()
-   phone: string;
+   address:string;
 
    @Column()
-   email: string;
+   phone:string;
 
    @Column()
-   patientId: string;
+   birthDate:number;
+
+   @Column()
+   email:string;
 }

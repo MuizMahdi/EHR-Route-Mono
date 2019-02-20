@@ -48,4 +48,12 @@ export class ElectronAppConfig
 
       return path.join(this.databaseFolderPath, addressDbFileName);
    }
+
+
+   public static getPatientInfoDbPath(userID:number): string
+   {
+      let patientInfoDbFileName:string = 'user-info-' + userID + '.info';
+
+      return path.join(this.databaseFolderPath, patientInfoDbFileName);
+   }
 }

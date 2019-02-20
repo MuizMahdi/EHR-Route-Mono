@@ -34,7 +34,7 @@
          </nz-form-control>
       </div>
             
-      <nz-form-item>
+      <nz-form-item style="margin-top:4vh;">
          <label for="phone" class="form-layout">Phone: </label>
          <nz-form-control [nzValidateStatus]="userInfoForm.controls['phoneCtrl']">
             <input formControlName="phoneCtrl" id="phone" placeholder="Input your phone number" nz-input>
@@ -49,14 +49,14 @@
          </nz-select>
       </div>
 
-      <div>
+      <div style="margin-top:4vh;">
          <label for="city" class="form-layout">City: </label>
          <nz-select formControlName="cityCtrl" nzAllowClear nzShowSearch nzPlaceHolder="Choose a city" id="city">
             <nz-option *ngFor="let c of countryCities" [nzValue]="c" [nzLabel]="c.matching_full_name"></nz-option>
          </nz-select>
       </div>
 
-      <nz-form-item>
+      <nz-form-item style="margin-top:4vh;">
          <label for="name" class="form-layout">Address: </label>
          <nz-form-control>
             <input nz-input formControlName="addressCtrl" id="address" placeholder="Input your address">
