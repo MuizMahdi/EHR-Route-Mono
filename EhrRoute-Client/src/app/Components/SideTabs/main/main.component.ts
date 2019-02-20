@@ -1,3 +1,4 @@
+import { RoleName } from './../../../Models/RoleName';
 import { InformationInputComponent } from './../../Modals/information-input/information-input.component';
 import { NzModalService } from 'ng-zorro-antd';
 import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
@@ -33,9 +34,8 @@ export class MainComponent implements OnInit
       // allows for a request to be made, unsubscribing the node from clusters.
       //this.handleReloads();
 
-      console.log("IS USER PROVIDER: " + this.authService.isUserProvider());
-
-      this.checkIfHasAddedInfo();
+      
+      this.checkIfUserIsProvider();
       this.initializeLocalDbs();
    }
 
@@ -84,15 +84,42 @@ export class MainComponent implements OnInit
    }
 
 
-   private checkIfHasAddedInfo(): void
+   // Checks if user has a 'Provider' role
+   private checkIfUserIsProvider(): void
    {
+      // Get user info once received from server
       this.authService.currentUser.subscribe((userInfo:UserInfo) => {
-         // If user hasven't submitted their info
-         if (userInfo && !(userInfo.hasAddedInfo)) {
-            this.showUserInfoModal();
+
+         let isProvider:boolean = false;
+
+         // If user is logged in and user info received
+         if (userInfo) {
+
+            // Go through the user roles
+            userInfo.roles.forEach(role => {
+               // If user has a 'Provider' role
+               if (role === RoleName.PROVIDER) {
+                  isProvider = true;
+               }
+            });
+
+            // If user is not a provider, then check if they have added and saved their info
+            if (!isProvider) {
+               this.checkIfHasAddedInfo(userInfo);
+            }
+
          }
-         
+
       });
+   }
+
+
+   private checkIfHasAddedInfo(userInfo:UserInfo): void
+   {
+      // If user hasven't submitted their info
+      if (userInfo && !(userInfo.hasAddedInfo)) {
+         this.showUserInfoModal();
+      }
    }
 
 

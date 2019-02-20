@@ -126,7 +126,15 @@ public class UserService
     {
         return userRepository.getIsUserFirstLogin(id);
     }
-    
+
+
+    @Transactional
+    public void setUserHasAddedInfo(Long userID) {
+        User user = findUserById(userID);
+        user.setHasAddedInfo(true);
+        saveUser(user);
+    }
+
 
     @Transactional
     public Set<Role> findUserRoles(String username) {

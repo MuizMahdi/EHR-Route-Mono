@@ -22,6 +22,7 @@ export class UsersService
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
    private userFirstLoginStatusUrl:string = environment.apiUrl + '/users/current/first-login-status';
+   private userInfoAdditionStatusUrl:string = environment.apiUrl + '/users/current/info-addition-status';
 
 
    constructor(private http:HttpClient) {
@@ -94,8 +95,16 @@ export class UsersService
    }
 
 
-   public setUserInfoAdditionStatus(): Observable<any>
+   public updateUserInfoAdditionStatus(): Observable<any>
    {
-      return null;
+      let url = this.userInfoAdditionStatusUrl;
+
+      return this.http.post(url, "").pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
    }
 }

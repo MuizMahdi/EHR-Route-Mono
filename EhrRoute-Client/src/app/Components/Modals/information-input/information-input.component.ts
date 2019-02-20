@@ -155,11 +155,20 @@ export class InformationInputComponent implements OnInit
 
    private setUserHasSavedInfo(): void
    {
-      
+      // Update the user info addition status boolean to true
+      this.userService.updateUserInfoAdditionStatus().subscribe(
 
-      // Once successfully set, close the modal
-      this.isUserInfoModalLoading = false;
-      this.modal.destroy();
+         response => {
+            // Once successfully updated, close the modal
+            this.isUserInfoModalLoading = false;
+            this.modal.destroy();
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
    }
 
 }

@@ -176,6 +176,24 @@ public class UserController
     }
 
 
+    @PostMapping("/current/info-addition-status")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity setCurrentUserHasAddedInfoStatus(@CurrentUser UserPrincipal currentUser)
+    {
+        if (currentUser == null) {
+            return ResponseEntity.badRequest().body(
+                new ApiResponse(false, "User not logged in")
+            );
+        }
+
+        userService.setUserHasAddedInfo(currentUser.getId());
+
+        return ResponseEntity.ok(
+            new ApiResponse(false, "Your info has been saved")
+        );
+    }
+
+
     @GetMapping("/search-by-username")
     public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username)
     {
