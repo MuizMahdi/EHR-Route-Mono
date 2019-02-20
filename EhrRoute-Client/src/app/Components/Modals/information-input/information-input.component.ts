@@ -1,3 +1,4 @@
+import { AuthService } from './../../../Services/auth.service';
 import { CountryResponse } from './../../../Models/Payload/Responses/CountryResponse';
 import { LocationService } from './../../../Services/location.service';
 import { PatientInfo } from './../../../Models/Payload/Requests/PatientInfo';
@@ -26,7 +27,7 @@ export class InformationInputComponent implements OnInit
    isUserInfoModalLoading:boolean = false;
 
 
-   constructor(private locationService:LocationService) 
+   constructor(private locationService:LocationService, private authSerice:AuthService) 
    { }
 
 
@@ -69,13 +70,19 @@ export class InformationInputComponent implements OnInit
 
    private onUserInfoSubmit(): void {
 
+      // TODO: Get current user email
+      let userEmail = this.authSerice.getCurrentUser().email;
+
+      // Start the loading animation on the modal's submit button
       this.isUserInfoModalLoading = true;
 
+      // Recalculate the values and validations of form controls
       for (const i in this.userInfoForm.controls) {
         this.userInfoForm.controls[ i ].markAsDirty();
         this.userInfoForm.controls[ i ].updateValueAndValidity();
       }
 
+      // Construct a PatientInfo object using form data
       let userInfo:PatientInfo = {
          name: this.userInfoForm.get("nameCtrl").value,
          gender: this.userInfoForm.get("genderSelectCtrl").value,
@@ -84,18 +91,17 @@ export class InformationInputComponent implements OnInit
          address: this.userInfoForm.get("addressCtrl").value,
          phone: this.userInfoForm.get("phoneCtrl").value,
          birthDate: this.userInfoForm.get("birthCtrl").value.getTime(),
-         email: ""
+         email: userEmail
       }
 
       console.log(userInfo);
 
-      // TODO: Get form data and save it on local DB
-      // TODO: Once successfully saved, send a post request that sets the user's hasAddedInfo boolean to true
-      // TODO: Once successfully set, close the modal
+      // TODO: Save PatientInfo on local DB
 
-      window.setTimeout(() => {
-         this.isUserInfoModalLoading = false;
-      }, 3000);
+      // TODO: Once successfully saved, send a post request that sets the user's hasAddedInfo boolean to true
+      
+      // TODO: Once successfully set, close the modal
+      this.isUserInfoModalLoading = false;
    }
 
 

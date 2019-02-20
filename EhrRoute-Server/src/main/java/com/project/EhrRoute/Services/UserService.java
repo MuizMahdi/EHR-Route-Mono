@@ -89,6 +89,7 @@ public class UserService
             userID,
             user.getUsername(),
             user.getName(),
+            user.getEmail(),
             userRoles,
             user.isFirstLogin(),
             user.hasAddedInfo()
