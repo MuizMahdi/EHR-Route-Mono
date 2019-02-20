@@ -130,7 +130,7 @@ export class MainComponent implements OnInit
          nzContent: InformationInputComponent,
          nzWidth: "70%",
          nzFooter: null,
-         nzClosable: true,
+         nzClosable: false,
          nzMaskClosable: false,
          nzKeyboard: false
       });
