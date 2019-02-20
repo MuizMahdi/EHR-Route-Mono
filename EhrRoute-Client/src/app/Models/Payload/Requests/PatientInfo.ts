@@ -6,6 +6,6 @@ export interface PatientInfo
    city:string;
    address:string;
    phone:string;
-   birthDate:string;
+   birthDate:number;
    email:string;
 }

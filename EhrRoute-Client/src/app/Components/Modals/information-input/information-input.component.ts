@@ -1,3 +1,7 @@
+import { UsersService } from './../../../Services/users.service';
+import { NzModalRef } from 'ng-zorro-antd';
+import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
+import { DatabaseService } from 'src/app/DataAccess/database.service';
 import { AuthService } from './../../../Services/auth.service';
 import { CountryResponse } from './../../../Models/Payload/Responses/CountryResponse';
 import { LocationService } from './../../../Services/location.service';
@@ -27,8 +31,11 @@ export class InformationInputComponent implements OnInit
    isUserInfoModalLoading:boolean = false;
 
 
-   constructor(private locationService:LocationService, private authSerice:AuthService) 
-   { }
+   constructor(
+      private locationService:LocationService, private authSerice:AuthService,
+      private databaseService:DatabaseService, private modal:NzModalRef, 
+      private userService:UsersService
+   ) { }
 
 
    ngOnInit() {
@@ -68,10 +75,7 @@ export class InformationInputComponent implements OnInit
    }
   
 
-   private onUserInfoSubmit(): void {
-
-      // TODO: Get current user email
-      let userEmail = this.authSerice.getCurrentUser().email;
+   private async onUserInfoSubmit() {
 
       // Start the loading animation on the modal's submit button
       this.isUserInfoModalLoading = true;
@@ -82,27 +86,80 @@ export class InformationInputComponent implements OnInit
         this.userInfoForm.controls[ i ].updateValueAndValidity();
       }
 
+      // Construct EhrPatientInfo object from form data
+      let pateintInfo = this.getPatientInfo();
+
+      // Save patient info on local DB
+      await this.savePatientInfo(pateintInfo).then(success => {
+
+         if (success) {
+            this.setUserHasSavedInfo();
+         }
+
+      });
+
+   }
+
+
+   private getPatientInfo(): PatientInfo
+   {
+      // Get current user email
+      let userEmail = this.authSerice.getCurrentUser().email;
+
+      let country:string = this.userInfoForm.get("countryCtrl").value.name;
+      let city:string = this.userInfoForm.get("cityCtrl").value.matching_full_name;
+
       // Construct a PatientInfo object using form data
       let userInfo:PatientInfo = {
          name: this.userInfoForm.get("nameCtrl").value,
          gender: this.userInfoForm.get("genderSelectCtrl").value,
-         country: this.userInfoForm.get("countryCtrl").value,
-         city: this.userInfoForm.get("cityCtrl").value,
+         country: country,
+         city: city,
          address: this.userInfoForm.get("addressCtrl").value,
          phone: this.userInfoForm.get("phoneCtrl").value,
          birthDate: this.userInfoForm.get("birthCtrl").value.getTime(),
          email: userEmail
       }
 
-      console.log(userInfo);
-
-      // TODO: Save PatientInfo on local DB
-
-      // TODO: Once successfully saved, send a post request that sets the user's hasAddedInfo boolean to true
-      
-      // TODO: Once successfully set, close the modal
-      this.isUserInfoModalLoading = false;
+      return userInfo;
    }
 
+
+   private async savePatientInfo(patientInfo:PatientInfo): Promise<boolean>
+   {
+      let success:boolean;
+
+      // Get current user ID
+      let userID = this.authSerice.getCurrentUser().id;
+
+      // Create connection to pateint info DB
+      await this.databaseService.createPatientInfoDbConnection(userID);
+
+      // Map to a ehr patient info entity
+      let ehrPatientInfo = ModelMapper.mapPatientInfoToEhrPatientInfo(patientInfo);
+
+      // Save on patient info DB
+      await this.databaseService.getPatientInfoDbConnection(userID).manager.save(ehrPatientInfo).then(
+         response => {
+            success = true;
+         },
+
+         error => {
+            success = false;
+         }
+      );
+
+      return success;
+   }
+
+
+   private setUserHasSavedInfo(): void
+   {
+      
+
+      // Once successfully set, close the modal
+      this.isUserInfoModalLoading = false;
+      this.modal.destroy();
+   }
 
 }

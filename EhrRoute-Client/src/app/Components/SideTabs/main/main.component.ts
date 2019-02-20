@@ -33,6 +33,8 @@ export class MainComponent implements OnInit
       // allows for a request to be made, unsubscribing the node from clusters.
       //this.handleReloads();
 
+      console.log("IS USER PROVIDER: " + this.authService.isUserProvider());
+
       this.checkIfHasAddedInfo();
       this.initializeLocalDbs();
    }

@@ -1,3 +1,5 @@
+import { EhrPatientInfo } from './../../DataAccess/entities/EHR/EhrPatientInfo';
+import { PatientInfo } from './../../Models/Payload/Requests/PatientInfo';
 import { Address } from './../../DataAccess/entities/Core/Address';
 import { AddressResponse } from './../../Models/Payload/Responses/AddressResponse';
 import { EhrAllergyAndReaction } from './../../DataAccess/entities/EHR/EhrAllergyAndReaction';
@@ -93,6 +95,23 @@ export default class ModelMapper
       address.privateKey = addressResponse.privateKey;
       
       return address;
+   }
+
+
+   public static mapPatientInfoToEhrPatientInfo(patientInfo:PatientInfo): EhrPatientInfo
+   {
+      const ehrPatientInfo = new EhrPatientInfo();
+
+      ehrPatientInfo.name = patientInfo.name;
+      ehrPatientInfo.phone = patientInfo.phone;
+      ehrPatientInfo.birthDate = patientInfo.birthDate;
+      ehrPatientInfo.email = patientInfo.email;
+      ehrPatientInfo.gender = patientInfo.gender;
+      ehrPatientInfo.city = patientInfo.city;
+      ehrPatientInfo.country = patientInfo.country;
+      ehrPatientInfo.address = patientInfo.address;
+
+      return ehrPatientInfo;
    }
 
 }

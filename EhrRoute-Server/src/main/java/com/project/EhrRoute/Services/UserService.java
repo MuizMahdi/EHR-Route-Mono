@@ -126,7 +126,7 @@ public class UserService
     {
         return userRepository.getIsUserFirstLogin(id);
     }
-
+    
 
     @Transactional
     public Set<Role> findUserRoles(String username) {
