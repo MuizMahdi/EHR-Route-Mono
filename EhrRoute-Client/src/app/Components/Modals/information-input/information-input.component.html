@@ -1,3 +1,74 @@
-<p>
-  information-input works!
-</p>
+<div>
+   <p>
+      This information will be used on your health records.
+      It will be saved on your device and will <b>not</b> be 
+      shared among healthcare institutions without your consent.
+   </p>
+</div>
+
+<div style="margin-top:6vh;">
+   <form [formGroup]="userInfoForm" (ngSubmit)="onUserInfoSubmit()">
+   
+      <label for="name" class="form-layout">Full name: </label>
+      <nz-form-item>
+         <nz-form-control [nzValidateStatus]="userInfoForm.controls['nameCtrl']">
+            <input formControlName="nameCtrl" id="name" nz-input placeholder="Input your full name">
+            <nz-form-explain *ngIf="userInfoForm.get('nameCtrl').dirty && userInfoForm.get('nameCtrl').errors">Please input your name</nz-form-explain>
+         </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+         <label for="birth-date" class="form-layout">Birthdate: </label>
+         <nz-form-control>
+            <nz-date-picker formControlName="birthCtrl" [nzFormat]="dateFormat" id="birth-date"></nz-date-picker>
+         </nz-form-control>
+      </nz-form-item>
+
+      <div>
+         <label class="form-layout">Gender: </label>
+         <nz-form-control>
+            <nz-radio-group formControlName="genderSelectCtrl">
+               <label nz-radio-button nzValue="male">male</label>
+               <label nz-radio-button nzValue="female">female</label>
+            </nz-radio-group>
+         </nz-form-control>
+      </div>
+            
+      <nz-form-item>
+         <label for="phone" class="form-layout">Phone: </label>
+         <nz-form-control [nzValidateStatus]="userInfoForm.controls['phoneCtrl']">
+            <input formControlName="phoneCtrl" id="phone" placeholder="Input your phone number" nz-input>
+            <nz-form-explain *ngIf="userInfoForm.get('phoneCtrl').dirty && userInfoForm.get('phoneCtrl').errors">Please input your phone number</nz-form-explain>
+         </nz-form-control>
+      </nz-form-item>
+
+      <div>
+         <label for="country" class="form-layout">Country: </label>
+         <nz-select formControlName="countryCtrl" (ngModelChange)="log($event)" nzAllowClear nzShowSearch nzPlaceHolder="Choose a country" id="country">
+            <nz-option *ngFor="let c of countries" [nzValue]="c" [nzLabel]="c.name"></nz-option>
+         </nz-select>
+      </div>
+
+      <div>
+         <label for="city" class="form-layout">City: </label>
+         <nz-select formControlName="cityCtrl" nzAllowClear nzShowSearch nzPlaceHolder="Choose a city" id="city">
+            <nz-option *ngFor="let c of countryCities" [nzValue]="c" [nzLabel]="c.name"></nz-option>
+         </nz-select>
+      </div>
+
+      <nz-form-item>
+         <label for="name" class="form-layout">Address: </label>
+         <nz-form-control>
+            <input nz-input formControlName="addressCtrl" id="address" placeholder="Input your address">
+            <nz-form-explain *ngIf="userInfoForm.get('addressCtrl').dirty && userInfoForm.get('addressCtrl').errors">Please input your address</nz-form-explain>
+         </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item nz-row style="margin-bottom:8px;">
+         <nz-form-control>
+            <button nz-button [nzLoading]="isUserInfoModalLoading" type="submit" nzType="primary">Submit</button>
+         </nz-form-control>
+      </nz-form-item>
+
+   </form>
+</div>

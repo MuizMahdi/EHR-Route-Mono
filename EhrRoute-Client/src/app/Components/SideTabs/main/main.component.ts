@@ -1,3 +1,5 @@
+import { InformationInputComponent } from './../../Modals/information-input/information-input.component';
+import { NzModalService } from 'ng-zorro-antd';
 import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
 import { AuthService } from 'src/app/Services/auth.service';
 import { AddressService } from './../../../Services/address.service';
@@ -16,14 +18,10 @@ import { NodeClustersService } from 'src/app/Services/node-clusters.service';
 
 export class MainComponent implements OnInit
 {
-   isUserInfoModalVisible = false;
-   isUserInfoModalLoading = false;
-
-
    constructor(
       public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
       private networkService:NodeNetworkService, private addressService:AddressService,
-      private authService:AuthService
+      private authService:AuthService, private modalService:NzModalService
    ) {
       this.mainLayout.show();
    }
@@ -96,26 +94,21 @@ export class MainComponent implements OnInit
    }
 
 
-   showUserInfoModal(): void {
-      this.isUserInfoModalVisible = true;
-   }
+   private showUserInfoModal(): void
+   {
+      const userInfoModal = this.modalService.create({
+         nzTitle: "Add your personal information",
+         nzContent: InformationInputComponent,
+         nzWidth: "70%",
+         nzFooter: null,
+         nzClosable: true,
+         nzMaskClosable: false,
+         nzKeyboard: false
+      });
 
-
-   onUserInfoSubmit(): void {
-      this.isUserInfoModalLoading = true;
-
-      // TODO: Get form data and save it on local DB
-      // TODO: Once successfully saved, send a post request that sets the user's hasAddedInfo boolean to true
-      // TODO: Once successfully set, close the modal
-
+      // delay until modal instance created
       window.setTimeout(() => {
-         this.isUserInfoModalVisible = false;
-         this.isUserInfoModalLoading = false;
-      }, 3000);
+        const instance = userInfoModal.getContentComponent();
+      }, 2000);
    }
-  
-   onUserInfoCancel(): void {
-      this.isUserInfoModalVisible = false;
-   }
-
 }

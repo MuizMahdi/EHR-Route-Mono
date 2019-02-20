@@ -3,18 +3,22 @@ package com.project.EhrRoute.Entities.EHR;
 
 public class PatientInfo
 {
-    private String name; // Normal input
+    private String name;
     private String gender; // Radio buttons
+    private String country;
+    private String city;
     private String address; // Use API
     private String phone; // Phone input
-    private String birthDate; // Date pick
+    private long birthDate;
     private String email; // Get it from user
 
 
     public PatientInfo() { }
-    public PatientInfo(String name, String gender, String address, String phone, String birthDate, String email) {
+    public PatientInfo(String name, String gender, String country, String city, String address, String phone, long birthDate, String email) {
         this.name = name;
         this.gender = gender;
+        this.country = country;
+        this.city = city;
         this.address = address;
         this.phone = phone;
         this.birthDate = birthDate;
@@ -24,6 +28,9 @@ public class PatientInfo
 
     public String getName() {
         return name;
+    }
+    public String getCity() {
+        return city;
     }
     public String getPhone() {
         return phone;
@@ -37,8 +44,14 @@ public class PatientInfo
     public String getAddress() {
         return address;
     }
-    public String getBirthDate() {
+    public String getCountry() {
+        return country;
+    }
+    public long getBirthDate() {
         return birthDate;
+    }
+    public void setCity(String city) {
+        this.city = city;
     }
     public void setName(String name) {
         this.name = name;
@@ -55,7 +68,10 @@ public class PatientInfo
     public void setAddress(String address) {
         this.address = address;
     }
-    public void setBirthDate(String birthDate) {
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    public void setBirthDate(long birthDate) {
         this.birthDate = birthDate;
     }
 }
