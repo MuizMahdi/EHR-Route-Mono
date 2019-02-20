@@ -48,7 +48,7 @@ public class GenesisBlock
 
         // Empty record
         MedicalRecord record = new MedicalRecord(
-            new PatientInfo("", "", "", "", "", ""),
+            new PatientInfo("", "", "", "", "", "", 0, ""),
             new ArrayList<>(),
             new ArrayList<>(),
             new HashMap<>()

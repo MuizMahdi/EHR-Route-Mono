@@ -44,7 +44,7 @@
 
       <div>
          <label for="country" class="form-layout">Country: </label>
-         <nz-select formControlName="countryCtrl" (ngModelChange)="log($event)" nzAllowClear nzShowSearch nzPlaceHolder="Choose a country" id="country">
+         <nz-select formControlName="countryCtrl" (ngModelChange)="onCountrySelect($event)" nzAllowClear nzShowSearch nzPlaceHolder="Choose a country" id="country">
             <nz-option *ngFor="let c of countries" [nzValue]="c" [nzLabel]="c.name"></nz-option>
          </nz-select>
       </div>
@@ -52,7 +52,7 @@
       <div>
          <label for="city" class="form-layout">City: </label>
          <nz-select formControlName="cityCtrl" nzAllowClear nzShowSearch nzPlaceHolder="Choose a city" id="city">
-            <nz-option *ngFor="let c of countryCities" [nzValue]="c" [nzLabel]="c.name"></nz-option>
+            <nz-option *ngFor="let c of countryCities" [nzValue]="c" [nzLabel]="c.matching_full_name"></nz-option>
          </nz-select>
       </div>
 
