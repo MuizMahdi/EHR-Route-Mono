@@ -116,6 +116,7 @@ export class AuthService
 
       // Reset currentUser subject
       this.currentUser.next(null);
+      this.currentUser = new Subject<any>();
    }
 
 
