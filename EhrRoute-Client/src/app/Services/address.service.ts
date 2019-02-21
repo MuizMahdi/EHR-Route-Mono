@@ -29,27 +29,9 @@ export class AddressService
    { }
 
 
-   public async ensureAddressDBsConnection()
+   public async ensureAddressDbConnection(userID:number)
    {
-      this.authService.getCurrentUserInfo().subscribe(
-
-         (userInfo:UserInfo) => {
-            // Get current user ID
-            let userID = userInfo.id;
-            this.checkAddressDbConnection(userID);
-         },
-
-         (error:ErrorResponse) => {
-            console.log(error);
-         }
-
-      );
-   }
-
-
-   private async checkAddressDbConnection(userID:number)
-   {
-      // Get the DB connection of address's DB
+      // Get user's address DB connection
       try
       {
          this.dbService.getAddressDbConnection(userID);
@@ -78,7 +60,7 @@ export class AddressService
       );
    }
 
-   
+
    public async getUserAddress(userID:number): Promise<Address>
    {
       try
@@ -89,7 +71,7 @@ export class AddressService
       catch(error)
       {
          // Create an address DB/Connection
-         await this.checkAddressDbConnection(userID);
+         await this.ensureAddressDbConnection(userID);
       }
       
       // Get the address DB of user connection

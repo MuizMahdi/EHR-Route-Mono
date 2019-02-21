@@ -1,3 +1,4 @@
+import { PatientInfoService } from './../../../Services/patient-info.service';
 import { RoleName } from './../../../Models/RoleName';
 import { InformationInputComponent } from './../../Modals/information-input/information-input.component';
 import { NzModalService } from 'ng-zorro-antd';
@@ -22,21 +23,19 @@ export class MainComponent implements OnInit
    constructor(
       public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
       private networkService:NodeNetworkService, private addressService:AddressService,
-      private authService:AuthService, private modalService:NzModalService
+      private patientInfoService:PatientInfoService, private authService:AuthService,
+      private modalService:NzModalService
    ) {
       this.mainLayout.show();
    }
 
 
-   ngOnInit()
-   {
+   ngOnInit() {
       // Handles when user reloads page after loggin in, to show a prompt, which 
       // allows for a request to be made, unsubscribing the node from clusters.
       //this.handleReloads();
-
       
-      this.checkIfUserIsProvider();
-      this.initializeLocalDbs();
+      this.checkUserRole();
    }
 
 
@@ -70,22 +69,27 @@ export class MainComponent implements OnInit
    }
 
 
-   private initializeLocalDbs(): void
+   private initializeProviderLocalDbs(userID:number): void
    {
-      // If user has provider role
-      if (this.authService.isUserProvider()) {
+      // Establish connection to user's address DB
+      this.addressService.ensureAddressDbConnection(userID);
 
-         // Establish connection to user's address DB
-         this.addressService.ensureAddressDBsConnection();
-
-         // Establish connections to all of user's networks DBs if they exist
-         this.networkService.checkUserNetworks();
-      }
+      // Establish connections to all of user's networks DBs if they exist
+      this.networkService.checkUserNetworks();
    }
 
 
-   // Checks if user has a 'Provider' role
-   private checkIfUserIsProvider(): void
+   private initializeUserLocalDbs(userID:number): void
+   {
+      // Establish connection to user's address DB
+      this.addressService.ensureAddressDbConnection(userID);
+
+      // Establish connection to user's EHR Patient Info DB
+      this.patientInfoService.ensurePateintInfoDbConnection(userID);
+   }
+
+
+   private checkUserRole(): void
    {
       // Get user info once received from server
       this.authService.currentUser.subscribe((userInfo:UserInfo) => {
@@ -103,9 +107,13 @@ export class MainComponent implements OnInit
                }
             });
 
-            // If user is not a provider, then check if they have added and saved their info
-            if (!isProvider) {
+            if (isProvider) {
+               this.initializeProviderLocalDbs(userInfo.id);
+            }
+            else { // If user is not a provider
+               // Check if they have added and saved their info
                this.checkIfHasAddedInfo(userInfo);
+               this.initializeUserLocalDbs(userInfo.id);
             }
 
          }
@@ -125,6 +133,7 @@ export class MainComponent implements OnInit
 
    private showUserInfoModal(): void
    {
+      // Create modal
       const userInfoModal = this.modalService.create({
          nzTitle: "Add your personal information",
          nzContent: InformationInputComponent,

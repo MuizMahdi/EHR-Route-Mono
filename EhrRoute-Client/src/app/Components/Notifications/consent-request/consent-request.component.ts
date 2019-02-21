@@ -1,3 +1,5 @@
+import { DatabaseService } from 'src/app/DataAccess/database.service';
+import { Address } from './../../../DataAccess/entities/Core/Address';
 import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { NetworkDetails } from './../../../Models/Payload/Responses/NetworkDetails';
 import { NodeNetworkService } from './../../../Services/node-network.service';
@@ -26,7 +28,7 @@ export class ConsentRequestComponent implements OnInit
    constructor(
       private notificationService:NotificationService,
       private networkService:NodeNetworkService,
-      private modal:NzModalRef,
+      private modal:NzModalRef, private databaseService:DatabaseService
    ) 
    { }
 
@@ -55,10 +57,16 @@ export class ConsentRequestComponent implements OnInit
    }
 
 
-   onConsentRequestAccept(): void
+   async onConsentRequestAccept()
    {
-      // Add user address, private key, and info into the Block in the ConsentRequest
-      
+      /* Add user address, private key, and info into the Block in the ConsentRequest */
+
+      // Get user's address from DB
+      //let address:Address = await
+      // Get user's private key from DB
+
+      // Get user's info from DB
+
    }
 
 

@@ -22,7 +22,6 @@ export class AuthService
    loginUrl:string = environment.apiUrl + '/auth/signin';
    getCurrentUserUrl:string = environment.apiUrl + '/users/current';
    userRolesUrl: string = environment.apiUrl + '/users/current/roles';
-   
 
    currentUser: Subject<UserInfo> = new Subject<UserInfo>();
    isLoggedIn:boolean = false;
@@ -53,7 +52,7 @@ export class AuthService
 
             this.saveSession(tokenResponse);
             this.isLoggedIn = true;
-            
+  
             shareReplay()
 
          }),
@@ -122,8 +121,7 @@ export class AuthService
 
    private saveSession(jwtToken): void
    {
-      if(jwtToken && jwtToken.accessToken)
-      {
+      if (jwtToken && jwtToken.accessToken) {
          // Save jwt to local storage
          localStorage.setItem('accessToken', jwtToken.accessToken)
       }
@@ -149,7 +147,7 @@ export class AuthService
                }
             });
 
-            // Then set the user in the user subject, so subscribers will know when user info is received
+            // Set the user in the user subject, so subscribers will know when user info is received
             this.currentUser.next(userInfo);
          },
 
