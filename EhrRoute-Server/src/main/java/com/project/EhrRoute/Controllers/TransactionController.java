@@ -217,8 +217,7 @@ public class TransactionController
         }
 
         // Validate Consent Response.
-        if (!isConsentResponseValid(consentResponse))
-        {
+        if (!isConsentResponseValid(consentResponse)) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Provider has not made a consent request for this response"),
                 HttpStatus.NOT_FOUND
@@ -226,11 +225,12 @@ public class TransactionController
         }
 
         // Get user's EHR Details using their Address that was sent in the consent response
-
+        
 
         // Add the EHR details EHR fields into the block
 
 
+        /*
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
@@ -250,7 +250,8 @@ public class TransactionController
         deleteMatchingConsentRequest(consentResponse);
 
         // Change provider's network ChainRoot to the new sent chainRootWithBlock.
-        changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
+        //changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
+        */
 
         return new ResponseEntity<>(
             new ApiResponse(true, "Block has been signed and Broad-casted successfully"),

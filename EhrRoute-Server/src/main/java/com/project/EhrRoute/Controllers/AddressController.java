@@ -3,10 +3,12 @@ import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Entities.Auth.User;
+import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Core.AddressResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
+import com.project.EhrRoute.Services.EhrDetailService;
 import com.project.EhrRoute.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,14 +26,16 @@ import java.security.PublicKey;
 public class AddressController
 {
     private UserService userService;
+    private EhrDetailService ehrDetailService;
 
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private AddressUtil addressUtil;
 
     @Autowired
-    public AddressController(UserService userService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
+    public AddressController(UserService userService, EhrDetailService ehrDetailService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
         this.userService = userService;
+        this.ehrDetailService = ehrDetailService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.addressUtil = addressUtil;
@@ -42,19 +46,19 @@ public class AddressController
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException
     {
+        // Get user
         User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
 
-        if (user == null)
-        {
+        // Validate user
+        if (user == null) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "User not logged in. Invalid user"),
                 HttpStatus.BAD_REQUEST
             );
         }
 
-        // Not first time login (default is false)
-        if (!user.isFirstLogin())
-        {
+        // If its not the user's first time login
+        if (!user.isFirstLogin()) {
             return new ResponseEntity<>(
                 new ApiResponse(false, "Not the user's first login, user already has an address"),
                 HttpStatus.CONFLICT
@@ -65,16 +69,25 @@ public class AddressController
         user.setFirstLogin(false);
         userService.saveUser(user);
 
-        // Generate address
+        // Generate keypair
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey pubKey = keyPair.getPublic();
         PrivateKey privKey = keyPair.getPrivate();
 
+        // Generate address from public key
         String address = addressUtil.generateAddress(pubKey);
+
+        // Get base64 encoded keys
         String publicKey = keyUtil.getStringFromPublicKey(pubKey);
         String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
-        // Return address
+        // Check if user doesn't have a 'Provider' or 'Admin' role
+        if (!userService.userHasRole(user, RoleName.ROLE_PROVIDER) && !userService.userHasRole(user, RoleName.ROLE_ADMIN)) {
+            // Generate an EHR detail using user's address
+            ehrDetailService.generateUserEhrDetails(address);
+        }
+
+        // Return Address Response
         return new ResponseEntity<>(
             new AddressResponse(address, publicKey, privateKey),
             HttpStatus.OK

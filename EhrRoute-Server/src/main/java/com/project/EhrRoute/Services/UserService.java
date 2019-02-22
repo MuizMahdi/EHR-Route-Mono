@@ -148,6 +148,20 @@ public class UserService
     }
 
 
+    // Checks if the user has a specific role
+    public boolean userHasRole(User user, RoleName role) {
+        Set<Role> userRoles = user.getRoles();
+
+        for (Role userRole : userRoles) {
+            if (userRole.getName() == role) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     @Transactional
     public Set<Network> findUserNetworks(User user) {
         //Network userNetwork = user.getNetwork();
