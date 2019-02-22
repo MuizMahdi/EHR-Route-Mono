@@ -1,3 +1,4 @@
+import { TransactionService } from './../../../Services/transaction.service';
 import { BlockAdditionRequest } from './../../../Models/Payload/Requests/BlockAdditionRequest';
 import { AuthService } from 'src/app/Services/auth.service';
 import { AddressService } from './../../../Services/address.service';
@@ -37,7 +38,7 @@ export class UserProfileComponent implements OnInit
       private userService:UsersService, private modalService:NzModalService, 
       private networkService:NodeNetworkService, private providerService:ProviderService,
       private chainService:ChainService, private addressService:AddressService,
-      private authService:AuthService
+      private authService:AuthService, private transactionService:TransactionService
    ) { }
 
 
@@ -98,7 +99,7 @@ export class UserProfileComponent implements OnInit
    {
       this.getBlockAdditionRequest().then(blockAdditionRequest => {
          
-         this.userService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
+         this.transactionService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
 
             response => {
                console.log(response);

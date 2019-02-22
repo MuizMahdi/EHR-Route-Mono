@@ -114,4 +114,21 @@ export default class ModelMapper
       return ehrPatientInfo;
    }
 
+
+   public static mapEhrPatientInfoToPatientInfo(ehrPatientInfo:EhrPatientInfo): PatientInfo
+   {
+      const patientInfo:PatientInfo = {
+         name: ehrPatientInfo.name,
+         gender: ehrPatientInfo.gender,
+         country: ehrPatientInfo.country,
+         city: ehrPatientInfo.city,
+         address: ehrPatientInfo.address,
+         phone: ehrPatientInfo.phone,
+         birthDate: ehrPatientInfo.birthDate,
+         email: ehrPatientInfo.email
+      }
+
+      return patientInfo;
+   }
+
 }

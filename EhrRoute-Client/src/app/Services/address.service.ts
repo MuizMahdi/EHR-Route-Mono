@@ -74,7 +74,7 @@ export class AddressService
          await this.ensureAddressDbConnection(userID);
       }
       
-      // Get the address DB of user connection
+      // Get user's address DB connection
       const dbConnection:Connection = await this.dbService.getAddressDbConnection(userID);
 
       const address:Address = await dbConnection.manager.findOne(Address, 1);

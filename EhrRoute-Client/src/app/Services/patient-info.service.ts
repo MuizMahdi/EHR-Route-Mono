@@ -1,4 +1,5 @@
-import { UserInfo } from './../Models/Payload/Responses/UserInfo';
+import { Connection } from 'typeorm';
+import { EhrPatientInfo } from './../DataAccess/entities/EHR/EhrPatientInfo';
 import { AuthService } from 'src/app/Services/auth.service';
 import { DatabaseService } from './../DataAccess/database.service';
 import { Injectable } from '@angular/core';
@@ -34,6 +35,21 @@ export class PatientInfoService
             console.log(error);
          }
       }
+   }
+
+
+   public async getUserPateintInfo(userID:number): Promise<EhrPatientInfo>
+   {
+      // Make sure that a connection is available
+      await this.ensurePateintInfoDbConnection(userID);
+      
+      // Get user's PatientInfo DB connection
+      const dbConnection:Connection = await this.dbService.getPatientInfoDbConnection(userID);
+
+      // Get the patient info
+      const patientInfo:EhrPatientInfo = await dbConnection.manager.findOne(EhrPatientInfo, 1);
+
+      return patientInfo;
    }
 
 }

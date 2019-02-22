@@ -199,7 +199,7 @@ public class TransactionController
 
 
     // Called when a user gives consent and accepts a consent request of a block addition
-    @PostMapping("/giveConsent")
+    @PostMapping("/give-consent")
     //@PreAuthorize("hasRole('USER')")
     public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception
     {
@@ -211,8 +211,8 @@ public class TransactionController
         }
         catch (BadRequestException Ex) { // Catch mapping errors due to absence of any field
             return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()),
-                    HttpStatus.BAD_REQUEST
+                new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()),
+                HttpStatus.BAD_REQUEST
             );
         }
 
@@ -224,6 +224,12 @@ public class TransactionController
                 HttpStatus.NOT_FOUND
             );
         }
+
+        // Get user's EHR Details using their Address that was sent in the consent response
+
+
+        // Add the EHR details EHR fields into the block
+
 
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);

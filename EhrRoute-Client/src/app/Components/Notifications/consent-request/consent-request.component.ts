@@ -1,4 +1,10 @@
-import { DatabaseService } from 'src/app/DataAccess/database.service';
+import { TransactionService } from './../../../Services/transaction.service';
+import { UserConsentResponse } from './../../../Models/Payload/Requests/UserConsentResponse';
+import { PatientInfo } from './../../../Models/Payload/Requests/PatientInfo';
+import { EhrPatientInfo } from './../../../DataAccess/entities/EHR/EhrPatientInfo';
+import { PatientInfoService } from './../../../Services/patient-info.service';
+import { AuthService } from 'src/app/Services/auth.service';
+import { AddressService } from './../../../Services/address.service';
 import { Address } from './../../../DataAccess/entities/Core/Address';
 import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { NetworkDetails } from './../../../Models/Payload/Responses/NetworkDetails';
@@ -8,6 +14,7 @@ import { Notification } from 'src/app/Models/Payload/Responses/Notification';
 import { NzModalRef } from 'ng-zorro-antd';
 import { ConsentRequest } from './../../../Models/Payload/Responses/ConsentRequest';
 import { Component, OnInit, Input } from '@angular/core';
+import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
 
 
 @Component({
@@ -26,9 +33,10 @@ export class ConsentRequestComponent implements OnInit
 
 
    constructor(
-      private notificationService:NotificationService,
-      private networkService:NodeNetworkService,
-      private modal:NzModalRef, private databaseService:DatabaseService
+      private notificationService:NotificationService, private modal:NzModalRef,
+      private networkService:NodeNetworkService, private addressService:AddressService,
+      private patientInfoService:PatientInfoService, private authService:AuthService,
+      private transactionService:TransactionService
    ) 
    { }
 
@@ -59,14 +67,43 @@ export class ConsentRequestComponent implements OnInit
 
    async onConsentRequestAccept()
    {
-      /* Add user address, private key, and info into the Block in the ConsentRequest */
+      // Get current user ID
+      let userID: number = this.authService.getCurrentUser().id
 
-      // Get user's address from DB
-      //let address:Address = await
-      // Get user's private key from DB
+      // Get user's address (also private key) from DB
+      let userAddress:Address = await this.addressService.getUserAddress(userID);
 
       // Get user's info from DB
+      let ehrPatientInfo:EhrPatientInfo = await this.patientInfoService.getUserPateintInfo(userID);
 
+      // Add user info into the Block in the ConsentRequest
+      if (this.consentRequest) {
+         let patientInfo:PatientInfo = ModelMapper.mapEhrPatientInfoToPatientInfo(ehrPatientInfo);
+         this.consentRequest.block.transaction.record.patientInfo = patientInfo;
+      }
+
+      // Construct a UserConsentResponse object
+      let userConsentResponse:UserConsentResponse = {
+         block: this.consentRequest.block,
+         userPrivateKey: userAddress.privateKey,
+         userAddress: userAddress.address,
+         providerUUID: this.consentRequest.providerUUID,
+         networkUUID: this.consentRequest.networkUUID,
+         userID: userID
+      }
+
+      // Send the consent response
+      this.transactionService.sendUserEhrConsentResponse(userConsentResponse).subscribe(
+
+         response => {
+            console.log(response);
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
    }
 
 

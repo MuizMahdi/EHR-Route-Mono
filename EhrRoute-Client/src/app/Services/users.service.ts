@@ -1,6 +1,3 @@
-import { UserInfo } from './../Models/Payload/Responses/UserInfo';
-import { RoleName } from './../Models/RoleName';
-import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
 import { first, catchError } from 'rxjs/operators';
 import { RoleChangeRequest } from './../Models/Payload/Requests/RoleChangeRequest';
 import { HttpClient } from '@angular/common/http';
@@ -20,7 +17,6 @@ export class UsersService
    private userRoleChangeUrl:string = environment.apiUrl + '/auth/user-role-change';
    private userSearchUrl:string = environment.apiUrl + '/users/search-by-username';
    private getUserInfoUrl:string = environment.apiUrl + '/users/get-by-username/';
-   private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
    private userFirstLoginStatusUrl:string = environment.apiUrl + '/users/current/first-login-status';
    private userInfoAdditionStatusUrl:string = environment.apiUrl + '/users/current/info-addition-status';
 
@@ -75,18 +71,6 @@ export class UsersService
    {
       return this.http.get(this.userFirstLoginStatusUrl).pipe(first(),
 
-         catchError(error => {
-            return throwError(error);
-         })
-
-      );
-   }
-
-
-   public sendUserEhrConsentRequest(blockAdditionRequest:BlockAdditionRequest): Observable<any>
-   {
-      return this.http.post(this.getUserEhrConsentUrl, blockAdditionRequest).pipe(first(),
-      
          catchError(error => {
             return throwError(error);
          })

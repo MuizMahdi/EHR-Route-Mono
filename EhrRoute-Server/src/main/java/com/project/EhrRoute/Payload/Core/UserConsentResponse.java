@@ -4,17 +4,16 @@ package com.project.EhrRoute.Payload.Core;
 public class UserConsentResponse
 {
     private SerializableBlock block;
-    private String chainRootWithBlock;
     private String userPrivateKey;
     private String userAddress;
     private String providerUUID;
     private String networkUUID;
-    private String userID;
+    private Long userID;
+
 
     public UserConsentResponse() { }
-    public UserConsentResponse(SerializableBlock block, String chainRootWithBlock, String userPrivateKey, String userAddress, String providerUUID, String networkUUID, String userID) {
+    public UserConsentResponse(SerializableBlock block, String userPrivateKey, String userAddress, String providerUUID, String networkUUID, Long userID) {
         this.block = block;
-        this.chainRootWithBlock = chainRootWithBlock;
         this.userPrivateKey = userPrivateKey;
         this.userAddress = userAddress;
         this.providerUUID = providerUUID;
@@ -22,7 +21,8 @@ public class UserConsentResponse
         this.userID = userID;
     }
 
-    public String getUserID() {
+
+    public Long getUserID() {
         return userID;
     }
     public SerializableBlock getBlock() {
@@ -40,11 +40,7 @@ public class UserConsentResponse
     public String getUserPrivateKey() {
         return userPrivateKey;
     }
-    public String getChainRootWithBlock() {
-        return chainRootWithBlock;
-    }
-
-    public void setUserID(String userID) {
+    public void setUserID(Long userID) {
         this.userID = userID;
     }
     public void setBlock(SerializableBlock block) {
@@ -61,8 +57,5 @@ public class UserConsentResponse
     }
     public void setUserPrivateKey(String userPrivateKey) {
         this.userPrivateKey = userPrivateKey;
-    }
-    public void setChainRootWithBlock(String chainRootWithBlock) {
-        this.chainRootWithBlock = chainRootWithBlock;
     }
 }
