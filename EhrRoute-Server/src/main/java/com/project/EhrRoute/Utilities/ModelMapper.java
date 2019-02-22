@@ -116,8 +116,14 @@ public class ModelMapper
         //Transaction transaction = new Transaction();
 
         String base64EncodedStringSignature = serializableBlock.getTransaction().getSignature();
-        transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
 
+        // If block has signature
+        // (blocks in UserConsentResponse doesn't, because signature is generated on server-side after the SerializableBlock is mapped into a Block)
+        if ((base64EncodedStringSignature != null) && (!base64EncodedStringSignature.isEmpty())) {
+            transaction.setSignature(stringUtil.base64DecodeString(base64EncodedStringSignature));
+        } else {
+            transaction.setSignature("".getBytes(StandardCharsets.UTF_8));
+        }
 
         transaction.setTransactionId(stringUtil.base64DecodeString(serializableBlock.getTransaction().getTransactionId()));
         transaction.setRecord(serializableBlock.getTransaction().getRecord());
