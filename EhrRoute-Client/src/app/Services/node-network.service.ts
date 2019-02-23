@@ -39,7 +39,7 @@ export class NodeNetworkService implements OnInit
    { }
 
 
-   checkUserNetworks() 
+   public checkUserNetworks() 
    {
 
       this.getUserNetworks().subscribe(
@@ -67,7 +67,24 @@ export class NodeNetworkService implements OnInit
    }
 
 
-   ensureNetworksDBsConnection(userNetworks:NetworkInfo[])
+   public async ensureNetworkDbConnection(networkUUID:string) 
+   {
+      try {
+         this.dbService.getNetworkDbConnection(networkUUID);
+      }
+      catch (error) {
+         // If no connection for network's DB is available, then create a connection
+         if ( (<Error>error).name == 'ConnectionNotFoundError' ) {
+            await this.dbService.createNetworkDbConnection(networkUUID);
+         }
+         else {
+            console.log(error);
+         }
+      }
+   }
+
+
+   public ensureNetworksDBsConnection(userNetworks:NetworkInfo[])
    {
       // If user has networks
       if (this.userHasNetwork)

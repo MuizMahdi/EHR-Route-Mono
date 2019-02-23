@@ -1,3 +1,6 @@
+import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
+import { NodeNetworkService } from 'src/app/Services/node-network.service';
+import { BlockResponse } from './../Models/Payload/Responses/BlockResponse';
 import { Block } from './../DataAccess/entities/Core/Block';
 import { Connection } from 'typeorm';
 import { DatabaseService } from 'src/app/DataAccess/database.service';
@@ -13,7 +16,7 @@ import sha256 from 'crypto-js/sha256';
 
 export class ChainService 
 {
-   constructor(private dbService:DatabaseService) 
+   constructor(private dbService:DatabaseService, private networkService:NodeNetworkService) 
    { }
 
 
@@ -117,4 +120,18 @@ export class ChainService
 
       return latestBlock[0];
    }
+
+
+   public async addBlock(networkUUID:string, blockResponse:BlockResponse)
+   {
+      // Make sure that a connection has been established
+      this.networkService.ensureNetworkDbConnection(networkUUID);
+
+      // Get a Block from the response
+      let block = ModelMapper.mapBlockResponseToBlock(blockResponse);
+
+      // Get DB connection for the network, then save the block
+      await this.dbService.getNetworkDbConnection(networkUUID).manager.save(block);
+   }   
+         
 }

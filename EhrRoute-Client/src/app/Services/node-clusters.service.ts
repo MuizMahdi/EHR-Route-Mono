@@ -1,3 +1,4 @@
+import { ChainService } from './chain.service';
 import { BlockResponse } from './../Models/Payload/Responses/BlockResponse';
 import { ProviderService } from './provider.service';
 import { HttpClient } from '@angular/common/http';
@@ -28,11 +29,14 @@ export class NodeClustersService implements OnInit
 
    providersEventSource:EventSourcePolyfill;
    consumersEventSource:EventSourcePolyfill;
-   
 
-   constructor(private http:HttpClient, private providerService:ProviderService) { }
 
-   
+   constructor(
+      private http:HttpClient, private providerService:ProviderService,
+      private chainService:ChainService
+   ) { }
+
+
    ngOnInit() {
      this.unsubscribeClusters();
    }
@@ -99,7 +103,7 @@ export class NodeClustersService implements OnInit
 
    }
 
-   
+
    public async subscribeConsumer()
    {
       let nodeUUID:string = "";
@@ -123,17 +127,23 @@ export class NodeClustersService implements OnInit
          );
 
          this.consumersEventSource.onmessage = ((event:any) => {
-
-            let block:BlockResponse = JSON.parse(event.data);
-            console.log(block);
-
             console.log(event);
+         });
 
+         this.consumersEventSource.addEventListener('block', (event:any) => {
+            // Get block from event data
+            let block:BlockResponse = JSON.parse(event.data);
+            let blockNetworkUUID = block.blockHeader.networkUUID;
+
+            console.log(blockNetworkUUID);
+
+            // Add the block to the block network's DB
+            this.chainService.addBlock(blockNetworkUUID, block);
          });
       }   
    }
 
-   
+
    public async unsubscribeClusters()
    {
       console.log("[ClusterService] Sending unsubscribe request...");
