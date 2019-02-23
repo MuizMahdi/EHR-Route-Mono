@@ -2,6 +2,7 @@ package com.project.EhrRoute.Entities.EHR;
 import java.util.List;
 import java.util.Map;
 
+
 public class MedicalRecord
 {
     private PatientInfo patientInfo;
@@ -41,5 +42,15 @@ public class MedicalRecord
     }
     public void setHistory(Map<String, Boolean> history) {
         this.history = history;
+    }
+
+    @Override
+    public String toString() {
+        return "MedicalRecord{" +
+                "patientInfo=" + patientInfo +
+                ", problems=" + problems +
+                ", allergiesAndReactions=" + allergiesAndReactions +
+                ", history=" + history +
+                '}';
     }
 }

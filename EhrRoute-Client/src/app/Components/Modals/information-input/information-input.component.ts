@@ -1,3 +1,4 @@
+import { PatientInfoService } from './../../../Services/patient-info.service';
 import { UsersService } from './../../../Services/users.service';
 import { NzModalRef } from 'ng-zorro-antd';
 import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
@@ -34,7 +35,7 @@ export class InformationInputComponent implements OnInit
    constructor(
       private locationService:LocationService, private authSerice:AuthService,
       private databaseService:DatabaseService, private modal:NzModalRef, 
-      private userService:UsersService
+      private userService:UsersService, private patientInfoService:PatientInfoService
    ) { }
 
 
@@ -133,7 +134,9 @@ export class InformationInputComponent implements OnInit
       let userID = this.authSerice.getCurrentUser().id;
 
       // Create connection to pateint info DB
-      await this.databaseService.createPatientInfoDbConnection(userID);
+      //await this.databaseService.createPatientInfoDbConnection(userID);
+
+      this.patientInfoService.ensurePateintInfoDbConnection(userID);
 
       // Map to a ehr patient info entity
       let ehrPatientInfo = ModelMapper.mapPatientInfoToEhrPatientInfo(patientInfo);

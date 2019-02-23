@@ -5,6 +5,9 @@ import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Entities.App.Notification;
+import com.project.EhrRoute.Entities.EHR.EhrDetails;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Entities.EHR.PatientInfo;
 import com.project.EhrRoute.Events.GetUserConsentEvent;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Exceptions.BadRequestException;
@@ -44,6 +47,7 @@ public class TransactionController
     private ApplicationEventPublisher eventPublisher;
 
     private UserService userService;
+    private EhrDetailService ehrDetailService;
     private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
 
@@ -58,10 +62,11 @@ public class TransactionController
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, EhrDetailService ehrDetailService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
+        this.ehrDetailService = ehrDetailService;
         this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
@@ -225,14 +230,29 @@ public class TransactionController
         }
 
         // Get user's EHR Details using their Address that was sent in the consent response
-        
+        EhrDetails ehrDetails;
 
-        // Add the EHR details EHR fields into the block
+        try {
+            ehrDetails = ehrDetailService.findEhrDetails(consentResponse.getUserAddress());
+        }
+        catch (ResourceNotFoundException Ex) {
+            return ResponseEntity.badRequest().body(
+                new ApiResponse(false, "Invalid user address in consent response." + Ex.getMessage())
+            );
+        }
 
+        // Get patient info from block
+        PatientInfo patientInfo = block.getTransaction().getRecord().getPatientInfo();
 
-        /*
+        // Map EhrDetails data along with the patient info into a MedicalRecord
+        MedicalRecord record = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, patientInfo);
+
+        // Add the MedicalRecord into the block
+        block.getTransaction().setRecord(record);
+
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
+
 
         try
         {
@@ -246,6 +266,7 @@ public class TransactionController
             );
         }
 
+        /*
         // Delete the consent request that matches the response data from DB
         deleteMatchingConsentRequest(consentResponse);
 

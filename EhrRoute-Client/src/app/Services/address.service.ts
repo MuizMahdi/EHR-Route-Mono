@@ -85,11 +85,11 @@ export class AddressService
 
    public async saveUserAddress(addressResponse:AddressResponse, userID:number)
    {
-      // Create an address DB/Connection
-      await this.dbService.createAddressDbConnection(userID);
+      // Make sure that a connection to the address DB has been created
+      this.ensureAddressDbConnection(userID);
 
-      // Get the Connection
-      const dbConnection:Connection = await this.dbService.getAddressDbConnection(userID);
+      // Get the connection
+      const dbConnection:Connection = this.dbService.getAddressDbConnection(userID);
 
       // Map the address response to address
       let address:Address = ModelMapper.mapAddressResponseToAddress(addressResponse);

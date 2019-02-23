@@ -36,8 +36,6 @@ export class TransactionService
 
    public sendUserEhrConsentResponse(userConsentResponse:UserConsentResponse): Observable<any>
    {
-      console.log("SENDING USER CONSENT RESPONSE");
-
       return this.http.post(this.giveUserEhrConsentUrl, userConsentResponse).pipe(first(),
       
          catchError(error => {

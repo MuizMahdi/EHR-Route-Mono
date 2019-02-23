@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class ModelMapper
 {
 
-    private KeyUtil keyUtil;
+private KeyUtil keyUtil;
     private HashUtil hashUtil;
     private StringUtil stringUtil;
     private BlockHeader blockHeader;
@@ -51,7 +51,7 @@ public class ModelMapper
     }
 
 
-    public SerializableBlock mapBlockToSerializableBlock(Block block) throws GeneralSecurityException
+    public SerializableBlock mapBlockToSerializableBlock(Block block)
     {
         /*                                                            */
         // ||||| Populate the SerializableBlock with Block data ||||| //
@@ -90,7 +90,8 @@ public class ModelMapper
         return serializableBlock;
     }
 
-    public Block mapSerializableBlockToBlock(SerializableBlock serializableBlock) throws GeneralSecurityException
+
+    public Block mapSerializableBlockToBlock(SerializableBlock serializableBlock)
     {
         Block block = new Block();
 
@@ -147,6 +148,7 @@ public class ModelMapper
         return block;
     }
 
+
     public Block mapAdditionRequestToBlock(BlockAddition blockAdditionRequest)
     {
         Block block = new Block();
@@ -186,6 +188,7 @@ public class ModelMapper
         return block;
     }
 
+
     public ConsentRequestBlock mapToConsentRequestBlock(Long userID, String providerUUID, String networkUUID, SerializableBlock block)
     {
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
@@ -206,7 +209,8 @@ public class ModelMapper
         return consentRequest;
     }
 
-    private NetworkResponse mapNetworkToNetworkPayload(Network network) throws NullUserNetworkException
+
+    private NetworkResponse mapNetworkToNetworkPayload(Network network)
     {
         if (network == null) {
             throw new NullUserNetworkException("Invalid Network");
@@ -223,7 +227,8 @@ public class ModelMapper
         return new NetworkResponse(networkName, networkUUID, networkChainRoot);
     }
 
-    public UserNetworksResponse mapNetworksToUserNetworksResponse(Set<Network> networks) throws NullUserNetworkException
+
+    public UserNetworksResponse mapNetworksToUserNetworksResponse(Set<Network> networks)
     {
         UserNetworksResponse userNetworksResponse = new UserNetworksResponse();
 
@@ -236,7 +241,8 @@ public class ModelMapper
         return userNetworksResponse;
     }
 
-    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationRequestPayload invitationResponse) throws ResourceEmptyException
+
+    public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationRequestPayload invitationResponse)
     {
         String senderName = invitationResponse.getSenderUsername();
         String networkName = invitationResponse.getNetworkName();
@@ -245,8 +251,8 @@ public class ModelMapper
 
         // Validate NetworkInvitationResponse fields
         if (
-            senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
-            networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty())
+                senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
+                        networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty())
         {
             throw new ResourceEmptyException("Invalid invitation response");
         }
@@ -263,27 +269,30 @@ public class ModelMapper
         return invitationRequest;
     }
 
+
     public NotificationResponse mapNotificationToNotificationResponse(Notification notification, Object reference)
     {
         return new NotificationResponse(
-            notification.getId(),
-            notification.getSender().getUsername(),
-            notification.getRecipient().getUsername(),
-            notification.getType().toString(),
-            reference
+                notification.getId(),
+                notification.getSender().getUsername(),
+                notification.getRecipient().getUsername(),
+                notification.getType().toString(),
+                reference
         );
     }
+
 
     public NetworkInvitationRequestPayload mapNetworkInvitationRequestToPayload(NetworkInvitationRequest invitationRequest, String recipientUsername)
     {
         return new NetworkInvitationRequestPayload(
-            recipientUsername,
-            invitationRequest.getSenderName(),
-            invitationRequest.getNetworkName(),
-            invitationRequest.getNetworkUUID(),
-            invitationRequest.getInvitationToken()
+                recipientUsername,
+                invitationRequest.getSenderName(),
+                invitationRequest.getNetworkName(),
+                invitationRequest.getNetworkUUID(),
+                invitationRequest.getInvitationToken()
         );
     }
+
 
     public UserConsentRequest mapConsentRequestBlockToUserConsentRequest(ConsentRequestBlock consentRequestBlock)
     {
@@ -299,57 +308,48 @@ public class ModelMapper
         medicalRecord.setAllergiesAndReactions(new ArrayList<>());
 
         SerializableTransaction transaction = new SerializableTransaction(
-            consentRequestBlock.getTransactionId(),
-            medicalRecord,
-            consentRequestBlock.getSenderPubKey(),
-            consentRequestBlock.getSenderAddress(),
-            consentRequestBlock.getRecipientAddress(),
-            consentRequestBlock.getSignature()
+                consentRequestBlock.getTransactionId(),
+                medicalRecord,
+                consentRequestBlock.getSenderPubKey(),
+                consentRequestBlock.getSenderAddress(),
+                consentRequestBlock.getRecipientAddress(),
+                consentRequestBlock.getSignature()
         );
 
         SerializableBlockHeader blockHeader = new SerializableBlockHeader(
-            consentRequestBlock.getHash(),
-            consentRequestBlock.getPreviousHash(),
-            consentRequestBlock.getTimeStamp(),
-            consentRequestBlock.getBlockIndex(),
-            consentRequestBlock.getMerkleLeafHash(),
-            consentRequestBlock.getNetworkUUID()
+                consentRequestBlock.getHash(),
+                consentRequestBlock.getPreviousHash(),
+                consentRequestBlock.getTimeStamp(),
+                consentRequestBlock.getBlockIndex(),
+                consentRequestBlock.getMerkleLeafHash(),
+                consentRequestBlock.getNetworkUUID()
         );
 
         SerializableBlock block = new SerializableBlock(blockHeader, transaction);
 
         return new UserConsentRequest(
-            block,
-            consentRequestBlock.getProviderUUID(),
-            consentRequestBlock.getNetworkUUID(),
-            consentRequestBlock.getUserID()
+                block,
+                consentRequestBlock.getProviderUUID(),
+                consentRequestBlock.getNetworkUUID(),
+                consentRequestBlock.getUserID()
         );
     }
 
-    private List<String> mapEhrProblemsToList(Set<EhrProblems> ehrPatientProblems)
+
+    public MedicalRecord mapEhrDetailsToMedicalRecord(EhrDetails ehrDetails, PatientInfo patientInfo)
     {
-        List<String> patientProblems = ehrPatientProblems.stream().map(
+        List<String> medicalProblems = ehrDetails.getProblems().stream().map(
             EhrProblems::getProblem
         ).collect(Collectors.toList());
 
-        return patientProblems;
-    }
-
-    private List<String> mapEhrAllergiesToList(Set<EhrAllergies> ehrPatientAllergies)
-    {
-        List<String> pateintAllergies = ehrPatientAllergies.stream().map(
-                EhrAllergies::getAllergy
+        List<String> allergies = ehrDetails.getAllergies().stream().map(
+            EhrAllergies::getAllergy
         ).collect(Collectors.toList());
 
-        return pateintAllergies;
-    }
-
-    private Map<String, Boolean> mapEhrHistoryToMap(Set<EhrHistory> ehrPatientHistory)
-    {
-        Map<String, Boolean> patientHistory = ehrPatientHistory.stream().collect(
+        Map<String, Boolean> medicalHistory = ehrDetails.getHistory().stream().collect(
             Collectors.toMap(EhrHistory::getCondition, EhrHistory::isOccurrence)
         );
 
-        return patientHistory;
+        return new MedicalRecord(patientInfo, medicalProblems, allergies, medicalHistory);
     }
 }

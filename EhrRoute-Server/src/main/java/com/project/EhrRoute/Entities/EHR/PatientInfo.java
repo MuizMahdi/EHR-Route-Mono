@@ -74,4 +74,19 @@ public class PatientInfo
     public void setBirthDate(long birthDate) {
         this.birthDate = birthDate;
     }
+
+
+    @Override
+    public String toString() {
+        return "PatientInfo{" +
+                "name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", birthDate=" + birthDate +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
