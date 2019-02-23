@@ -100,12 +100,12 @@ export class AuthService
    }
 
 
-   public logout(): void
+   public async logout()
    {
       // If the user has provider role
       if (this.isUserProvider()) {
          // Unsubscribe user node from clusters
-         this.clustersService.unsubscribeClusters();
+         await this.clustersService.unsubscribeClusters();
       }
 
       // Remove user token

@@ -1,3 +1,4 @@
+import { BlockResponse } from './../Models/Payload/Responses/BlockResponse';
 import { ProviderService } from './provider.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
@@ -82,7 +83,7 @@ export class NodeClustersService implements OnInit
 
       if (!this.providersEventSource) 
       {
-         console.log("SENDING PROVDER SUBSCRIBE REQUEST");
+         console.log("[ Sending provider subscribe request ]");
 
          this.providersEventSource = new EventSourcePolyfill(
             url, 
@@ -114,7 +115,7 @@ export class NodeClustersService implements OnInit
 
       if (!this.consumersEventSource)
       {
-         console.log("SENDING CONSUMER SUBSCRIBE REQUEST");
+         console.log("[ Sending consumer subscribe request ]");
 
          this.consumersEventSource = new EventSourcePolyfill(
             url, 
@@ -123,18 +124,26 @@ export class NodeClustersService implements OnInit
 
          this.consumersEventSource.onmessage = ((event:any) => {
 
-            console.log(event.data);
+            let block:BlockResponse = JSON.parse(event.data);
+            console.log(block);
+
+            console.log(event);
 
          });
       }   
    }
 
    
-   unsubscribeClusters(): void
+   public async unsubscribeClusters()
    {
       console.log("[ClusterService] Sending unsubscribe request...");
 
-      let nodeUUID = "a906c224-f882-4cc7-bf48-31ece53765fa";
+      let nodeUUID:string = "";
+
+      // Get and set node UUID as the current provider UUID
+      await this.getCurrentProviderUUID().then(uuid => {
+         nodeUUID = uuid;
+      });
 
       // Unsubscribe node from clusters
       this.http.get(this.clustersUnsubscripeUrl + nodeUUID).pipe(first(),
