@@ -1,3 +1,28 @@
-<p>
-   health-records-manager works!
-</p>
+<h1>Electronic Health Records Manager</h1>
+
+
+<div *ngIf="!userHasNetworks">
+   <h2>You have no network</h2>
+</div>
+
+
+<div *ngIf="userHasNetworks">
+   <ul *ngIf="records.length > 0">
+      <li *ngFor="let record of records">
+         <a href="javascript:void(0)" class="record-item">
+            {{record.patientData.name}}
+         </a>
+      </li>
+   </ul>
+</div>
+
+
+<nz-pagination 
+   *ngIf="totalPagesNumber"
+   (nzPageIndexChange)="changePageNumber($event)" 
+   (nzPageSizeChange)="changePageSize($event)" 
+   [nzPageIndex]="1" 
+   [nzTotal]="totalPagesNumber"
+   [nzPageSizeOptions]="[10, 30, 50]"
+   nzShowSizeChanger>
+</nz-pagination>

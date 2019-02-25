@@ -127,15 +127,13 @@ export class NodeClustersService implements OnInit
          );
 
          this.consumersEventSource.onmessage = ((event:any) => {
-            console.log(event);
+            //console.log(event);
          });
 
          this.consumersEventSource.addEventListener('block', (event:any) => {
             // Get block from event data
             let block:BlockResponse = JSON.parse(event.data);
             let blockNetworkUUID = block.blockHeader.networkUUID;
-
-            console.log(blockNetworkUUID);
 
             // Add the block to the block network's DB
             this.chainService.addBlock(blockNetworkUUID, block);

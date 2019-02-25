@@ -253,9 +253,7 @@ public class TransactionController
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
-
-        try
-        {
+        try {
             // Broadcast the signed block to the other provider nodes in network.
             blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
         }
@@ -266,13 +264,11 @@ public class TransactionController
             );
         }
 
-        /*
         // Delete the consent request that matches the response data from DB
         deleteMatchingConsentRequest(consentResponse);
 
         // Change provider's network ChainRoot to the new sent chainRootWithBlock.
         //changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
-        */
 
         return new ResponseEntity<>(
             new ApiResponse(true, "Block has been signed and Broad-casted successfully"),

@@ -5,6 +5,7 @@ import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Services.ClustersContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @Component
@@ -26,8 +27,11 @@ public class BlockBroadcaster
         // Send SSEs with block to all consumers in the node's network
         networkChainConsumers.getCluster().forEach((consumerUUID, consumerNode) -> {
             try {
+                Long blockID = block.getBlockHeader().getIndex();
+
                 // Send block through a SSE
-                consumerNode.getEmitter().send(block);
+                SseEmitter.SseEventBuilder event = SseEmitter.event().data(block).id(blockID.toString()).name("block");
+                consumerNode.getEmitter().send(event);
             }
             catch (Exception Ex) {
                 clustersContainer.getChainConsumers().removeNode(consumerUUID);

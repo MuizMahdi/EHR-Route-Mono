@@ -132,6 +132,24 @@ export class ChainService
 
       // Get DB connection for the network, then save the block
       await this.dbService.getNetworkDbConnection(networkUUID).manager.save(block);
-   }   
-         
+   }
+
+
+   public async countAllNetworksBlocks(networksUUIDs:string[]): Promise<number>
+   {
+      let count: number = 0;  
+
+      for (let networkUUID of networksUUIDs) {
+         // Get the connection of the network
+         let networkDb = this.dbService.getNetworkDbConnection(networkUUID);
+
+         // Genesis block is subtracted
+         const networkBlocksCount = await networkDb.getRepository(Block).count()-1;
+
+         // Add the counted blocks of the network
+         count = count + networkBlocksCount;
+      }
+
+      return count;
+   }
 }

@@ -116,11 +116,13 @@ public class ClustersController
     {
         // Remove the client from clusters
         if(clustersContainer.getChainConsumers().existsInCluster(nodeUUID)) {
+            clustersContainer.getChainConsumers().getNodeEmitter(nodeUUID).complete();
             clustersContainer.getChainConsumers().removeNode(nodeUUID);
             logger.info("Node [" + nodeUUID + "] has been removed from Consumers.");
         }
 
         if (clustersContainer.getChainProviders().existsInCluster(nodeUUID)) {
+            clustersContainer.getChainProviders().getNodeEmitter(nodeUUID).complete();
             clustersContainer.getChainProviders().removeNode(nodeUUID);
             logger.info("Node [" + nodeUUID + "] has been removed from Providers.");
         }
@@ -201,6 +203,9 @@ public class ClustersController
 
                     // Remove the provider from cluster
                     cluster.removeNode(nodeUUID);
+
+                    // Close connection
+                    node.getEmitter().complete();
 
                     logger.info("Node [" + nodeUUID + "] was not found, and has been removed from cluster.");
                 }

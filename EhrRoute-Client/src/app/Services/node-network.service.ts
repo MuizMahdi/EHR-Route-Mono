@@ -127,6 +127,25 @@ export class NodeNetworkService implements OnInit
    }
 
 
+   public async getUserNetworksUUIDs(): Promise<string[]>
+   {
+      let networkUUIDs:string[] = [];
+
+      return this.getUserNetworks().toPromise().then((response:UserNetworks) => { 
+  
+         let userNetworks: NetworkInfo[] = response.userNetworks;
+
+         userNetworks.forEach(network => {
+            networkUUIDs.push(network.networkUUID);
+         });
+
+         return networkUUIDs;
+         
+      });
+   }
+
+
+
    public getNetworkRoot(networkUUID:string): Observable<any> {
 
       let url:string = this.networkRootUrl + '?networkuuid=' + networkUUID;
