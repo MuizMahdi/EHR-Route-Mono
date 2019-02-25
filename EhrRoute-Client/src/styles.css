@@ -2,19 +2,24 @@
 
 body
 {
-   background-color: rgb(244, 246, 248);
-   background-repeat: round;
+   background-image: linear-gradient(to right, rgb(244, 244, 244), rgb(244, 244, 244));
+
+   /* LIGHT GRAY 
+      background-color: rgb(244, 244, 244);
+   */
 
    /* LIGHT GRAY SOLID
       background-color: rgb(239, 241, 243);
    */
 
    /*GRAY GRADIENT
-      background-image: linear-gradient(to right, rgb(225, 225, 225), whitesmoke); 
+      background-image: linear-gradient(to right, rgb(225, 225, 225), whitesmoke);
+      background-repeat: round;
    */
    
    /*BLUE GRADIENT
       background-image: linear-gradient(to right, rgb(85, 151, 218), rgb(95, 199, 218));
+      background-repeat: round;
    */
 }
 

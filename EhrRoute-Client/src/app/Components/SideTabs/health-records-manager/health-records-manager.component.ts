@@ -15,7 +15,7 @@ import { MainLayoutService } from 'src/app/Services/main-layout.service';
 
 export class HealthRecordsManagerComponent implements OnInit 
 {
-   pageSize: number = 3;
+   pageSize: number = 8;
    pageNumber: number = 1;
    totalPagesNumber: number;
    records: ElectronicHealthRecord[] = [];
@@ -88,6 +88,12 @@ export class HealthRecordsManagerComponent implements OnInit
    private changePageSize(pageSize:number): void {
       this.pageSize = pageSize;
       this.getRecords();
+   }
+
+
+   private viewRecordDetails(record:ElectronicHealthRecord): void
+   {
+      console.log(record);
    }
 
 }
