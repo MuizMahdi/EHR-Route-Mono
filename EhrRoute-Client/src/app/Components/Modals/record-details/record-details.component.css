@@ -1,0 +1,38 @@
+.menu-tab-title {
+   font-weight: bold; 
+   font-size: 1em;
+   margin-left: 10px;
+   font-family:'QanelasSoft-Regular';
+}
+
+
+.info-category {
+   font-size: 1.2em;
+   color: gray;
+   text-transform: uppercase;
+   font-family:'QanelasSoft-Regular';
+   margin-top: 10vh;
+}
+
+
+.info-category-basic {
+   margin-top: 5vh;
+}
+
+
+.info-text {
+   margin-bottom: 10px;
+}
+
+
+.ehr-prompt {
+   margin-bottom: 1vh;
+}
+
+.ehr-list {
+   margin-bottom: 3vh;
+}
+
+.ehr-input {
+   margin-bottom: 10vh;
+}

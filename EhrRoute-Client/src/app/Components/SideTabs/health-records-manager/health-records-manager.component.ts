@@ -1,3 +1,5 @@
+import { RecordDetailsComponent } from './../../Modals/record-details/record-details.component';
+import { NzModalService } from 'ng-zorro-antd';
 import { ChainService } from './../../../Services/chain.service';
 import { ElectronicHealthRecord } from './../../../Models/App/ElectronicHealthRecord';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
@@ -25,7 +27,8 @@ export class HealthRecordsManagerComponent implements OnInit
 
    constructor (
       public mainLayout:MainLayoutService, private ehrService:EhrService,
-      private networkService:NodeNetworkService, private chainService:ChainService
+      private networkService:NodeNetworkService, private chainService:ChainService,
+      private modalService:NzModalService
    ) { 
       mainLayout.show();
    }
@@ -93,7 +96,28 @@ export class HealthRecordsManagerComponent implements OnInit
 
    private viewRecordDetails(record:ElectronicHealthRecord): void
    {
-      console.log(record);
-   }
+      let patientName:string = record.patientData.name;
 
+      const recordDetailsModal = this.modalService.create({
+
+         nzTitle: patientName + "'s EHR",
+
+         nzContent: RecordDetailsComponent,
+
+         // Pass the parameter to the component as an input
+         nzComponentParams: {
+            EHR: record
+         },
+
+         nzFooter: null,
+
+         nzWidth: '60vw'
+
+      });
+
+      // delay until modal instance created
+      window.setTimeout(() => {
+        const instance = recordDetailsModal.getContentComponent();
+      }, 2000);
+   }
 }

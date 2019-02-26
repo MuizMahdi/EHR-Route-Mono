@@ -36,6 +36,7 @@ import { NgxElectronModule } from 'ngx-electron';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
+import { RecordDetailsComponent } from './Components/Modals/record-details/record-details.component';
 
 
 registerLocaleData(en);
@@ -47,7 +48,8 @@ registerLocaleData(en);
       NetworkInvitationComponent,
       UserProfileComponent,
       ConsentRequestComponent,
-      InformationInputComponent
+      InformationInputComponent,
+      RecordDetailsComponent
    ],
 
    declarations: [
@@ -67,7 +69,8 @@ registerLocaleData(en);
       HealthRecordsManagerComponent,
       UserProfileComponent,
       ConsentRequestComponent,
-      InformationInputComponent
+      InformationInputComponent,
+      RecordDetailsComponent
    ],
 
    imports: [
