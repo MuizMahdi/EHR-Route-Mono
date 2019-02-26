@@ -1,7 +1,8 @@
-import { MedicalRecord } from './../DataAccess/entities/EHR/MedicalRecord';
 import { ElectronicHealthRecord } from './../Models/App/ElectronicHealthRecord';
+import { BlockInfo } from './../Models/App/BlockInfo';
+import { HealthRecordData } from './../Models/App/HealthRecordData';
+import { MedicalRecord } from './../DataAccess/entities/EHR/MedicalRecord';
 import { Block } from './../DataAccess/entities/Core/Block';
-import { NodeNetworkService } from 'src/app/Services/node-network.service';
 import { DatabaseService } from 'src/app/DataAccess/database.service';
 import { Injectable } from '@angular/core';
 
@@ -75,13 +76,35 @@ export class EhrService
                break networksLoop;
             }
 
+            // Get medical records
             let record: MedicalRecord[] = await networkDb.getRepository(MedicalRecord).find({
                where: {id: i}, 
                relations: ["patientData", "conditions", "allergies", "history"]
             });
+
+            // Get blocks
+            let block: Block[] = await networkDb.getRepository(Block).find({
+               where: {id: i}
+            });
    
-            let ehr:ElectronicHealthRecord = record[0];
+            // The medical record
+            let recordData:HealthRecordData = record[0];
+
+            // Construct a BlockInfo using fields acquired from the block of the medical record
+            let blockInfo: BlockInfo = {
+               index: block[0].index,
+               timeStamp: block[0].timeStamp,
+               networkUUID: block[0].networkUUID,
+               senderAddress: block[0].senderAddress,
+               recipientAddress: block[0].recipientAddress
+            };
    
+            // Construct an EHR object
+            let ehr: ElectronicHealthRecord = {
+               blockInfo: blockInfo,
+               recordData: recordData
+            }
+
             if (ehr) {
                records.push(ehr);
                recordsCount++;

@@ -1,5 +1,7 @@
-import { NzModalService } from 'ng-zorro-antd';
+import { BlockInfo } from './../../../Models/App/BlockInfo';
+import { HealthRecordData } from './../../../Models/App/HealthRecordData';
 import { ElectronicHealthRecord } from './../../../Models/App/ElectronicHealthRecord';
+import { NzModalService } from 'ng-zorro-antd';
 import { Component, OnInit, Input } from '@angular/core';
 
 
@@ -16,6 +18,9 @@ export class RecordDetailsComponent implements OnInit
 
    patientAge:number;
 
+   recordData: HealthRecordData;
+   blockInfo: BlockInfo;
+
    ehrConditions: string[] = [];
    ehrAllergies: string[] = [];
    ehrHistory: {condition:string; occurrence:boolean;};
@@ -31,8 +36,10 @@ export class RecordDetailsComponent implements OnInit
    ngOnInit() {
 
       if (this.EHR) {
-         this.ehrConditions = this.EHR.conditions;
-         this.ehrAllergies = this.EHR.allergies;
+         this.recordData = this.EHR.recordData;
+         this.blockInfo = this.EHR.blockInfo;
+         this.ehrConditions = this.recordData.conditions;
+         this.ehrAllergies = this.recordData.allergies;
          this.calculateAge();
       }
 
@@ -40,7 +47,7 @@ export class RecordDetailsComponent implements OnInit
 
 
    private calculateAge(): void {
-      let birthDateInMs = this.EHR.patientData.birthDate;
+      let birthDateInMs = this.EHR.recordData.patientData.birthDate;
       let currentTimeInMs = new Date().getTime();
       this.patientAge = Math.floor((currentTimeInMs - birthDateInMs) / (1000*60*60*24*30*12));
    }
@@ -85,6 +92,11 @@ export class RecordDetailsComponent implements OnInit
 
    private toggleEhrEditing(): void {
       this.isEditingEhr = !this.isEditingEhr;
+   }
+
+
+   private requestEhrUpdateConsent() {
+      
    }
 
 }

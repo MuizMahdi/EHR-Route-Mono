@@ -1,11 +1,9 @@
-import { PatientInfo } from './../Payload/Requests/PatientInfo';
+import { HealthRecordData } from './HealthRecordData';
+import { BlockInfo } from './BlockInfo';
 
 
 export interface ElectronicHealthRecord
 {
-   id:number;
-   patientData:PatientInfo;
-   conditions:any;
-   allergies:any;
-   history:any;
+   blockInfo: BlockInfo;
+   recordData: HealthRecordData;
 }

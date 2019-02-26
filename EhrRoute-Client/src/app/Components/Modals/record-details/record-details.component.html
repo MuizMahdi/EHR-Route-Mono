@@ -21,12 +21,12 @@
 
       <tr>
          <th>Name: </th>
-         <span class="info-text">{{EHR.patientData.name}}</span>
+         <span class="info-text">{{recordData.patientData.name}}</span>
       </tr>
 
       <tr class="info-text">
          <th>Gender: </th>
-         <span>{{EHR.patientData.gender}}</span>
+         <span>{{recordData.patientData.gender}}</span>
       </tr>
 
       <tr class="info-text">
@@ -36,12 +36,12 @@
 
       <tr class="info-text">
          <th>Country: </th>
-         <span>{{EHR.patientData.country}}</span>
+         <span>{{recordData.patientData.country}}</span>
       </tr>
 
       <tr class="info-text">
          <th>City: </th>
-         <span>{{EHR.patientData.city}}</span>
+         <span>{{recordData.patientData.city}}</span>
       </tr>
 
    </table> 
@@ -54,17 +54,17 @@
 
       <tr class="info-text">
          <th>Phone: </th>
-         <span>{{EHR.patientData.phone}}</span>
+         <span>{{recordData.patientData.phone}}</span>
       </tr>
 
       <tr class="info-text">
          <th>Email: </th>
-         <span>{{EHR.patientData.email}}</span>
+         <span>{{recordData.patientData.email}}</span>
       </tr>
 
       <tr class="info-text">
          <th>Address: </th>
-         <span>{{EHR.patientData.address}}</span>
+         <span>{{recordData.patientData.address}}</span>
       </tr>
   
    </table> 
@@ -146,7 +146,7 @@
 
    <div style="margin-top:3vh;">
       <button *ngIf="!isEditingEhr" (click)="toggleEhrEditing()" style="margin-right:5px;" nzType="default" nz-button>Edit EHR</button>
-      <button *ngIf="isEditingEhr" (click)="requestEhrEditConsent()" style="margin-right:5px;" nzType="primary" nz-button>Request Edit consent</button>
+      <button *ngIf="isEditingEhr" (click)="requestEhrUpdateConsent()" style="margin-right:5px;" nzType="primary" nz-button>Request Edit consent</button>
       <button *ngIf="isEditingEhr" (click)="toggleEhrEditing()" nzType="default" nz-button>Cancel Editing</button>
    </div>
 

@@ -1,7 +1,8 @@
+import { ElectronicHealthRecord } from './../../../Models/App/ElectronicHealthRecord';
 import { RecordDetailsComponent } from './../../Modals/record-details/record-details.component';
 import { NzModalService } from 'ng-zorro-antd';
 import { ChainService } from './../../../Services/chain.service';
-import { ElectronicHealthRecord } from './../../../Models/App/ElectronicHealthRecord';
+import { HealthRecordData } from '../../../Models/App/HealthRecordData';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
 import { EhrService } from './../../../Services/ehr.service';
 import { Component, OnInit } from '@angular/core';
@@ -96,7 +97,7 @@ export class HealthRecordsManagerComponent implements OnInit
 
    private viewRecordDetails(record:ElectronicHealthRecord): void
    {
-      let patientName:string = record.patientData.name;
+      let patientName:string = record.recordData.patientData.name;
 
       const recordDetailsModal = this.modalService.create({
 
