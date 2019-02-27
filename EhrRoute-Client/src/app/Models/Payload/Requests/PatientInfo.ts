@@ -8,4 +8,5 @@ export interface PatientInfo
    phone:string;
    birthDate:number;
    email:string;
+   userID:number;
 }

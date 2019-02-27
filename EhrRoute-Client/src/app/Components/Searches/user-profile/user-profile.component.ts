@@ -95,8 +95,9 @@ export class UserProfileComponent implements OnInit
    }
 
 
-   private requestEhrPrivilege(): void
+   private async requestEhrPrivilege()
    {
+      /*
       this.getBlockAdditionRequest().then(blockAdditionRequest => {
          
          this.transactionService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
@@ -112,6 +113,26 @@ export class UserProfileComponent implements OnInit
          );
          
       })
+      */
+
+      let providerUserId = this.authService.getCurrentUser().id;
+      let patientUserId = this.searchedUser.id;
+      let providerNetworkUUID = this.selectedNetwork.networkUUID;
+
+      let blockAdditionRequest = await this.chainService.generateBlockAdditionRequest(providerUserId, patientUserId, providerNetworkUUID);
+   
+      this.transactionService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
+
+         response => {
+            console.log(response);
+         },
+
+         (error:ErrorResponse) => {
+            console.log(error);
+         }
+
+      );
+   
    }
 
 

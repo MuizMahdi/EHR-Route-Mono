@@ -1,3 +1,6 @@
+import { AddressService } from './address.service';
+import { ProviderService } from './provider.service';
+import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
 import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
 import { NodeNetworkService } from 'src/app/Services/node-network.service';
 import { BlockResponse } from './../Models/Payload/Responses/BlockResponse';
@@ -16,8 +19,10 @@ import sha256 from 'crypto-js/sha256';
 
 export class ChainService 
 {
-   constructor(private dbService:DatabaseService, private networkService:NodeNetworkService) 
-   { }
+   constructor(
+      private dbService:DatabaseService, private networkService:NodeNetworkService,
+      private providerService:ProviderService, private addressService:AddressService
+   ) { }
 
 
    public async generateNetworkMerkleRoot(networkUUID:string): Promise<string>
@@ -154,5 +159,69 @@ export class ChainService
    }
 
 
-   
+   public async generateBlockAdditionRequest(providerUserId:number, ehrUserId:number, networkUuid:string): Promise<BlockAdditionRequest>
+   {
+      let providerID = providerUserId;
+      let ehrUserID = ehrUserId;
+      let networkUUID = networkUuid;
+      let merkleRootWithoutBlock:string = "";
+      let previousBlockHash:string = "";
+      let previousBlockIndex:number;
+      let senderAddress:string = "";
+      let providerUUID:string = "";
+
+      // Get and set provider UUID
+      await this.getCurrentProviderUUID().then(uuid => {
+         providerUUID = uuid;
+      });
+
+      // Get and set merkle root
+      await this.generateNetworkMerkleRoot(networkUUID).then(root => {
+         merkleRootWithoutBlock = root;
+      });
+
+      // Get and set sender address
+      await this.addressService.getUserAddress(providerID).then(address => {
+         senderAddress = address.address;
+      });
+
+      // Get and set block index and previous hash
+      await this.getNetworkLatestBlock(networkUUID).then(block => {
+         previousBlockIndex = block.index;
+         previousBlockHash = block.hash;
+      });
+
+      // Construct a block addition object
+      let blockAdditionRequest:BlockAdditionRequest = {
+         chainRootWithoutBlock:merkleRootWithoutBlock,
+         previousBlockIndex: previousBlockIndex.toString(),
+         previousBlockHash: previousBlockHash,
+         senderAddress: senderAddress,
+         providerUUID: providerUUID,
+         networkUUID: networkUUID,
+         ehrUserID: ehrUserID.toString()
+      }
+
+      return blockAdditionRequest;
+   }
+
+
+   private async getCurrentProviderUUID(): Promise<string>
+   {
+      let providerUUID:string;
+      
+      await this.providerService.getCurrentProviderUUID().then(
+         
+         response => {
+            providerUUID = response.payload;
+         })
+
+         .catch(error => {
+            console.log(error);
+         }
+
+      );
+      
+      return providerUUID;
+   }
 }

@@ -30,4 +30,7 @@ export class EhrPatientInfo
 
    @Column()
    email:string;
+
+   @Column()
+   userID:number;
 }

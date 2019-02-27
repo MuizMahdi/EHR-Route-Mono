@@ -9,6 +9,7 @@ import { LocationService } from './../../../Services/location.service';
 import { PatientInfo } from './../../../Models/Payload/Requests/PatientInfo';
 import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { EhrPatientInfo } from 'src/app/DataAccess/entities/EHR/EhrPatientInfo';
 
 
 @Component({
@@ -106,6 +107,7 @@ export class InformationInputComponent implements OnInit
    {
       // Get current user email
       let userEmail = this.authSerice.getCurrentUser().email;
+      let userID = this.authSerice.getCurrentUser().id;
 
       let country:string = this.userInfoForm.get("countryCtrl").value.name;
       let city:string = this.userInfoForm.get("cityCtrl").value.matching_full_name;
@@ -119,7 +121,8 @@ export class InformationInputComponent implements OnInit
          address: this.userInfoForm.get("addressCtrl").value,
          phone: this.userInfoForm.get("phoneCtrl").value,
          birthDate: this.userInfoForm.get("birthCtrl").value.getTime(),
-         email: userEmail
+         email: userEmail,
+         userID: userID
       }
 
       return userInfo;
@@ -139,7 +142,7 @@ export class InformationInputComponent implements OnInit
       this.patientInfoService.ensurePateintInfoDbConnection(userID);
 
       // Map to a ehr patient info entity
-      let ehrPatientInfo = ModelMapper.mapPatientInfoToEhrPatientInfo(patientInfo);
+      let ehrPatientInfo: EhrPatientInfo = ModelMapper.mapPatientInfoToEhrPatientInfo(patientInfo);
 
       // Save on patient info DB
       await this.databaseService.getPatientInfoDbConnection(userID).manager.save(ehrPatientInfo).then(

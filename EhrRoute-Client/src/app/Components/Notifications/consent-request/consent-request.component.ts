@@ -11,7 +11,7 @@ import { NetworkDetails } from './../../../Models/Payload/Responses/NetworkDetai
 import { NodeNetworkService } from './../../../Services/node-network.service';
 import { NotificationService } from './../../../Services/notification.service';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
-import { NzModalRef } from 'ng-zorro-antd';
+import { NzModalRef, NzModalService } from 'ng-zorro-antd';
 import { ConsentRequest } from './../../../Models/Payload/Responses/ConsentRequest';
 import { Component, OnInit, Input } from '@angular/core';
 import ModelMapper from 'src/app/Helpers/Utils/ModelMapper';
@@ -36,7 +36,7 @@ export class ConsentRequestComponent implements OnInit
       private notificationService:NotificationService, private modal:NzModalRef,
       private networkService:NodeNetworkService, private addressService:AddressService,
       private patientInfoService:PatientInfoService, private authService:AuthService,
-      private transactionService:TransactionService
+      private transactionService:TransactionService, private modalService: NzModalService
    ) 
    { }
 
@@ -78,7 +78,7 @@ export class ConsentRequestComponent implements OnInit
 
       // Add user info into the Block in the ConsentRequest
       if (this.consentRequest) {
-         let patientInfo:PatientInfo = ModelMapper.mapEhrPatientInfoToPatientInfo(ehrPatientInfo);
+         let patientInfo:PatientInfo = ModelMapper.mapEhrPatientInfoToPatientInfo(ehrPatientInfo, userID);
          this.consentRequest.block.transaction.record.patientInfo = patientInfo;
       }
 
@@ -104,6 +104,20 @@ export class ConsentRequestComponent implements OnInit
          }
 
       );
+
+      // Delete notification
+      this.deleteNotification();
+   }
+
+
+   onConsentRequestReject()
+   {
+      // View a modal asking for confirmation
+      this.modalService.confirm({
+         nzTitle: 'Are you sure that you want to reject ?',
+         nzContent: 'The institution will not be notified if you reject the request',
+         nzOnOk: () => this.deleteNotification()
+      });
    }
 
 

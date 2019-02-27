@@ -12,7 +12,7 @@ import { Injectable } from '@angular/core';
 
 export class PatientInfoService 
 {
-   constructor(private dbService:DatabaseService, private authService:AuthService)
+   constructor(private dbService:DatabaseService)
    { }
 
 

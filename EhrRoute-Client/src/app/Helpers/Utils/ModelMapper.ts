@@ -110,12 +110,13 @@ export default class ModelMapper
       ehrPatientInfo.city = patientInfo.city;
       ehrPatientInfo.country = patientInfo.country;
       ehrPatientInfo.address = patientInfo.address;
+      ehrPatientInfo.userID = patientInfo.userID;
 
       return ehrPatientInfo;
    }
 
 
-   public static mapEhrPatientInfoToPatientInfo(ehrPatientInfo:EhrPatientInfo): PatientInfo
+   public static mapEhrPatientInfoToPatientInfo(ehrPatientInfo:EhrPatientInfo, userId:number): PatientInfo
    {
       const patientInfo:PatientInfo = {
          name: ehrPatientInfo.name,
@@ -125,7 +126,8 @@ export default class ModelMapper
          address: ehrPatientInfo.address,
          phone: ehrPatientInfo.phone,
          birthDate: ehrPatientInfo.birthDate,
-         email: ehrPatientInfo.email
+         email: ehrPatientInfo.email,
+         userID: userId
       }
 
       return patientInfo;

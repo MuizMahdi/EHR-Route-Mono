@@ -144,23 +144,17 @@ export class NavUserNotificationsComponent implements OnInit
             notification: notification
          },
 
+         nzWidth: '50vw',
+
          nzFooter: [
             {
                label: 'Later',
                shape: 'default',
                onClick: () => notificationModal.destroy()
-            },
-            {
-               label: 'Reject',
-               shape: 'danger',
-               onClick: () => { /* Delete Notification from DB */ notificationModal.destroy(); }
             }
          ]
 
       });
-
-      notificationModal.afterOpen.subscribe(() => console.log('Notification Modal Opened'));
-      notificationModal.afterClose.subscribe(() => console.log('Notification Modal Closed'));
 
       // delay until modal instance created
       window.setTimeout(() => {

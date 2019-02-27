@@ -55,9 +55,17 @@
 
    <br>
 
-   <p>You can give consent, reject the request, or choose later.</p>
 
-   <button (click)="onConsentRequestAccept()" nz-button nzType="primary" style="display:flex; margin-left:auto; padding-top:0px; margin-bottom:-13px; margin-right:-9px;">
-      Accept
-   </button>
+   <div style="margin-top:4vh;">
+      <button (click)="onConsentRequestAccept()" nz-button nzType="primary" style="display:flex; margin-left:auto; margin-bottom:-32px; margin-right:70px;">
+         Accept
+      </button>
+
+      <button (click)="onConsentRequestReject()" nz-button nzType="danger" style="display:flex; margin-left:auto; margin-bottom:-13px; margin-right:-9px;">
+         Reject
+      </button>
+   </div>
+      
+   
+   
 </div>

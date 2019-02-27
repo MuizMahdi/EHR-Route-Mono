@@ -25,8 +25,7 @@ export class AddressService
 
    constructor(
       private dbService:DatabaseService, private http:HttpClient, 
-      private authService:AuthService) 
-   { }
+   ) { }
 
 
    public async ensureAddressDbConnection(userID:number)

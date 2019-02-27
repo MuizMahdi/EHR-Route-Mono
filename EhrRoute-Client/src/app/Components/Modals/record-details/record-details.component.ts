@@ -1,3 +1,6 @@
+import { AuthService } from './../../../Services/auth.service';
+import { BlockAdditionRequest } from './../../../Models/Payload/Requests/BlockAdditionRequest';
+import { ChainService } from './../../../Services/chain.service';
 import { BlockInfo } from './../../../Models/App/BlockInfo';
 import { HealthRecordData } from './../../../Models/App/HealthRecordData';
 import { ElectronicHealthRecord } from './../../../Models/App/ElectronicHealthRecord';
@@ -29,7 +32,8 @@ export class RecordDetailsComponent implements OnInit
    isEditingEhr: boolean = false;
 
    constructor(
-      private modalService:NzModalService
+      private modalService:NzModalService, private chainService:ChainService,
+      private authService:AuthService
    ) { }
 
 
@@ -41,6 +45,7 @@ export class RecordDetailsComponent implements OnInit
          this.ehrConditions = this.recordData.conditions;
          this.ehrAllergies = this.recordData.allergies;
          this.calculateAge();
+         console.log(this.recordData.patientData.userID);
       }
 
    }
@@ -95,8 +100,16 @@ export class RecordDetailsComponent implements OnInit
    }
 
 
-   private requestEhrUpdateConsent() {
-      
+   private async requestEhrUpdateConsent() {
+
+      let providerUserId = this.authService.getCurrentUser().id;
+      let patientUserId = this.recordData.patientData.userID;
+      let providerNetworkUUID = this.blockInfo.networkUUID;
+
+      let blockAdditionRequest: BlockAdditionRequest = await this.chainService.generateBlockAdditionRequest(providerUserId, patientUserId, providerNetworkUUID);
+   
+      console.log(blockAdditionRequest);
    }
+   
 
 }

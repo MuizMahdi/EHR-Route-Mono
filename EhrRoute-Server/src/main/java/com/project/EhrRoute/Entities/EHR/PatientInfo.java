@@ -11,10 +11,11 @@ public class PatientInfo
     private String phone; // Phone input
     private long birthDate;
     private String email; // Get it from user
+    private long userID;
 
 
     public PatientInfo() { }
-    public PatientInfo(String name, String gender, String country, String city, String address, String phone, long birthDate, String email) {
+    public PatientInfo(String name, String gender, String country, String city, String address, String phone, long birthDate, String email, long userID) {
         this.name = name;
         this.gender = gender;
         this.country = country;
@@ -23,6 +24,7 @@ public class PatientInfo
         this.phone = phone;
         this.birthDate = birthDate;
         this.email = email;
+        this.userID = userID;
     }
 
 
@@ -31,6 +33,9 @@ public class PatientInfo
     }
     public String getCity() {
         return city;
+    }
+    public long getUserID() {
+        return userID;
     }
     public String getPhone() {
         return phone;
@@ -62,6 +67,9 @@ public class PatientInfo
     public void setEmail(String email) {
         this.email = email;
     }
+    public void setUserID(long userID) {
+        this.userID = userID;
+    }
     public void setGender(String gender) {
         this.gender = gender;
     }
@@ -78,15 +86,16 @@ public class PatientInfo
 
     @Override
     public String toString() {
-        return "PatientInfo{" +
-                "name='" + name + '\'' +
-                ", gender='" + gender + '\'' +
-                ", country='" + country + '\'' +
-                ", city='" + city + '\'' +
-                ", address='" + address + '\'' +
-                ", phone='" + phone + '\'' +
-                ", birthDate=" + birthDate +
-                ", email='" + email + '\'' +
-                '}';
+        return "PatientInfo {" +
+            "name='" + name + '\'' +
+            ", gender='" + gender + '\'' +
+            ", country='" + country + '\'' +
+            ", city='" + city + '\'' +
+            ", address='" + address + '\'' +
+            ", phone='" + phone + '\'' +
+            ", birthDate=" + birthDate +
+            ", email='" + email + '\'' +
+            ", userID=" + userID +
+        '}';
     }
 }
