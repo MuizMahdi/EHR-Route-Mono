@@ -1,3 +1,4 @@
+import { UpdatedBlockAdditionRequest } from './../Models/Payload/Requests/UpdatedBlockAdditionRequest';
 import { UserConsentResponse } from './../Models/Payload/Requests/UserConsentResponse';
 import { first, catchError } from 'rxjs/operators';
 import { environment } from './../../environments/environment.prod';
@@ -15,6 +16,7 @@ import { Injectable } from '@angular/core';
 export class TransactionService 
 {
    private getUserEhrConsentUrl:string = environment.apiUrl + '/transaction/getConsent';
+   private getEhrUpdateConsentUrl:string = environment.apiUrl + '/transaction/get-update-consent';
    private giveUserEhrConsentUrl:string = environment.apiUrl + '/transaction/give-consent';
 
 
@@ -42,6 +44,18 @@ export class TransactionService
             return throwError(error);
          })
       
+      );
+   }
+
+
+   public sendEhrUpdateConsentResponse(updatedBlockRequest:UpdatedBlockAdditionRequest): Observable<any>
+   {
+      return this.http.post(this.getEhrUpdateConsentUrl, updatedBlockRequest).pipe(first(),
+      
+         catchError(error => {
+            return throwError(error);
+         })
+   
       );
    }
 }

@@ -1,6 +1,7 @@
 package com.project.EhrRoute.Entities.EHR;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ public class EhrDetails
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull
     private String address;
 
 
@@ -60,6 +61,12 @@ public class EhrDetails
     }
 
 
+    public Long getId() {
+        return id;
+    }
+    public String getAddress() {
+        return address;
+    }
     public Set<EhrHistory> getHistory() {
         return history;
     }
@@ -70,6 +77,12 @@ public class EhrDetails
         return allergies;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
     public void setHistory(Set<EhrHistory> history) {
         this.history = history;
     }

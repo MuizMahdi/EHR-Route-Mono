@@ -42,14 +42,14 @@ public class ProviderDetails
     public User getUser() {
         return user;
     }
-    public Institution getProviderInstitution() {
-        return providerInstitution;
-    }
     public String getProviderUUID() {
         return providerUUID;
     }
     public String getProviderAddress() {
         return providerAddress;
+    }
+    public Institution getProviderInstitution() {
+        return providerInstitution;
     }
 
     public void setId(Long id) {

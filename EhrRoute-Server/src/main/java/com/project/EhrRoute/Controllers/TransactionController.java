@@ -15,15 +15,12 @@ import com.project.EhrRoute.Exceptions.GeneralAppException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
-import com.project.EhrRoute.Payload.Core.BlockAddition;
-import com.project.EhrRoute.Payload.Core.UserConsentRequest;
-import com.project.EhrRoute.Payload.Core.UserConsentResponse;
+import com.project.EhrRoute.Payload.Core.*;
 import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import com.project.EhrRoute.Utilities.ChainUtil;
 import com.project.EhrRoute.Utilities.SimpleStringUtil;
-import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +45,7 @@ public class TransactionController
 
     private UserService userService;
     private EhrDetailService ehrDetailService;
+    private TransactionService transactionService;
     private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
 
@@ -62,11 +60,12 @@ public class TransactionController
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, EhrDetailService ehrDetailService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
         this.ehrDetailService = ehrDetailService;
+        this.transactionService = transactionService;
         this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
@@ -200,6 +199,40 @@ public class TransactionController
             new ApiResponse(true, "User consent request was successfully sent"),
             HttpStatus.ACCEPTED
         );
+    }
+
+
+    @PostMapping("/get-update-consent")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    public ResponseEntity getUserUpdateConsent(@RequestBody UpdatedBlockAddition updatedBlockAddition)
+    {
+        String providerUUID = updatedBlockAddition.getBlockAddition().getProviderUUID();
+        String networkUUID = updatedBlockAddition.getBlockAddition().getNetworkUUID();
+
+        // The ID of the user to get consent from
+        String userID = updatedBlockAddition.getBlockAddition().getEhrUserID();
+
+        // Validate Provider UUID and User ID
+        if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
+            return ResponseEntity.badRequest().body(
+                new ApiResponse(false, "Invalid Provider UUID or User ID")
+            );
+        }
+
+        // Validate userID
+        userService.findUserById(Long.parseLong(userID));
+
+        // Check if provider's network uuid is valid
+        if (networkUUID == null || networkUUID.isEmpty()) {
+           return ResponseEntity.badRequest().body(
+               new ApiResponse(false, "Invalid provider network or doesn't exist")
+           );
+        }
+
+        // Send a notification
+        transactionService.sendUpdateConsentRequest(updatedBlockAddition.getBlockAddition(), updatedBlockAddition.getRecordUpdateData());
+
+        return ResponseEntity.accepted().build();
     }
 
 

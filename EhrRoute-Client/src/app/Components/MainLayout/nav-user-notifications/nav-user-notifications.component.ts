@@ -1,3 +1,4 @@
+import { UpdateConsentRequest } from './../../../Models/Payload/Responses/UpdateConsentRequest';
 import { ConsentRequestComponent } from './../../Notifications/consent-request/consent-request.component';
 import { ConsentRequest } from './../../../Models/Payload/Responses/ConsentRequest';
 import { NetworkInvitationComponent } from '../../Notifications/network-invitation/network-invitation.component';
@@ -93,7 +94,16 @@ export class NavUserNotificationsComponent implements OnInit
          this.createNotificationComponentModal(
             notification, title, ConsentRequestComponent
          );
+      }
 
+      if (notification.notificationType === NotificationType.UPDATE_CONSENT_REQUEST)
+      {
+         let title = "Medical Record Update Consent Request";
+
+         // View Consent request info within modal
+         this.createNotificationComponentModal(
+            notification, title, ConsentRequestComponent
+         );
       }
    }
 
@@ -114,15 +124,22 @@ export class NavUserNotificationsComponent implements OnInit
 
       if (notification.notificationType === NotificationType.CONSENT_REQUEST) 
       {
-         // TODO:
-         // TODO: Get info about the network where the EHR is shared on consent request
-         // TODO:
-
          let ehrExchangeConsentRequest: ConsentRequest = notification.reference;
          
          let message:string =
          notification.senderName + 
          " is asking for consent to use and share your medical record";
+
+         return message;
+      }
+
+      if (notification.notificationType === NotificationType.UPDATE_CONSENT_REQUEST) 
+      {
+         let ehrExchangeConsentRequest: UpdateConsentRequest = notification.reference;
+         
+         let message:string =
+         notification.senderName + 
+         " is asking for consent to update or make a change in your medical record";
 
          return message;
       }

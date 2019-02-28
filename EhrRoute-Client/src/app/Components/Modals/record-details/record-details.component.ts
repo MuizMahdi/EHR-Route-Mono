@@ -1,3 +1,6 @@
+import { TransactionService } from './../../../Services/transaction.service';
+import { UpdatedBlockAdditionRequest } from './../../../Models/Payload/Requests/UpdatedBlockAdditionRequest';
+import { RecordUpdateData } from './../../../Models/Payload/Requests/RecordUpdateData';
 import { AuthService } from './../../../Services/auth.service';
 import { BlockAdditionRequest } from './../../../Models/Payload/Requests/BlockAdditionRequest';
 import { ChainService } from './../../../Services/chain.service';
@@ -33,7 +36,7 @@ export class RecordDetailsComponent implements OnInit
 
    constructor(
       private modalService:NzModalService, private chainService:ChainService,
-      private authService:AuthService
+      private authService:AuthService, private transactionService:TransactionService
    ) { }
 
 
@@ -106,10 +109,34 @@ export class RecordDetailsComponent implements OnInit
       let patientUserId = this.recordData.patientData.userID;
       let providerNetworkUUID = this.blockInfo.networkUUID;
 
-      let blockAdditionRequest: BlockAdditionRequest = await this.chainService.generateBlockAdditionRequest(providerUserId, patientUserId, providerNetworkUUID);
-   
-      console.log(blockAdditionRequest);
-   }
-   
+      // Generate a block addition request
+      let blockAddition: BlockAdditionRequest = await this.chainService.generateBlockAdditionRequest(providerUserId, patientUserId, providerNetworkUUID);
 
+      // Get the updated/edited EHR data
+      let recordUpdateData:RecordUpdateData = {
+         conditions: this.ehrConditions,
+         allergies: this.ehrAllergies,
+         history: {}
+      }
+
+      // Construct an UpdatedBlockAdditionRequest
+      let updatedBlockRequest:UpdatedBlockAdditionRequest = {
+         blockAddition,
+         recordUpdateData
+      }
+
+      this.transactionService.sendEhrUpdateConsentResponse(updatedBlockRequest).subscribe(
+
+         response => {
+            console.log(response);
+         },
+
+         error => {
+            console.log(error);
+         }
+
+      );
+
+      console.log(updatedBlockRequest);
+   }
 }

@@ -3,6 +3,10 @@ import com.project.EhrRoute.Entities.App.NetworkInvitationRequest;
 import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
+import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
+import com.project.EhrRoute.Entities.EHR.EhrDetails;
+import com.project.EhrRoute.Entities.EHR.MedicalRecord;
+import com.project.EhrRoute.Entities.EHR.PatientInfo;
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.InvalidNotificationException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
@@ -10,6 +14,9 @@ import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Models.PageConstants;
 import com.project.EhrRoute.Payload.App.NotificationResponse;
 import com.project.EhrRoute.Payload.App.PageResponse;
+import com.project.EhrRoute.Payload.Core.UserConsentRequest;
+import com.project.EhrRoute.Payload.Core.UserUpdateConsentRequest;
+import com.project.EhrRoute.Payload.EHR.RecordUpdateData;
 import com.project.EhrRoute.Repositories.NotificationRepository;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
@@ -128,6 +135,32 @@ public class NotificationService
                 notificationReference = modelMapper.mapConsentRequestBlockToUserConsentRequest(consentRequestBlock);
             }
 
+            // Check for consent request notifications
+            if (notification.getType().equals(NotificationType.UPDATE_CONSENT_REQUEST))
+            {
+                // Get UpdateConsentRequest from notification's reference
+                UpdateConsentRequest updateConsentRequest = (UpdateConsentRequest) notification.getReference();
+
+                // Get EhrDetails of UpdateConsentRequest
+                EhrDetails ehrDetails = updateConsentRequest.getEhrDetails();
+
+                // Get ConsentRequestBlock of the UpdateConsentRequest
+                ConsentRequestBlock consentRequestBlock = updateConsentRequest.getConsentRequestBlock();
+
+                if (consentRequestBlock == null || updateConsentRequest == null) {
+                    throw new InvalidNotificationException("Invalid UpdateConsentRequest notification reference.");
+                }
+
+                // Get UserConsentRequest
+                UserConsentRequest userConsentRequest = modelMapper.mapConsentRequestBlockToUserConsentRequest(consentRequestBlock);
+
+                // Get Medical Record data from EhrDetails
+                MedicalRecord updateRecordData = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, new PatientInfo());
+
+                // Set the UserUpdateConsentRequest as notification reference
+                notificationReference = new UserUpdateConsentRequest(userConsentRequest, updateRecordData);
+            }
+
             if (notificationReference == null) {
                 throw new InvalidNotificationException("Invalid or null notification type");
             }
@@ -163,13 +196,37 @@ public class NotificationService
         // Generate a notification
         Notification notification = new Notification();
 
-        // Add the generated NetworkInvitationRequest to Notification object as reference
+        // Set the ConsentRequestBlock as Notification reference
         notification.setReference(consentRequest);
 
         // Set notification data
         notification.setRecipient(recipient);
         notification.setSender(sender);
         notification.setType(NotificationType.CONSENT_REQUEST);
+
+        // Persist notification
+        saveNotification(notification);
+    }
+
+
+    public void notifyUser(ConsentRequestBlock consentRequest, UpdateConsentRequest updateConsentRequest)
+    {
+        // Get notification recipient User using notification recipient ID (userID)
+        User recipient = userService.findUserById(consentRequest.getUserID());
+
+        // Get notification sender User using provider UUID
+        User sender = userService.getUserByProviderUUID(consentRequest.getProviderUUID());
+
+        // Generate a notification
+        Notification notification = new Notification();
+
+        // Set the UpdateConsentRequest as Notification reference
+        notification.setReference(updateConsentRequest);
+
+        // Set notification data
+        notification.setRecipient(recipient);
+        notification.setSender(sender);
+        notification.setType(NotificationType.UPDATE_CONSENT_REQUEST);
 
         // Persist notification
         saveNotification(notification);

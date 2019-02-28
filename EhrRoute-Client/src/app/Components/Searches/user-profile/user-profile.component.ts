@@ -97,24 +97,6 @@ export class UserProfileComponent implements OnInit
 
    private async requestEhrPrivilege()
    {
-      /*
-      this.getBlockAdditionRequest().then(blockAdditionRequest => {
-         
-         this.transactionService.sendUserEhrConsentRequest(blockAdditionRequest).subscribe(
-
-            response => {
-               console.log(response);
-            },
-
-            (error:ErrorResponse) => {
-               console.log(error);
-            }
-
-         );
-         
-      })
-      */
-
       let providerUserId = this.authService.getCurrentUser().id;
       let patientUserId = this.searchedUser.id;
       let providerNetworkUUID = this.selectedNetwork.networkUUID;
