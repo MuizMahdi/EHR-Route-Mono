@@ -76,34 +76,45 @@ export class NavUserNotificationsComponent implements OnInit
 
    onNotificationClick(notification:Notification): void
    {
-      if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
-      {
-         let title = "Network Invitation Request";
+      switch(notification.notificationType) {
 
-         // View NetworkInviteNotification component within modal
-         this.createNotificationComponentModal(
-            notification, title, NetworkInvitationComponent
-         );
-      }
+         case NotificationType.NETWORK_INVITATION: {
+            let title = "Network Invitation Request";
 
-      if (notification.notificationType === NotificationType.CONSENT_REQUEST)
-      {
-         let title = "Medical Record Exchange Consent Request";
+            // View the NetworkInviteNotification component within modal
+            this.createNotificationComponentModal(
+               notification, title, NetworkInvitationComponent
+            );
 
-          // View Consent request info within modal
-         this.createNotificationComponentModal(
-            notification, title, ConsentRequestComponent
-         );
-      }
+            break;
+         }
 
-      if (notification.notificationType === NotificationType.UPDATE_CONSENT_REQUEST)
-      {
-         let title = "Medical Record Update Consent Request";
+         case NotificationType.CONSENT_REQUEST: {
+            let title = "Medical Record Exchange Consent Request";
 
-         // View Consent request info within modal
-         this.createNotificationComponentModal(
-            notification, title, ConsentRequestComponent
-         );
+            // View the Consent Request info within modal
+            this.createNotificationComponentModal(
+               notification, title, ConsentRequestComponent
+            );
+
+            break;
+         }
+
+         case NotificationType.UPDATE_CONSENT_REQUEST: {
+            let title = "Medical Record Update Consent Request";
+
+            // View the Update Consent Request info within modal
+            this.createNotificationComponentModal(
+               notification, title, ConsentRequestComponent
+            );
+
+            break;
+         }
+
+         default: { 
+            break; 
+         }
+
       }
    }
 
@@ -111,37 +122,42 @@ export class NavUserNotificationsComponent implements OnInit
    // Todo: add consent request notification
    notificationMessageBuilder(notification:Notification): string
    {
-      if (notification.notificationType === NotificationType.NETWORK_INVITATION) 
-      {
-         let invitationRequest:NetworkInvitationRequest = notification.reference;
+      switch(notification.notificationType) {
 
-         let message:string =
-         invitationRequest.senderUsername + " has invited you to join their network, " +
-         invitationRequest.networkName;
+         case NotificationType.NETWORK_INVITATION: {
+            let invitationRequest:NetworkInvitationRequest = notification.reference;
 
-         return message;
-      }
+            let message:string =
+            invitationRequest.senderUsername + " has invited you to join their network, " +
+            invitationRequest.networkName;
+   
+            return message;
+         }
 
-      if (notification.notificationType === NotificationType.CONSENT_REQUEST) 
-      {
-         let ehrExchangeConsentRequest: ConsentRequest = notification.reference;
+         case NotificationType.CONSENT_REQUEST: {
+            let ehrExchangeConsentRequest: ConsentRequest = notification.reference;
          
-         let message:string =
-         notification.senderName + 
-         " is asking for consent to use and share your medical record";
+            let message:string =
+            notification.senderName + 
+            " is asking for consent to use and share your medical record";
+   
+            return message;
+         }
 
-         return message;
-      }
-
-      if (notification.notificationType === NotificationType.UPDATE_CONSENT_REQUEST) 
-      {
-         let ehrExchangeConsentRequest: UpdateConsentRequest = notification.reference;
+         case NotificationType.UPDATE_CONSENT_REQUEST: {
+            let ehrExchangeConsentRequest: UpdateConsentRequest = notification.reference;
          
-         let message:string =
-         notification.senderName + 
-         " is asking for consent to update or make a change in your medical record";
+            let message:string =
+            notification.senderName + 
+            " is asking for consent to update or make a change in your medical record";
 
-         return message;
+            return message;
+         }
+
+         default: { 
+            break; 
+         }
+
       }
    }
 
