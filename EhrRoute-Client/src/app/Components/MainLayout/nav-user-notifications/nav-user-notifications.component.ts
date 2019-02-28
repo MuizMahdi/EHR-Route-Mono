@@ -1,3 +1,4 @@
+import { UpdateConsentRequestComponent } from './../../Notifications/update-consent-request/update-consent-request.component';
 import { UpdateConsentRequest } from './../../../Models/Payload/Responses/UpdateConsentRequest';
 import { ConsentRequestComponent } from './../../Notifications/consent-request/consent-request.component';
 import { ConsentRequest } from './../../../Models/Payload/Responses/ConsentRequest';
@@ -105,7 +106,7 @@ export class NavUserNotificationsComponent implements OnInit
 
             // View the Update Consent Request info within modal
             this.createNotificationComponentModal(
-               notification, title, ConsentRequestComponent
+               notification, title, UpdateConsentRequestComponent
             );
 
             break;

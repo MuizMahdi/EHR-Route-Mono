@@ -116,7 +116,7 @@ export class ConsentRequestComponent implements OnInit
       this.modalService.confirm({
          nzTitle: 'Are you sure that you want to reject ?',
          nzContent: 'The institution will not be notified if you reject the request',
-         nzOnOk: () => this.deleteNotification()
+         nzOnOk: () => { this.deleteNotification(); this.modal.close(); }
       });
    }
 

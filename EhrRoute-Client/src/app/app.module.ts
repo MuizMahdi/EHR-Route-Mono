@@ -30,13 +30,14 @@ import { NetworkInvitationComponent } from './Components/Notifications/network-i
 import { NavUserNotificationsComponent } from './Components/MainLayout/nav-user-notifications/nav-user-notifications.component';
 import { ConsentRequestComponent } from './Components/Notifications/consent-request/consent-request.component';
 import { InformationInputComponent } from './Components/Modals/information-input/information-input.component';
+import { RecordDetailsComponent } from './Components/Modals/record-details/record-details.component';
+import { UpdateConsentRequestComponent } from './Components/Notifications/update-consent-request/update-consent-request.component';
 
 // External Modules
 import { NgxElectronModule } from 'ngx-electron';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgZorroAntdModule, NZ_I18N, en_US } from 'ng-zorro-antd';
-import { RecordDetailsComponent } from './Components/Modals/record-details/record-details.component';
 
 
 registerLocaleData(en);
@@ -49,7 +50,8 @@ registerLocaleData(en);
       UserProfileComponent,
       ConsentRequestComponent,
       InformationInputComponent,
-      RecordDetailsComponent
+      RecordDetailsComponent,
+      UpdateConsentRequestComponent
    ],
 
    declarations: [
@@ -70,7 +72,8 @@ registerLocaleData(en);
       UserProfileComponent,
       ConsentRequestComponent,
       InformationInputComponent,
-      RecordDetailsComponent
+      RecordDetailsComponent,
+      UpdateConsentRequestComponent
    ],
 
    imports: [

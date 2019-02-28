@@ -6,10 +6,10 @@
          {{notification.senderName}}
       </a> 
 
-      is asking for permission to use, and share your medical record.
+      is asking for permission to change, and update your medical record.
    </p>
 
-   <br>
+   <hr>
 
    <div>
       <h4>Request Information</h4>
@@ -17,18 +17,25 @@
       <p>
          <b>{{notification.senderName}}</b> from the <b>{{requesterNetworkDetails?.networkName}}</b> 
          healthcare institutions network is asking for your consent and permission to 
-         use your electronic health record.
+         update your electronic health record.
          <br><br>
          If you choose to accept, then all of the institutions of the network will be able 
-         to access your record's data. However, they will not be able to share it with other
-         networks without your consent.
+         to access your record's both old and updated data. However, they will not be able 
+         to share it with other networks without your consent.
       </p>
    </div>
 
-   <br>
+   <hr>
 
    <div>
-      <h6>{{requesterNetworkDetails?.networkName}} network information</h6>
+      <h4>Updated data details</h4>
+      
+   </div>
+
+   <hr>
+
+   <div>
+      <h4>{{requesterNetworkDetails?.networkName}} network information</h4>
 
       <p>Network's name: {{requesterNetworkDetails?.networkName}}</p>
 
@@ -52,9 +59,8 @@
       </ul>
    </div>
 
-   <br>
 
-   <div style="margin-top:4vh;">
+   <div style="margin-top:6vh;">
       <button (click)="onConsentRequestAccept()" nz-button nzType="primary" style="display:flex; margin-left:auto; margin-bottom:-32px; margin-right:70px;">
          Accept
       </button>
@@ -63,5 +69,4 @@
          Reject
       </button>
    </div>
-   
 </div>
