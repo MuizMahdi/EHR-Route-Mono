@@ -20,6 +20,10 @@ export class UpdateConsentRequestComponent implements OnInit
    @Input() notification: Notification;
    updateConsentRequest: UpdateConsentRequest;
    requesterNetworkDetails: NetworkDetails;
+   
+   ehrConditions: string[] = [];
+   ehrAllergies: string[] = [];
+   ehrHistory: {condition:string; occurrence:boolean;};
 
 
    constructor(
@@ -32,6 +36,9 @@ export class UpdateConsentRequestComponent implements OnInit
       if (this.notification) {
          this.updateConsentRequest = this.notification.reference;
          this.getRequesterNetworkDetails(this.updateConsentRequest.userConsentRequest.networkUUID);
+         this.ehrConditions = this.updateConsentRequest.updateMedicalRecord.problems;
+         this.ehrAllergies = this.updateConsentRequest.updateMedicalRecord.allergiesAndReactions;
+         this.ehrHistory = this.updateConsentRequest.updateMedicalRecord.history;
       }
    }
 
@@ -54,7 +61,7 @@ export class UpdateConsentRequestComponent implements OnInit
 
    async onConsentRequestAccept()
    {
-
+      
    }
 
 

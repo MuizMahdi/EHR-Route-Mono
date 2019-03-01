@@ -1,18 +1,20 @@
 <div>
-   <h4>Consent Request</h4>
+   <div class="info-group">
+      <h4 class="info-header">Consent Request</h4>
 
-   <p>
-      <a href="javascript:void(0)">
-         {{notification.senderName}}
-      </a> 
+      <p>
+         <a href="javascript:void(0)">
+            {{notification.senderName}}
+         </a> 
 
-      is asking for permission to use, and share your medical record.
-   </p>
+         is asking for permission to use, and share your medical record.
+      </p>
+   </div>
+  
+   <hr class="info-break-line">
 
-   <br>
-
-   <div>
-      <h4>Request Information</h4>
+   <div class="info-group">
+      <h4 class="info-header">Request Information</h4>
 
       <p>
          <b>{{notification.senderName}}</b> from the <b>{{requesterNetworkDetails?.networkName}}</b> 
@@ -25,10 +27,10 @@
       </p>
    </div>
 
-   <br>
+   <hr class="info-break-line">
 
-   <div>
-      <h6>{{requesterNetworkDetails?.networkName}} network information</h6>
+   <div class="info-group">
+      <h4 class="info-header">{{requesterNetworkDetails?.networkName}} network information</h4>
 
       <p>Network's name: {{requesterNetworkDetails?.networkName}}</p>
 
@@ -52,9 +54,8 @@
       </ul>
    </div>
 
-   <br>
 
-   <div style="margin-top:4vh;">
+   <div style="margin-top:6vh;">
       <button (click)="onConsentRequestAccept()" nz-button nzType="primary" style="display:flex; margin-left:auto; margin-bottom:-32px; margin-right:70px;">
          Accept
       </button>

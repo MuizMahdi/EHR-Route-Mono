@@ -1,18 +1,20 @@
 <div>
-   <h4>Consent Request</h4>
+   <div class="info-group">
+      <h4 class="info-header">Consent Request</h4>
 
-   <p>
-      <a href="javascript:void(0)">
-         {{notification.senderName}}
-      </a> 
+      <p>
+         <a href="javascript:void(0)">
+            {{notification.senderName}}
+         </a> 
 
-      is asking for permission to change, and update your medical record.
-   </p>
+         is asking for permission to change, and update your medical record.
+      </p>
+   </div>
+   
+   <hr class="info-break-line">
 
-   <hr>
-
-   <div>
-      <h4>Request Information</h4>
+   <div class="info-group">
+      <h4 class="info-header">Request Information</h4>
 
       <p>
          <b>{{notification.senderName}}</b> from the <b>{{requesterNetworkDetails?.networkName}}</b> 
@@ -25,17 +27,41 @@
       </p>
    </div>
 
-   <hr>
+   <hr class="info-break-line">
 
-   <div>
-      <h4>Updated data details</h4>
+   <div class="info-group">
+      <h4 class="info-header">Updated data details</h4>
+
+      <div class="patient-conditions">
+         <p class="info-category">Medical Conditions</p>
+         <div class="ehr-list">
+            <ul class="list-group">
+               <li *ngFor="let condition of ehrConditions" class="list-group-item d-flex justify-content-between align-items-center">
+                  {{condition}}
+                  <a *ngIf="isEditingEhr" (click)="deleteCondition(condition)" href="javascript:void(0)" class="badge"><i class="far fa-minus-square fa-lg" style="float:right;"></i></a>
+               </li>
+            </ul>
+         </div>
+      </div>
+
+      <div class="patient-allergies">
+         <p class="info-category info-category-basic">Allergies and Drug Reactions</p>
+         <div class="ehr-list">
+            <ul class="list-group">
+               <li *ngFor="let allergy of ehrAllergies" class="list-group-item d-flex justify-content-between align-items-center">
+                  {{allergy}}
+                  <a *ngIf="isEditingEhr" (click)="deleteAllergy(allergy)" href="javascript:void(0)" class="badge"><i class="far fa-minus-square fa-lg" style="float:right;"></i></a>
+               </li>
+            </ul>
+         </div>
+      </div>
       
    </div>
 
-   <hr>
+   <hr class="info-break-line">
 
-   <div>
-      <h4>{{requesterNetworkDetails?.networkName}} network information</h4>
+   <div class="info-group">
+      <h4 class="info-header">{{requesterNetworkDetails?.networkName}} network information</h4>
 
       <p>Network's name: {{requesterNetworkDetails?.networkName}}</p>
 

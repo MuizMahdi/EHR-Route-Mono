@@ -178,7 +178,7 @@ export class NavUserNotificationsComponent implements OnInit
             notification: notification
          },
 
-         nzWidth: '50vw',
+         nzWidth: '70vw',
 
          nzFooter: [
             {

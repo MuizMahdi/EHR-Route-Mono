@@ -27,5 +27,4 @@ public class UserUpdateConsentRequest
     public UserConsentRequest getUserConsentRequest() {
         return userConsentRequest;
     }
-
 }
