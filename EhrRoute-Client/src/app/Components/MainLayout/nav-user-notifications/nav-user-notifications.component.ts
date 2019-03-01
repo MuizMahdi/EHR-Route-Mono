@@ -150,7 +150,7 @@ export class NavUserNotificationsComponent implements OnInit
          
             let message:string =
             notification.senderName + 
-            " is asking for consent to update or make a change in your medical record";
+            " is asking for consent to update your medical record";
 
             return message;
          }

@@ -43,67 +43,62 @@
 {
    display: block;
    position: absolute;
-   background-color: rgb(244, 246, 248);
+   background-color: rgb(255, 255, 255);
    min-width: 30vw;
    box-shadow: 0px 4px 5px 0px rgba(0,0,0,0.2);
    border: 1px solid rgb(233, 233, 233);
    z-index: 1; 
-   right: 6vw;
+   right: 4vw;
    border-radius: 3px;
    overflow: hidden;
-}
- 
-.nav-notifications-menu a 
-{
-   color: rgb(165, 165, 165);
-   text-decoration: none;
-   display: block;
-}
-
-.nav-notifications-menu a 
-{
-   color: rgb(125, 125, 125); 
 }
 
 .notification-menu-header
 {
    font-weight:600; 
    color: gray; 
-   letter-spacing: 0.13em;
-   margin-bottom: 10px;
+   letter-spacing: 0.2em;
+   margin-top: 10px;
 }
 /****************************************************/
  
 /**/
 
 /************* NOTIFICATIONS LIST ITEMS *************/
-.notifications-list
-{
-   list-style-type: none;
-   display: block;
-   margin-left: -35px;
-   max-height: 60vh;
-   overflow-y: scroll;
-   margin-right: -50px; /* maximum width of scrollbar */
-   padding-right: 35px; /* maximum width of scrollbar */
-}
-
-.notification-item:hover
-{
-   background-color: rgb(220, 226, 227);
-}
-
-.notification-item
-{
-   background-color: rgb(231, 237, 238);
-   padding: 35px;
-   margin-left: 15px;
-   margin-bottom: 15px;
-   border-radius: 6px;
-}
 
 ::-webkit-scrollbar { 
    display: none; 
+}
+
+
+.notifications-list {
+   display: block;
+   overflow-y: scroll;
+   margin-top: -10px;
+   margin-left: -41px;
+   margin-bottom: 0px;
+   list-style-type: none;
+}
+
+.notification-item a:hover {
+   background-color: rgb(240, 239, 239);
+}
+
+
+.notification-item a {
+   display: block;
+   max-height: 100px;
+   padding-top: 5%;
+   padding-bottom: 5%;
+
+   text-decoration: none;
+   text-transform: capitalize;
+   color: rgb(99, 99, 99);
+   font-family:'QanelasSoft-Regular';
+
+   border-top: solid 1px rgb(234, 234, 234);
+   border-left: solid 5px rgb(148, 204, 236);
+   background-color: rgb(255, 255, 255);
 }
 
 /*****************************************************/
