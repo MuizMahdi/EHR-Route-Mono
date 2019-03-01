@@ -61,7 +61,7 @@ export class UpdateConsentRequestComponent implements OnInit
 
    async onConsentRequestAccept()
    {
-      
+
    }
 
 
