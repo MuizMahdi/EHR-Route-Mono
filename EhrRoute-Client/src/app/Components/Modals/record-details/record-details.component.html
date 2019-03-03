@@ -80,7 +80,7 @@
    <div class="patient-conditions">
 
       <div class="ehr-prompt">
-         <span *ngIf="ehrConditions.length == 0">
+         <span *ngIf="ehrConditions.length > 0">
             Patient has no conditions.
          </span>
       </div>
@@ -115,7 +115,7 @@
       <hr>
 
       <div class="ehr-prompt">
-         <span *ngIf="ehrAllergies.length == 0">
+         <span *ngIf="ehrAllergies.length > 0">
             Patient has no allergies or drug reactions.
          </span>
       </div>

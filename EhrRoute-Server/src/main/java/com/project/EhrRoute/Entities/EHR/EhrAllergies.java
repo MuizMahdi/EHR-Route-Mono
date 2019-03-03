@@ -14,10 +14,6 @@ public class EhrAllergies
 
     @NotNull @NotBlank private String allergy;
 
-    @ManyToOne(fetch=FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ehr_details_id", nullable = false)
-    private EhrDetails ehrDetails;
-
 
     public EhrAllergies() { }
     public EhrAllergies(String allergy) {
@@ -31,17 +27,11 @@ public class EhrAllergies
     public String getAllergy() {
         return allergy;
     }
-    public EhrDetails getEhrDetails() {
-        return ehrDetails;
-    }
 
     public void setId(Long id) {
         this.id = id;
     }
     public void setAllergy(String allergy) {
         this.allergy = allergy;
-    }
-    public void setEhrDetails(EhrDetails ehrDetails) {
-        this.ehrDetails = ehrDetails;
     }
 }

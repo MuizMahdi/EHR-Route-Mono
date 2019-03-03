@@ -1,3 +1,5 @@
+import { EhrAllergyAndReaction } from './../../../DataAccess/entities/EHR/EhrAllergyAndReaction';
+import { EhrCondition } from './../../../DataAccess/entities/EHR/EhrCondition';
 import { TransactionService } from './../../../Services/transaction.service';
 import { UpdatedBlockAdditionRequest } from './../../../Models/Payload/Requests/UpdatedBlockAdditionRequest';
 import { RecordUpdateData } from './../../../Models/Payload/Requests/RecordUpdateData';
@@ -45,12 +47,24 @@ export class RecordDetailsComponent implements OnInit
       if (this.EHR) {
          this.recordData = this.EHR.recordData;
          this.blockInfo = this.EHR.blockInfo;
-         this.ehrConditions = this.recordData.conditions;
-         this.ehrAllergies = this.recordData.allergies;
+         this.initEhrDataArrays();
          this.calculateAge();
-         console.log(this.recordData.patientData.userID);
       }
 
+   }
+
+
+   private initEhrDataArrays() {
+      let conditions: EhrCondition[] = this.recordData.conditions;
+      let allergies: EhrAllergyAndReaction[] = this.recordData.allergies;
+
+      conditions.forEach((ehrCondition:EhrCondition) => {
+         this.ehrConditions.push(ehrCondition.condition);
+      });
+
+      allergies.forEach((ehrAllergy:EhrAllergyAndReaction) => {
+         this.ehrAllergies.push(ehrAllergy.allergy);
+      });
    }
 
 
@@ -89,7 +103,7 @@ export class RecordDetailsComponent implements OnInit
 
    private deleteAllergy(allergy:string): void {
 
-      let allergyIndex = this.ehrConditions.indexOf(allergy);
+      let allergyIndex = this.ehrAllergies.indexOf(allergy);
 
       if (allergyIndex > -1) {
          this.ehrAllergies.splice(allergyIndex, 1);

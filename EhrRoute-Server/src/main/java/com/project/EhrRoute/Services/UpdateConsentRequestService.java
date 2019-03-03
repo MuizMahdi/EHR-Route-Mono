@@ -39,4 +39,17 @@ public class UpdateConsentRequestService
         // Persist the request
         return updateConsentRequestRepository.save(updateConsentRequest);
     }
+
+    @Transactional
+    public UpdateConsentRequest findUpdateConsentRequestByEhrDetail(EhrDetails ehrDetails) {
+        return updateConsentRequestRepository.findByEhrDetails(ehrDetails).orElseThrow(() ->
+            new ResourceNotFoundException("UpdateConsentRequest", "EhrDetails Id", ehrDetails.getId())
+        );
+    }
+
+    @Transactional
+    public void deleteUpdateConsentRequest(UpdateConsentRequest updateConsentRequest)
+    {
+        updateConsentRequestRepository.delete(updateConsentRequest);
+    }
 }

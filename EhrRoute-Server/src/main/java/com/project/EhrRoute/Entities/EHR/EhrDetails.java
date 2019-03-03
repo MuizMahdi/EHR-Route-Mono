@@ -17,13 +17,30 @@ public class EhrDetails
     private String address;
 
 
-    @OneToMany(mappedBy = "ehrDetails", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "ehrDetail_problems",
+        joinColumns = @JoinColumn(name = "ehr_details_id"),
+        inverseJoinColumns = @JoinColumn(name = "ehr_problem_id")
+    )
     private Set<EhrProblems> problems = new HashSet<>();
 
-    @OneToMany(mappedBy = "ehrDetails", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "ehrDetail_allergies",
+            joinColumns = @JoinColumn(name = "ehr_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "ehr_allergy_id")
+    )
     private Set<EhrAllergies> allergies = new HashSet<>();
 
-    @OneToMany(mappedBy = "ehrDetails", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "ehrDetail_history",
+        joinColumns = @JoinColumn(name = "ehr_details_id"),
+        inverseJoinColumns = @JoinColumn(name = "ehr_history_id")
+    )
     private Set<EhrHistory> history = new HashSet<>();
 
 

@@ -11,11 +11,11 @@ public class UpdateConsentRequest
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(targetEntity = ConsentRequestBlock.class, fetch = FetchType.LAZY)
+    @OneToOne(targetEntity = ConsentRequestBlock.class, fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "consent_request_id", nullable = false)
     private ConsentRequestBlock consentRequestBlock;
 
-    @OneToOne(targetEntity = EhrDetails.class, fetch = FetchType.LAZY)
+    @OneToOne(targetEntity = EhrDetails.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "ehr_details_id")
     private EhrDetails ehrDetails;
 

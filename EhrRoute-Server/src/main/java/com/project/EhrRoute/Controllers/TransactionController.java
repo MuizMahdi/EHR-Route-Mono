@@ -4,10 +4,8 @@ import com.project.EhrRoute.Core.BlockBroadcaster;
 import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
-import com.project.EhrRoute.Entities.App.Notification;
-import com.project.EhrRoute.Entities.EHR.EhrDetails;
-import com.project.EhrRoute.Entities.EHR.MedicalRecord;
-import com.project.EhrRoute.Entities.EHR.PatientInfo;
+import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
+import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Events.GetUserConsentEvent;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Exceptions.BadRequestException;
@@ -48,6 +46,7 @@ public class TransactionController
     private TransactionService transactionService;
     private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
+    private UpdateConsentRequestService updateConsentRequestService;
 
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
@@ -60,7 +59,7 @@ public class TransactionController
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UpdateConsentRequestService updateConsentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
@@ -68,6 +67,7 @@ public class TransactionController
         this.transactionService = transactionService;
         this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
+        this.updateConsentRequestService = updateConsentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.uuidUtil = uuidUtil;
@@ -309,6 +309,71 @@ public class TransactionController
         );
     }
 
+
+    @PostMapping("/give-update-consent")
+    public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception
+    {
+        // Validate Consent Request that the user responded to
+        if (!isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, "Provider has not made a consent request for this response"),
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        // Get user's EHR Details using their Address that was sent in the consent response
+        EhrDetails ehrDetails = ehrDetailService.findEhrDetails(updateConsentResponse.getConsentResponse().getUserAddress());
+        ehrDetails.getAllergies().clear();
+        ehrDetails.getProblems().clear();
+
+        // Update the user's EhrDetails using values of the EhrDetails referenced in the UpdateConsentResponse
+        EhrDetails updatesEhrDetails = ehrDetailService.findEhrDetailsById(updateConsentResponse.getEhrDetailsId());
+
+        // Add the updated medical problems/conditions
+        updatesEhrDetails.getProblems().forEach(ehrDetails::addProblem);
+
+        // Add the updated allergies or drug reactions
+        updatesEhrDetails.getAllergies().forEach(ehrDetails::addAllergy);
+
+        // Persist changes
+        ehrDetailService.saveEhrDetails(ehrDetails);
+
+        // Get Block from SerializableBlock in the consent request of the update consent response
+        Block block = modelMapper.mapSerializableBlockToBlock(updateConsentResponse.getConsentResponse().getBlock());
+
+        // Get patient info from block
+        PatientInfo patientInfo = block.getTransaction().getRecord().getPatientInfo();
+
+        // Map EhrDetails data along with the patient info into a MedicalRecord
+        MedicalRecord record = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, patientInfo);
+
+        // Add the MedicalRecord into the block
+        block.getTransaction().setRecord(record);
+
+        // Sign the block.
+        SerializableBlock signedBlock = signBlock(updateConsentResponse.getConsentResponse(), block);
+
+        try {
+            // Broadcast the signed block to the other provider nodes in network.
+            blockBroadcaster.broadcast(signedBlock, updateConsentResponse.getConsentResponse().getNetworkUUID());
+        }
+        catch (ResourceEmptyException Ex) {
+            return new ResponseEntity<>(
+                new ApiResponse(false, Ex.getMessage()),
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        // Get the update consent request using the updates EhrDetails
+        UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequestByEhrDetail(updatesEhrDetails);
+
+        // Delete the UpdateConsentRequest since the user has already responded to it
+        updateConsentRequestService.deleteUpdateConsentRequest(updateConsentRequest);
+
+        return ResponseEntity.accepted().build();
+    }
+
+
     @EventListener
     protected void getUserConsent(GetUserConsentEvent event)
     {
@@ -448,6 +513,7 @@ public class TransactionController
 
         if (consentRequest != null)
         {
+            System.out.println("[ Deleting Consent Request ]");
             // delete consentRequest from DB
             consentRequestService.deleteRequest(consentRequest);
         }

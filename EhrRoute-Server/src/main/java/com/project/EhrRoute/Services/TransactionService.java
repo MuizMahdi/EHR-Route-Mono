@@ -2,12 +2,11 @@ package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Core.Block;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
-import com.project.EhrRoute.Entities.EHR.EhrAllergies;
-import com.project.EhrRoute.Entities.EHR.EhrDetails;
-import com.project.EhrRoute.Entities.EHR.EhrProblems;
+import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Events.GetUserUpdateConsentEvent;
 import com.project.EhrRoute.Payload.Core.BlockAddition;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
+import com.project.EhrRoute.Payload.Core.UserUpdateConsentResponse;
 import com.project.EhrRoute.Payload.EHR.RecordUpdateData;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,13 +96,11 @@ public class TransactionService
         /* Get the EHR Data of the update consent request from the event */
         event.getRecordUpdateData().getConditions().forEach(medicalProblem -> {
             EhrProblems ehrProblem = new EhrProblems(medicalProblem);
-            ehrProblem.setEhrDetails(ehrDetails);
             ehrDetails.addProblem(ehrProblem);
         });
 
         event.getRecordUpdateData().getAllergies().forEach(allergy -> {
             EhrAllergies ehrAllergy = new EhrAllergies(allergy);
-            ehrAllergy.setEhrDetails(ehrDetails);
             ehrDetails.addAllergy(ehrAllergy);
         });
 

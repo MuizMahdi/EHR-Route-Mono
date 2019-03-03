@@ -28,8 +28,16 @@ public class EhrDetailService
 
     @Transactional
     public EhrDetails findEhrDetails(String address) {
-        return this.ehrDetailsRepository.findByAddress(address).orElseThrow(() ->
+        return ehrDetailsRepository.findByAddress(address).orElseThrow(() ->
             new ResourceNotFoundException("EHR Details", "address", address)
+        );
+    }
+
+
+    @Transactional
+    public EhrDetails findEhrDetailsById(Long id) {
+        return ehrDetailsRepository.findById(id).orElseThrow(() ->
+            new ResourceNotFoundException("EHR Details", "Id", id)
         );
     }
 
@@ -46,5 +54,11 @@ public class EhrDetailService
     @Transactional
     public void saveEhrDetails(EhrDetails ehrDetails) {
         ehrDetailsRepository.save(ehrDetails);
+    }
+
+
+    @Transactional
+    public void deleteEhrDetails(EhrDetails ehrDetails) {
+        ehrDetailsRepository.delete(ehrDetails);
     }
 }
