@@ -117,7 +117,6 @@ export class UpdateConsentRequestComponent implements OnInit
       // Construct the consent response
       await this.getUpdateConsentResponse().then(consentResponse => {
 
-         
          // Send the consent response
          this.transactionService.sendUpdateEhrConsentResponse(consentResponse).subscribe(
 
@@ -130,7 +129,6 @@ export class UpdateConsentRequestComponent implements OnInit
             }
 
          );
-         
 
       });
 

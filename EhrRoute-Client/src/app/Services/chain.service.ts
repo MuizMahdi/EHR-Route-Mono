@@ -1,3 +1,6 @@
+import { first, catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 import { AddressService } from './address.service';
 import { ProviderService } from './provider.service';
 import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
@@ -10,6 +13,7 @@ import { DatabaseService } from 'src/app/DataAccess/database.service';
 import { Injectable } from '@angular/core';
 import * as MerkleTree from 'merkletreejs';
 import sha256 from 'crypto-js/sha256';
+import { throwError } from 'rxjs';
 
 
 @Injectable({
@@ -19,9 +23,13 @@ import sha256 from 'crypto-js/sha256';
 
 export class ChainService 
 {
+   chainGetUrl:string = environment.apiUrl + '/chain/chainget';
+   chainSendUrl:string = environment.apiUrl + '/chain/chaingive'
+
    constructor(
       private dbService:DatabaseService, private networkService:NodeNetworkService,
-      private providerService:ProviderService, private addressService:AddressService
+      private providerService:ProviderService, private addressService:AddressService,
+      private http:HttpClient
    ) { }
 
 
@@ -223,5 +231,27 @@ export class ChainService
       );
       
       return providerUUID;
+   }
+
+
+   public getNetworkChain(consumerUUID:string, networkUUID:string)
+   {
+      let url = this.chainGetUrl + '?consumeruuid=' + consumerUUID + '&netuuid=' + networkUUID;
+
+      return this.http.get(url).pipe(first(),
+
+         catchError(error => {
+            return throwError(error);
+         })
+
+      );
+   }
+
+
+   public sendNetworkChain(consumerUUID:string, networkUUID:string) 
+   {
+      let url = this.chainSendUrl + '?consumer=' + consumerUUID;
+
+      
    }
 }

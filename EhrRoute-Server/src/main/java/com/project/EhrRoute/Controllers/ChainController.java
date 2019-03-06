@@ -3,6 +3,7 @@ import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
 import com.project.EhrRoute.Events.SendChainToConsumerEvent;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
+import com.project.EhrRoute.Payload.Core.ChainFetchRequest;
 import com.project.EhrRoute.Payload.Core.SerializableChain;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Utilities.UuidUtil;
@@ -81,35 +82,28 @@ public class ChainController
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID)
     {
         // If the consumer uuid is invalid or not in consumers list
-        if (!uuidUtil.isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID))
-        {
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid consumer UUID or doesn't exist"),
-                    HttpStatus.BAD_REQUEST
+        if (!uuidUtil.isValidUUID(consumerUUID) || !clustersContainer.getChainConsumers().existsInCluster(consumerUUID)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponse(false, "Invalid consumer UUID or doesn't exist")
             );
         }
 
         // Remove consumer from chain providers list
         clustersContainer.getChainProviders().removeNode(consumerUUID);
 
-        try
-        {
+        try {
             // Get chain from a provider
             GetChainFromProviderEvent chainFromProviderEvent = new GetChainFromProviderEvent(consumerUUID, networkUUID);
             eventPublisher.publishEvent(chainFromProviderEvent);
         }
-        catch (Exception Ex)
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid consumer UUID or doesn't exist"),
-                HttpStatus.BAD_REQUEST
+        catch (Exception Ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponse(false, "Invalid consumer UUID or doesn't exist")
             );
         }
 
-
-        return new ResponseEntity<>(
-                new ApiResponse(true, "ChainGet request successfully sent"),
-                HttpStatus.ACCEPTED
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+            new ApiResponse(true, "A Chain request has been send to a node from you network")
         );
     }
 
@@ -121,9 +115,10 @@ public class ChainController
         String consumerUUID = event.getConsumerUUID();
         String consumerNetworkUUID = event.getNetworkUUID();
 
+        // Get the consumer's SSE emitter using their UUID
         SseEmitter consumerEmitter = clustersContainer.getChainConsumers().getNodeEmitter(consumerUUID);
-        //String consumerNetworkUUID = clustersContainer.getChainConsumers().getNode(consumerUUID).getNetworkUUID();
 
+        // A list of UUIDs of providers in the consumer's network
         List<String> consumerNetworkProviders = new ArrayList<>();
 
         // Go through the providers cluster and find providers in the same network as the consumer
@@ -135,7 +130,6 @@ public class ChainController
                 consumerNetworkProviders.add(providerNode.getKey());
             }
         }
-
 
         if (consumerNetworkProviders.isEmpty()) // If no provider was found
         {
@@ -149,11 +143,16 @@ public class ChainController
             // Get first provider from list
             String providerUUID = consumerNetworkProviders.get(0);
 
+            // Construct a chain fetch request that will be sent to the provider via a SSE
+            ChainFetchRequest fetchRequest = new ChainFetchRequest(consumerNetworkUUID, providerUUID);
+
             // Get provider emitter
             SseEmitter providerEmitter = clustersContainer.getChainProviders().getNodeEmitter(providerUUID);
 
+            SseEmitter.SseEventBuilder sseEvent = SseEmitter.event().data(fetchRequest).id("").name("chain-request");
+
             // Send a ChainRequest SSE through ChainProviders stream that contains the consumerUUID to the provider
-            providerEmitter.send(consumerUUID, MediaType.APPLICATION_JSON);
+            providerEmitter.send(sseEvent);
         }
     }
 

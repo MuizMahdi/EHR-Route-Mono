@@ -1,4 +1,6 @@
-import { UserInfo } from './../../../Models/Payload/Responses/UserInfo';
+import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
+import { ProviderService } from './../../../Services/provider.service';
+import { ChainService } from './../../../Services/chain.service';
 import { AuthService } from './../../../Services/auth.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { Notification } from 'src/app/Models/Payload/Responses/Notification';
@@ -23,20 +25,17 @@ export class NetworkInvitationComponent implements OnInit
 
 
    constructor(
-      private notificationService:NotificationService, 
-      private networkService:NodeNetworkService, 
-      private authService:AuthService, 
-      private modal:NzModalRef
+      private modal:NzModalRef, private notificationService:NotificationService, 
+      private authService:AuthService, private networkService:NodeNetworkService,
+      private chainService:ChainService, private providerService:ProviderService
    ) 
    { }
 
 
    ngOnInit() {
-
       if (this.notification) {
          this.invitationRequest = this.notification.reference;
       }
-
    }
 
 
@@ -45,7 +44,7 @@ export class NetworkInvitationComponent implements OnInit
       if (this.notification) 
       {
          this.invitationAccept(this.invitationRequest);
-         this.deleteNotification();
+         //this.deleteNotification();
       }
 
       this.modal.destroy();
@@ -54,10 +53,13 @@ export class NetworkInvitationComponent implements OnInit
 
    invitationAccept(invitationRequest:NetworkInvitationRequest): void
    {
+      this.getNetworkChainFile(invitationRequest.networkUUID);
+
+      /*
       this.networkService.networkInvitationAccept(this.invitationRequest).subscribe(
 
          response => {
-            console.log(response);
+            this.getNetworkChainFile(invitationRequest.networkUUID);
          },
 
          error => {
@@ -65,6 +67,43 @@ export class NetworkInvitationComponent implements OnInit
          }
 
       );
+      */
+   }
+
+
+   private getNetworkChainFile(networkUUID:string)
+   {
+      this.getCurrentProviderUUID().then(providerUUID => {
+         this.chainService.getNetworkChain(providerUUID, networkUUID).subscribe(
+            response => {
+               console.log(response);
+            },
+
+            (error:ErrorResponse) => {
+               console.log(error);
+            }
+         )
+      })
+   }
+
+
+   private async getCurrentProviderUUID(): Promise<string>
+   {
+      let providerUUID:string;
+      
+      await this.providerService.getCurrentProviderUUID().then(
+         
+         response => {
+            providerUUID = response.payload;
+         })
+
+         .catch(error => {
+            console.log(error);
+         }
+
+      );
+      
+      return providerUUID;
    }
 
 

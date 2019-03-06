@@ -99,6 +99,12 @@ export class NodeClustersService implements OnInit
             console.log(event.data);
 
          });
+
+         this.providersEventSource.addEventListener('chain-request', (event:any) => {
+            // Get the chain fetch request data from event data
+            let chainFetchRequest:any = JSON.parse(event.data);;
+            console.log(chainFetchRequest);
+         });
       }
 
    }
