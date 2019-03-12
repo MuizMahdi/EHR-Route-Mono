@@ -1,3 +1,4 @@
+import { ChainFileService } from './chain-file.service';
 import { first, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -24,12 +25,11 @@ import { throwError } from 'rxjs';
 export class ChainService 
 {
    chainGetUrl:string = environment.apiUrl + '/chain/chainget';
-   chainSendUrl:string = environment.apiUrl + '/chain/chaingive'
 
    constructor(
       private dbService:DatabaseService, private networkService:NodeNetworkService,
       private providerService:ProviderService, private addressService:AddressService,
-      private http:HttpClient
+      private http:HttpClient, chainFileService:ChainFileService
    ) { }
 
 
@@ -245,13 +245,5 @@ export class ChainService
          })
 
       );
-   }
-
-
-   public sendNetworkChain(consumerUUID:string, networkUUID:string) 
-   {
-      let url = this.chainSendUrl + '?consumer=' + consumerUUID;
-      
-      
    }
 }

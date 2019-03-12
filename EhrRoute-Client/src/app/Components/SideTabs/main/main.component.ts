@@ -1,3 +1,4 @@
+import { ChainFileService } from './../../../Services/chain-file.service';
 import { PatientInfoService } from './../../../Services/patient-info.service';
 import { RoleName } from './../../../Models/RoleName';
 import { InformationInputComponent } from './../../Modals/information-input/information-input.component';
@@ -24,7 +25,7 @@ export class MainComponent implements OnInit
       public mainLayout:MainLayoutService, private clustersService:NodeClustersService,
       private networkService:NodeNetworkService, private addressService:AddressService,
       private patientInfoService:PatientInfoService, private authService:AuthService,
-      private modalService:NzModalService
+      private modalService:NzModalService, private chainFileService:ChainFileService
    ) {
       this.mainLayout.show();
    }
@@ -148,5 +149,10 @@ export class MainComponent implements OnInit
       window.setTimeout(() => {
         const instance = userInfoModal.getContentComponent();
       }, 2000);
+   }
+
+
+   testFileSystem() {
+      this.chainFileService.sendNetworkChain('5df4d1c3-1172-4fb1-8b57-a0fcf6ef9319');
    }
 }
