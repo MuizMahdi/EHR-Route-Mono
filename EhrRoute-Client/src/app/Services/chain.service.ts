@@ -251,7 +251,7 @@ export class ChainService
    public sendNetworkChain(consumerUUID:string, networkUUID:string) 
    {
       let url = this.chainSendUrl + '?consumer=' + consumerUUID;
-
+      
       
    }
 }
