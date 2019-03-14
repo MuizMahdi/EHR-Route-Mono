@@ -153,6 +153,6 @@ export class MainComponent implements OnInit
 
 
    testFileSystem() {
-      this.chainFileService.sendNetworkChain('5df4d1c3-1172-4fb1-8b57-a0fcf6ef9319');
+      this.chainFileService.sendNetworkChain('d8d38478-f809-4559-bcae-d0cf2d193180');
    }
 }

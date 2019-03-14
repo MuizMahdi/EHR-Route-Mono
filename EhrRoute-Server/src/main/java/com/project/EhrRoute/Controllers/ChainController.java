@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.*;
@@ -73,6 +74,18 @@ public class ChainController
                 new ApiResponse(true, "Chain was successfully sent"),
                 HttpStatus.ACCEPTED
         );
+    }
+
+
+    @RequestMapping(method = RequestMethod.POST, consumes = { "multipart/form-data" })
+    public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID)
+    {
+        System.out.println("ConsumerUUID: " + consumerUUID);
+        System.out.println("Name: " + chainFile.getName());
+        System.out.println("Type: " + chainFile.getContentType());
+        System.out.println("Size: " + chainFile.getSize());
+
+        return ResponseEntity.ok(new ApiResponse(true, "FileReceived"));
     }
 
 
