@@ -3,6 +3,9 @@ import com.dropbox.core.*;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.sharing.CreateSharedLinkWithSettingsErrorException;
+import com.dropbox.core.v2.sharing.ListSharedLinksResult;
+import com.dropbox.core.v2.sharing.SharedLinkMetadata;
 import com.dropbox.core.v2.users.FullAccount;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
@@ -53,65 +56,63 @@ public class ChainController
     }
 
 
-    // Publishes a SendChainToConsumerEvent with the chain to the node that needs it
-    @PostMapping("/chaingive")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity chainGive(@RequestBody SerializableChain chain, @RequestParam("consumer") String consumerUUID)
-    {
-        if (!uuidUtil.isValidUUID(consumerUUID)) {
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid Consumer UUID"),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        try
-        {
-            // Send chain through chainconsumer stream SSE
-            SendChainToConsumerEvent sendChainEvent = new SendChainToConsumerEvent(consumerUUID, chain);
-            eventPublisher.publishEvent(sendChainEvent);
-        }
-        catch (Exception Ex)
-        {
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid chain or consumer UUID"),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        //JsonUtil jsonUtil = new JsonUtil();
-        //System.out.println(jsonUtil.createJson(chain));
-
-        return new ResponseEntity<>(
-                new ApiResponse(true, "Chain was successfully sent"),
-                HttpStatus.ACCEPTED
-        );
-    }
-
-
+    // Publishes a SendChainToConsumerEvent with the chain download uri to the node that needs it
     @RequestMapping(method = RequestMethod.POST, consumes = { "multipart/form-data" })
-    public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID) throws DbxException, IOException
+    //@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID, @RequestParam("networkuuid") String networkUUID) throws DbxException, IOException
     {
-        System.out.println("ConsumerUUID: " + consumerUUID);
-        System.out.println("Name: " + chainFile.getName());
-        System.out.println("Type: " + chainFile.getContentType());
-        System.out.println("Size: " + chainFile.getSize());
+        /*
+        // Validate Consumer's UUID
+        if (!uuidUtil.isValidUUID(consumerUUID)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponse(false, "Invalid Consumer UUID")
+            );
+        }
+        */
 
+        // Construct a Dropbox request config
         DbxRequestConfig config = new DbxRequestConfig("EhrRoute/1.0");
 
+        // Get the Dropbox client
         DbxClientV2 client = new DbxClientV2(config, dbxAccessToken);
 
-        FullAccount account = client.users().getCurrentAccount();
-        System.out.println(account.getName().getDisplayName());
+        // Get file input stream to upload it
+        InputStream in = chainFile.getInputStream();
 
-        try (InputStream in = chainFile.getInputStream())
-        {
-            FileMetadata metadata = client.files()
-            .uploadBuilder("/test.chain")
-            .uploadAndFinish(in);
+        // Construct file path
+        String filePath = "/" + networkUUID + ".chain";
+
+        // Upload the chain file
+        client.files().uploadBuilder(filePath).uploadAndFinish(in);
+
+        SharedLinkMetadata meta;
+
+        // Get download URL
+        try {
+            meta = client.sharing().createSharedLinkWithSettings(filePath);
+        }
+        catch (CreateSharedLinkWithSettingsErrorException Ex) {
+            ListSharedLinksResult link = client.sharing().listSharedLinksBuilder().withPath(filePath).start();
+            meta = link.getLinks().get(0);
         }
 
-        return ResponseEntity.ok(new ApiResponse(true, "FileReceived"));
+        // Strip any other url params and append 'raw=1'
+        String chainDownloadUri = meta.getUrl().split("\\?")[0] + "?raw=1";
+
+        try {
+            // Send the file uri through SSE to the consumer
+            SendChainToConsumerEvent sendChainEvent = new SendChainToConsumerEvent(consumerUUID, chainDownloadUri);
+            eventPublisher.publishEvent(sendChainEvent);
+        }
+        catch (Exception Ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ApiResponse(false, "Invalid chain or consumer UUID")
+            );
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponse(true, "File has been successfully sent")
+        );
     }
 
 
@@ -183,7 +184,7 @@ public class ChainController
             String providerUUID = consumerNetworkProviders.get(0);
 
             // Construct a chain fetch request that will be sent to the provider via a SSE
-            ChainFetchRequest fetchRequest = new ChainFetchRequest(consumerNetworkUUID, providerUUID);
+            ChainFetchRequest fetchRequest = new ChainFetchRequest(consumerNetworkUUID, consumerUUID);
 
             // Get provider emitter
             SseEmitter providerEmitter = clustersContainer.getChainProviders().getNodeEmitter(providerUUID);
@@ -199,15 +200,13 @@ public class ChainController
     @EventListener
     protected void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
     {
-        SerializableChain chain = event.getChain();
         String consumerUUID = event.getConsumerUUID();
 
         // Get consumer node with consumerUUID from consumers
         Node consumerNode = clustersContainer.getChainConsumers().getCluster().get(consumerUUID);
 
-        SseEmitter consumerEmitter = consumerNode.getEmitter();
-
-        // Send the chain through the ChainConsumers SSE stream to the consumer with the consumerUUID
-        consumerEmitter.send(chain, MediaType.APPLICATION_JSON);
+        // Send the chain uri through the SSE connection to the consumer
+        SseEmitter.SseEventBuilder SSE = SseEmitter.event().data(event.getChainUri()).id("").name("chain-response");
+        consumerNode.getEmitter().send(SSE);
     }
 }

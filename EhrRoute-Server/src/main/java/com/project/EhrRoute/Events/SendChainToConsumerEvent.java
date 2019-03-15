@@ -1,26 +1,26 @@
 package com.project.EhrRoute.Events;
-import com.project.EhrRoute.Payload.Core.SerializableChain;
 import org.springframework.context.ApplicationEvent;
+
 
 public class SendChainToConsumerEvent extends ApplicationEvent
 {
     private String consumerUUID;
-    private SerializableChain chain;
+    private String chainUri;
 
-    public SendChainToConsumerEvent(String consumerUUID, SerializableChain chain) {
-        super(chain);
+    public SendChainToConsumerEvent(String consumerUUID, String chainUri) {
+        super(chainUri);
         this.consumerUUID = consumerUUID;
-        this.chain = chain;
+        this.chainUri = chainUri;
     }
 
-    public SerializableChain getChain() {
-        return chain;
+    public String getChainUri() {
+        return chainUri;
     }
     public String getConsumerUUID() {
         return consumerUUID;
     }
-    public void setChain(SerializableChain chain) {
-        this.chain = chain;
+    public void setChainUri(String chainUri) {
+        this.chainUri = chainUri;
     }
     public void setConsumerUUID(String consumerUUID) {
         this.consumerUUID = consumerUUID;

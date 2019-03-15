@@ -1,3 +1,5 @@
+import { ChainFileService } from './chain-file.service';
+import { ChainFetch } from './../Models/Payload/Responses/ChainFetch';
 import { ChainService } from './chain.service';
 import { BlockResponse } from './../Models/Payload/Responses/BlockResponse';
 import { ProviderService } from './provider.service';
@@ -32,8 +34,8 @@ export class NodeClustersService implements OnInit
 
 
    constructor(
-      private http:HttpClient, private providerService:ProviderService,
-      private chainService:ChainService
+      private chainService:ChainService, private providerService:ProviderService,
+      private http:HttpClient, private chainFileService:ChainFileService
    ) { }
 
 
@@ -101,9 +103,13 @@ export class NodeClustersService implements OnInit
          });
 
          this.providersEventSource.addEventListener('chain-request', (event:any) => {
+
             // Get the chain fetch request data from event data
-            let chainFetchRequest:any = JSON.parse(event.data);;
-            console.log(chainFetchRequest);
+            let chainFetchRequest:ChainFetch = JSON.parse(event.data);;
+
+            // Send chain file
+            this.chainFileService.sendNetworkChain(chainFetchRequest.networkUUID, chainFetchRequest.consumerUUID);
+
          });
       }
 
@@ -143,6 +149,14 @@ export class NodeClustersService implements OnInit
 
             // Add the block to the block network's DB
             this.chainService.addBlock(blockNetworkUUID, block);
+         });
+
+         this.consumersEventSource.addEventListener('chain-response', (event:any) => {
+
+            // Get the chain uri from data
+            let chainURI:any = event.data;
+            console.log(chainURI);
+
          });
       }   
    }

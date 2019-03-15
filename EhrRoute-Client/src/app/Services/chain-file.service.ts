@@ -1,3 +1,4 @@
+import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import { ElectronAppConfig } from '../Configuration/ElectronAppConfig';
@@ -20,11 +21,11 @@ export class ChainFileService
    constructor() { }
 
    
-   public sendNetworkChain(networkUUID:string): any
+   public sendNetworkChain(networkUUID:string, consumerUUID:string): any
    {
       let filePath:string = ElectronAppConfig.getNetworkChainDbPath(networkUUID);
 
-      let url = this.chainSendUrl + '?consumeruuid=' + 'DeConsumerUuid';
+      let url = this.chainSendUrl + '?consumeruuid=' + consumerUUID + '&networkuuid=' + networkUUID;
 
       fs.readFile(filePath, (error, fileData) => {
 
@@ -45,18 +46,19 @@ export class ChainFileService
 
       formData.append('file', new Blob([file]));
 
-      // TODO: Set file name as the network UUID (original file name instead of 'file');
-
       const options = {
          method: 'POST',
          body: formData
       };
 
-      fetch(uploadUri, options)
-      .then(
-         success => console.log(success)
+      fetch(uploadUri, options).then(
+
+         (success) => console.log(success)
+
       ).catch(
-         error => console.log(error)
+
+         (error:ErrorResponse) => console.log(error)
+         
       );
       
    }
