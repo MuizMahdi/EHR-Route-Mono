@@ -1,4 +1,9 @@
 package com.project.EhrRoute.Controllers;
+import com.dropbox.core.*;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.users.FullAccount;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
 import com.project.EhrRoute.Events.SendChainToConsumerEvent;
@@ -10,6 +15,7 @@ import com.project.EhrRoute.Utilities.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
@@ -19,7 +25,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 
@@ -28,6 +37,9 @@ import java.util.*;
 public class ChainController
 {
     private final Logger logger = LoggerFactory.getLogger(ChainController.class);
+
+    @Value("${app.dropbox.accessToken}")
+    private String dbxAccessToken;
 
     private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
@@ -78,12 +90,26 @@ public class ChainController
 
 
     @RequestMapping(method = RequestMethod.POST, consumes = { "multipart/form-data" })
-    public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID)
+    public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID) throws DbxException, IOException
     {
         System.out.println("ConsumerUUID: " + consumerUUID);
         System.out.println("Name: " + chainFile.getName());
         System.out.println("Type: " + chainFile.getContentType());
         System.out.println("Size: " + chainFile.getSize());
+
+        DbxRequestConfig config = new DbxRequestConfig("EhrRoute/1.0");
+
+        DbxClientV2 client = new DbxClientV2(config, dbxAccessToken);
+
+        FullAccount account = client.users().getCurrentAccount();
+        System.out.println(account.getName().getDisplayName());
+
+        try (InputStream in = chainFile.getInputStream())
+        {
+            FileMetadata metadata = client.files()
+            .uploadBuilder("/test.chain")
+            .uploadAndFinish(in);
+        }
 
         return ResponseEntity.ok(new ApiResponse(true, "FileReceived"));
     }

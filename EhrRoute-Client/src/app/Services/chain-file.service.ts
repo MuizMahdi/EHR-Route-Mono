@@ -22,7 +22,6 @@ export class ChainFileService
    
    public sendNetworkChain(networkUUID:string): any
    {
-      let file:any;
       let filePath:string = ElectronAppConfig.getNetworkChainDbPath(networkUUID);
 
       let url = this.chainSendUrl + '?consumeruuid=' + 'DeConsumerUuid';
@@ -45,6 +44,8 @@ export class ChainFileService
       let formData = new FormData();
 
       formData.append('file', new Blob([file]));
+
+      // TODO: Set file name as the network UUID (original file name instead of 'file');
 
       const options = {
          method: 'POST',
