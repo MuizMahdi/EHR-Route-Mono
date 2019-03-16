@@ -1,14 +1,15 @@
 'use strict';
 
-const { app, BrowserWindow } = require("electron");
-const { ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { download } = require("electron-dl");
 // require('electron-reload')(__dirname);
 
 const path = require("path");
 const url = require("url");
 
 
-let win; // Window object
+// Window object
+let win; 
 
 
 // Create window on electron initialization
@@ -35,7 +36,7 @@ app.on("window-all-closed", function () {
 });
 
 
-function createWindow()
+async function createWindow()
 {
    // Window properties
    win = new BrowserWindow({
@@ -75,5 +76,17 @@ function createWindow()
    // On window closing set win to null
    win.on("closed", function() {
       win = null
+   });
+
+
+   // On file download requests
+   ipcMain.on("download", (event, info) => {
+
+      const win = BrowserWindow.getFocusedWindow();
+
+      download(win, info.url, info.properties).then(dl => {
+         event.sender.send('DownloadComplete', dl.getSavePath());
+      });
+      
    });
 }

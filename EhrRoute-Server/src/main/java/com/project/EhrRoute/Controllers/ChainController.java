@@ -3,6 +3,7 @@ import com.dropbox.core.*;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.sharing.CreateSharedLinkWithSettingsErrorException;
 import com.dropbox.core.v2.sharing.ListSharedLinksResult;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
@@ -61,14 +62,12 @@ public class ChainController
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID, @RequestParam("networkuuid") String networkUUID) throws DbxException, IOException
     {
-        /*
         // Validate Consumer's UUID
         if (!uuidUtil.isValidUUID(consumerUUID)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ApiResponse(false, "Invalid Consumer UUID")
             );
         }
-        */
 
         // Construct a Dropbox request config
         DbxRequestConfig config = new DbxRequestConfig("EhrRoute/1.0");
@@ -83,15 +82,22 @@ public class ChainController
         String filePath = "/" + networkUUID + ".chain";
 
         // Upload the chain file
-        client.files().uploadBuilder(filePath).uploadAndFinish(in);
+        try {
+            client.files().uploadBuilder(filePath).uploadAndFinish(in);
+        }
+        catch (UploadErrorException Ex) {
+            // If file already exists/uploaded, then ignore the exception
+        }
 
         SharedLinkMetadata meta;
 
         // Get download URL
         try {
+            // Create a sharing link from filepath
             meta = client.sharing().createSharedLinkWithSettings(filePath);
         }
         catch (CreateSharedLinkWithSettingsErrorException Ex) {
+            // If already exists, then get it
             ListSharedLinksResult link = client.sharing().listSharedLinksBuilder().withPath(filePath).start();
             meta = link.getLinks().get(0);
         }

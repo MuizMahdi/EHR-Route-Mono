@@ -11,6 +11,9 @@ import { catchError, first } from 'rxjs/operators';
 import { throwError, Observable } from 'rxjs';
 
 
+// Electron-DL download
+declare var remote: any;
+
 
 @Injectable({
   providedIn: 'root'
@@ -155,7 +158,9 @@ export class NodeClustersService implements OnInit
 
             // Get the chain uri from data
             let chainURI:any = event.data;
-            console.log(chainURI);
+
+            // Download the chain and save it locally
+            this.chainFileService.downloadChainFile(chainURI);
 
          });
       }   
@@ -224,6 +229,5 @@ export class NodeClustersService implements OnInit
          }
       } 
    }
-
 
 }

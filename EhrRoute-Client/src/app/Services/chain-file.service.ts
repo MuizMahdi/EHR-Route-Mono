@@ -2,6 +2,7 @@ import { ErrorResponse } from 'src/app/Models/Payload/Responses/ErrorResponse';
 import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import { ElectronAppConfig } from '../Configuration/ElectronAppConfig';
+import { ElectronService } from 'ngx-electron';
 
 
 // NodeJs FileSystem
@@ -18,7 +19,8 @@ export class ChainFileService
    chainSendUrl:string = environment.apiUrl + '/chain'
 
 
-   constructor() { }
+   constructor(private electronService:ElectronService) 
+   { }
 
    
    public sendNetworkChain(networkUUID:string, consumerUUID:string): any
@@ -61,5 +63,25 @@ export class ChainFileService
          
       );
       
+   }
+
+
+   downloadChainFile(chainURL:string) {
+
+      if(this.electronService.isElectronApp) {
+
+         // Start download
+         this.electronService.ipcRenderer.send('download', {
+            url: chainURL,
+            properties: {directory: ElectronAppConfig.databaseFolderPath}
+         });
+
+         // On download complete
+         this.electronService.ipcRenderer.on('DownloadComplete', () => {
+            console.log('[ Chain file download has completed ]');
+         });
+
+      }
+
    }
 }
