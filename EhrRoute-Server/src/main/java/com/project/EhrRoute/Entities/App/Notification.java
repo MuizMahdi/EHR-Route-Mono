@@ -21,7 +21,7 @@ public class Notification extends DateAudit
     private Long id;
 
     @NotNull
-    @Column(columnDefinition = "tinyint(1) default 0") // Set to false as default value
+    //@Column(columnDefinition = "tinyint(1) default 0") // Set to false as default value
     private boolean isRead;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)

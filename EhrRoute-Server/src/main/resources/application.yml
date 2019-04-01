@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:db2://dashdb-txn-sbox-yp-lon02-01.services.eu-gb.bluemix.net:50001/BLUDB:sslConnection=true;
+    username: dxb58192
+    password: wpzb99h87b@m5q5f
+    driverClassName: com.ibm.db2.jcc.DB2Driver
+    testWhileIdle: true
+    validationQuery: SELECT 1
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    database-platform: DB2Platform
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.DB2Dialect
