@@ -103,7 +103,7 @@ export class MainComponent implements OnInit
             // Go through the user roles
             userInfo.roles.forEach(role => {
                // If user has a 'Provider' role
-               if (role === RoleName.PROVIDER) {
+               if (role === RoleName.PROVIDER || role === RoleName.ADMIN) {
                   isProvider = true;
                }
             });
