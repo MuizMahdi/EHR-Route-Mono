@@ -102,8 +102,8 @@ export class MainComponent implements OnInit
 
             // Go through the user roles
             userInfo.roles.forEach(role => {
-               // If user has a 'Provider' role
-               if (role === RoleName.PROVIDER) {
+               // If user has a 'Provider' (or admin) role
+               if (role === RoleName.PROVIDER || role === RoleName.ADMIN) {
                   isProvider = true;
                }
             });
@@ -149,10 +149,5 @@ export class MainComponent implements OnInit
       window.setTimeout(() => {
         const instance = userInfoModal.getContentComponent();
       }, 2000);
-   }
-
-
-   testFileSystem() {
-      //this.chainFileService.sendNetworkChain('d8d38478-f809-4559-bcae-d0cf2d193180');
    }
 }
