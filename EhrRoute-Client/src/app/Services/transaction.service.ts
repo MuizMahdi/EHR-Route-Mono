@@ -2,7 +2,7 @@ import { UserUpdateConsentResponse } from './../Models/Payload/Responses/UserUpd
 import { UpdatedBlockAdditionRequest } from './../Models/Payload/Requests/UpdatedBlockAdditionRequest';
 import { UserConsentResponse } from './../Models/Payload/Requests/UserConsentResponse';
 import { first, catchError } from 'rxjs/operators';
-import { environment } from './../../environments/environment.prod';
+import { environment } from './../../environments/environment';
 import { Observable, throwError } from 'rxjs';
 import { BlockAdditionRequest } from './../Models/Payload/Requests/BlockAdditionRequest';
 import { HttpClient } from '@angular/common/http';

@@ -2,7 +2,7 @@ import { first, catchError } from 'rxjs/operators';
 import { RoleChangeRequest } from './../Models/Payload/Requests/RoleChangeRequest';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 import { Observable, throwError } from 'rxjs';
 
 

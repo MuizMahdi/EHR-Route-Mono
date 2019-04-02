@@ -190,7 +190,8 @@ export class UserProfileComponent implements OnInit
       this.networkSelectionModal = this.modalService.create({
          nzTitle: "Network Selection",
          nzContent: templateContent,
-         nzOnOk: () => this.requestEhrPrivilege()
+         nzOnOk: () => this.requestEhrPrivilege(),
+         nzOkText: 'Request EHR'
       });
    }
 
