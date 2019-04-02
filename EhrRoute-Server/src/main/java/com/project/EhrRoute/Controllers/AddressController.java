@@ -43,7 +43,7 @@ public class AddressController
 
 
     @GetMapping("/generate")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('PROVIDER')")
     public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException
     {
         // Get user
