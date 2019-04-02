@@ -7,6 +7,10 @@ Genetic studies, cancer/chronic disease registries, substance abuse, population 
 
 <br/><br/>
 
+![EHRouteLogoImage](https://i.imgur.com/0uLOP8W.png)
+
+<br/>
+
 # EHR Route
 EHR Route is an open source Electronic Health Records (EHR) sharing and storage solution that aims to prevent the most common causes of 
 [EHRs data breaches](https://www.healthcareitnews.com/projects/biggest-healthcare-data-breaches-2018-so-far).
