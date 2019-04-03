@@ -155,16 +155,26 @@ private KeyUtil keyUtil;
 
         String networkUUID = blockAdditionRequest.getNetworkUUID();
 
+        // Get a random provider in the network to set as a recipient
         User networkRandUser = networkService.getNetworkRandomMember(networkUUID);
 
+        // Get the address of the provider
         String randUserProviderAddress = providerService.getProviderAddress(networkRandUser.getId());
 
         Address senderAddress = new Address(blockAdditionRequest.getSenderAddress());
         Address recipientAddress = new Address(randUserProviderAddress);
 
+        // If there is no recipient, in case there is only one member in a network
+        if (recipientAddress.getAddress().isEmpty()) {
+            // Set the recipient as the sender
+            transaction.setRecipientAddress(senderAddress);
+        }
+        else {
+            transaction.setRecipientAddress(recipientAddress);
+        }
 
-        transaction.setRecipientAddress(recipientAddress);
         transaction.setSenderAddress(senderAddress);
+
         PublicKey senderPubKey = keyUtil.getPublicKeyFromString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1bYsqwRE7Yj5y9C3Ahv2vcr7NMYGU2us23tlGbEpogrPbilirid4gRnjZXLNZdgDyTmtxiBFa5WT9nC1kuxrdbFcMIBECCkeTcJL3Zlv3iY5c4DmCMKwf4jBm4gCeXWan8PccrsruDNxP5u2rkj6ywSVDrvRobhXGL9i/IuqoSwIDAQAB");
         transaction.setSenderPubKey(senderPubKey);
         transaction.setRecord(new MedicalRecord());

@@ -87,8 +87,13 @@ public class NetworkService
         int networkUsersSize = networkUsers.size();
 
         // Validate network size
-        if (networkUsersSize < 1) {
+        if (networkUsersSize < 1 || networkUsers.isEmpty()) {
             throw new ResourceEmptyException("Network with UUID: " + networkUUID + ", has no members");
+        }
+        else if (networkUsersSize == 1) {
+            for (User user : networkUsers) {
+                return user;
+            }
         }
 
         // Pick a random number between 0 and the network's users set size
@@ -96,7 +101,7 @@ public class NetworkService
         int i = 0;
 
         // Pick a random member from the users
-        for(User user : networkUsers) {
+        for (User user : networkUsers) {
             if (i == rand) return user;
             i++;
         }
