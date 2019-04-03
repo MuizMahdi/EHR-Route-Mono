@@ -118,7 +118,7 @@ public class UserController
 
 
     @GetMapping("/current/networks")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
     {
         if (currentUser == null) {
