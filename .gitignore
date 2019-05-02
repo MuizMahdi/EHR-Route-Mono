@@ -67,7 +67,9 @@ Thumbs.db
 ### Properties File ###
 application.properties
 *.properties
+*.yml
 application.properties
+application.yml
 
 ### NodeModules ###
 node_modules/
