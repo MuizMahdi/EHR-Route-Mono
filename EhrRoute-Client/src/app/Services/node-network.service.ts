@@ -2,7 +2,7 @@ import { DatabaseService } from './../DataAccess/database.service';
 import { UserNetworks } from './../Models/Payload/Responses/UserNetworks';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 import { catchError, first, tap } from 'rxjs/operators';
 import { throwError, Observable } from 'rxjs';
 import { NetworkInvitationRequest } from '../Models/Payload/Requests/NetworkInvitationRequest';

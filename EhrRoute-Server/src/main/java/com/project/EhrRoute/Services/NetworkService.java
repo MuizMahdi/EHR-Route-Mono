@@ -101,7 +101,7 @@ public class NetworkService
         int i = 0;
 
         // Pick a random member from the users
-        for(User user : networkUsers) {
+        for (User user : networkUsers) {
             if (i == rand) return user;
             i++;
         }
