@@ -49,7 +49,6 @@ export class DatabaseService
          logging: false
       }
 
-      // If a connection has already been established
       await createConnection(dbOptions);
    }
 

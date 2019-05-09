@@ -150,4 +150,10 @@ export class MainComponent implements OnInit
         const instance = userInfoModal.getContentComponent();
       }, 2000);
    }
+
+   public async test()
+   {
+
+   }
+
 }

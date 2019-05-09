@@ -1,3 +1,4 @@
+import { Block } from './../../../DataAccess/entities/Core/Block';
 import { SimpleStringPayload } from './../../../Models/Payload/Responses/SimpleStringPayload';
 import { ErrorResponse } from './../../../Models/Payload/Responses/ErrorResponse';
 import { BlockResponse } from './../../../Models/Payload/Responses/BlockResponse';
@@ -82,7 +83,7 @@ export class NetworkManagerComponent implements OnInit
 
       this.networkService.generateNetwork(networkName).subscribe(
 
-         (response:BlockResponse) => {   
+         (response:BlockResponse) => {
             // Save the received genesis block
             this.saveNetworkGenesisBlock(networkName, response);
          },
@@ -109,10 +110,10 @@ export class NetworkManagerComponent implements OnInit
             await this.databaseService.createNetworkDbConnection(networkUUID);
 
             // Get a Block from the response genesis block
-            let block = ModelMapper.mapBlockResponseToBlock(genesisBlock);
+            let block:Block = ModelMapper.mapBlockResponseToBlock(genesisBlock);
 
             // Get DB connection for the network, then save the block
-            await this.databaseService.getNetworkDbConnection(networkUUID).manager.save(block);
+            await this.databaseService.getNetworkDbConnection(networkUUID).getRepository(Block).save(block);
 
             // Update networks with the newly added network
             this.updateNetworks();

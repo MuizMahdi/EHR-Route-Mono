@@ -6,10 +6,11 @@ const { download } = require("electron-dl");
 
 const path = require("path");
 const url = require("url");
+const fs = require("fs");
 
 
 // Window object
-let win; 
+let appWindow; 
 
 
 // Create window on electron initialization
@@ -19,8 +20,8 @@ app.on("ready", createWindow);
 // Initialize window and its properties on startup
 app.on("activate", function() {
    
-   if (win === null) {
-      createWindow()
+   if (appWindow === null) {
+      createWindow();
    }
 
 });
@@ -38,8 +39,8 @@ app.on("window-all-closed", function () {
 
 async function createWindow()
 {
-   // Window properties
-   win = new BrowserWindow({
+   // Application window properties
+   appWindow = new BrowserWindow({
       width: 800,
       height: 600,
       icon: "https://image.flaticon.com/icons/svg/149/149054.svg" 
@@ -51,12 +52,12 @@ async function createWindow()
       electron: require(`${__dirname}/node_modules/electron`)
    });
    
-   win.loadURL('http://localhost:4200');
+   appWindow.loadURL('http://localhost:4200');
 
 
 /*
    // load the index.html from the dist folder of Angular
-   win.loadURL(
+   appWindow.loadURL(
       url.format({
          pathname: path.join(__dirname, '/dist/index.html'),
          protocol: 'file:',
@@ -66,25 +67,25 @@ async function createWindow()
 */
 
    // Enable and open Chrome DevTools
-   win.webContents.openDevTools();
+   appWindow.webContents.openDevTools();
 
 
    // [Dev only] Disable menu 
-   win.setMenu(null);
+   appWindow.setMenu(null);
 
 
-   // On window closing set win to null
-   win.on("closed", function() {
-      win = null
+   // On window closing set appWindow to null
+   appWindow.on("closed", function() {
+      appWindow = null
    });
 
 
    // On file download requests
    ipcMain.on("download", (event, info) => {
 
-      const win = BrowserWindow.getFocusedWindow();
+      const appWindow = BrowserWindow.getFocusedWindow();
 
-      download(win, info.url, info.properties).then(dl => {
+      download(appWindow, info.url, info.properties).then(dl => {
          event.sender.send('DownloadComplete', dl.getSavePath());
       });
       
