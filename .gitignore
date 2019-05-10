@@ -67,7 +67,7 @@ Thumbs.db
 ### Properties File ###
 application.properties
 *.properties
-*.yml
+### *.yml
 application.properties
 application.yml
 
