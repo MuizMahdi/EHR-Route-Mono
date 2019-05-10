@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Core;
+import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.StringUtil;
 import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 import com.project.EhrRoute.Utilities.JsonUtil;
@@ -21,6 +22,9 @@ public class TransactionTest
     @Mock
     private JsonUtil jsonUtil;
 
+    @Mock
+    private KeyUtil keyUtil;
+
     @InjectMocks
     private Transaction transaction = new Transaction();
 
@@ -39,7 +43,7 @@ public class TransactionTest
         transaction.setRecord(medicalRecord);
 
         when(jsonUtil.createJson(medicalRecord)).thenReturn("RecordJson");
-        when(stringUtil.getStringFromKey(publicKey)).thenReturn("KeyString");
+        when(keyUtil.getStringFromPublicKey(publicKey)).thenReturn("KeyString");
 
         transaction.getTransactionData();
 

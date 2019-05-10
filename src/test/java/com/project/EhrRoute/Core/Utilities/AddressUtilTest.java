@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -26,6 +27,9 @@ public class AddressUtilTest
     private HashUtil hashUtil;
 
     @Mock
+    private KeyUtil keyUtil;
+
+    @Mock
     private Base58 base58;
 
     @InjectMocks
@@ -37,40 +41,50 @@ public class AddressUtilTest
     {
         PublicKey publicKey = mock(PublicKey.class);
 
-        when(stringUtil.getStringFromKey(publicKey)).thenReturn("StringPublicKey");
+        when(keyUtil.getStringFromPublicKey(publicKey)).thenReturn("StringPublicKey");
 
         when(hashUtil.SHA256((byte[])notNull())).thenReturn("StringPublicKeyHash".getBytes());
 
         String address = "Address";
 
-        when(addressUtil.generateAddress(publicKey)).thenReturn(address);
+        try {
+            when(addressUtil.generateAddress(publicKey)).thenReturn(address);
 
-        addressUtil.generateAddress(publicKey);
+            addressUtil.generateAddress(publicKey);
 
-        assertNotNull(addressUtil.generateAddress(publicKey));
-        assertTrue(addressUtil.generateAddress(publicKey) instanceof String);
-        assertEquals(addressUtil.generateAddress(publicKey).length(), address.length());
+            assertNotNull(addressUtil.generateAddress(publicKey));
+            assertTrue(addressUtil.generateAddress(publicKey) instanceof String);
+            assertEquals(addressUtil.generateAddress(publicKey).length(), address.length());
+        }
+        catch (GeneralSecurityException Ex) {}
+
     }
 
 
     @Test
     public void testConfirmTransactionSenderAddress()
     {
-        PublicKey publicKey = mock(PublicKey.class);
-        when(stringUtil.getStringFromKey(publicKey)).thenReturn("StringPublicKey");
-        when(hashUtil.SHA256((byte[])notNull())).thenReturn("StringPublicKeyHash".getBytes());
-        when(addressUtil.generateAddress(publicKey)).thenReturn("Address");
 
-        Address address = mock(Address.class);
-        when(address.getAddress()).thenReturn("Address");
+        try {
+            PublicKey publicKey = mock(PublicKey.class);
+            when(keyUtil.getStringFromPublicKey(publicKey)).thenReturn("StringPublicKey");
+            when(hashUtil.SHA256((byte[])notNull())).thenReturn("StringPublicKeyHash".getBytes());
 
-        Transaction transaction = mock(Transaction.class);
-        when(transaction.getSenderPubKey()).thenReturn(publicKey);
-        when(transaction.getSenderAddress()).thenReturn(address);
+            when(addressUtil.generateAddress(publicKey)).thenReturn("Address");
 
-        addressUtil.confirmTransactionSenderAddress(transaction);
+            Address address = mock(Address.class);
+            when(address.getAddress()).thenReturn("Address");
 
-        assertTrue(addressUtil.confirmTransactionSenderAddress(transaction));
+            Transaction transaction = mock(Transaction.class);
+            when(transaction.getSenderPubKey()).thenReturn(publicKey);
+            when(transaction.getSenderAddress()).thenReturn(address);
+
+            addressUtil.confirmTransactionSenderAddress(transaction);
+
+            assertTrue(addressUtil.confirmTransactionSenderAddress(transaction));
+        }
+        catch (GeneralSecurityException Ex) {}
+
     }
 
 }

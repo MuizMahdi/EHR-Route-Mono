@@ -25,13 +25,7 @@ public class KeyUtilTest
         assertTrue(keyUtil.getPublicKeyFromString(keyString) instanceof PublicKey);
 
         StringUtil stringUtil = new StringUtil();
-        assertEquals(keyString, stringUtil.getStringFromKey(keyUtil.getPublicKeyFromString(keyString)));
+        assertEquals(keyString, keyUtil.getStringFromPublicKey(keyUtil.getPublicKeyFromString(keyString)));
     }
-
-    @Test
-    public void getPublicKeyFromBytes() throws Exception {
-    }
-
-
 
 }
