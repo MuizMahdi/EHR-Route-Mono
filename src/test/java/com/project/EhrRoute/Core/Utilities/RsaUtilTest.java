@@ -31,7 +31,7 @@ public class RsaUtilTest
     }
 
     @Test
-    public void testRsaVerifyTransactionWithFalseSignature() throws Exception
+    public void testRsaVerifyTransactionWithSignature() throws Exception
     {
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
@@ -45,7 +45,7 @@ public class RsaUtilTest
 
         when(transaction.getSignature()).thenReturn(signature);
 
-        assertFalse(rsaUtil.rsaVerifyTransactionSignature(publicKey, transaction));
+        assertTrue(rsaUtil.rsaVerifyTransactionSignature(publicKey, transaction));
     }
 
     @Test(expected = Exception.class)
