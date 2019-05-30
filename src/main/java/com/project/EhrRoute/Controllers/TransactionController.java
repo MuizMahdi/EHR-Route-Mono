@@ -85,16 +85,11 @@ public class TransactionController
     {
         String providerUUID = blockAddition.getProviderUUID();
         String networkUUID = blockAddition.getNetworkUUID();
-
-        // The ID of the user to get consent from
-        String userID = blockAddition.getEhrUserID();
+        String userID = blockAddition.getEhrUserID(); // The ID of the user to get consent from
 
         // Check if Provider UUID and User ID are valid
         if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid Provider UUID or User ID"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Provider UUID or User ID"));
         }
 
         // Validate userID (exception thrown if not found)
@@ -102,41 +97,25 @@ public class TransactionController
 
         // Check if provider exists in providers cluster
         if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "You are not in the providers list"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "You are not in the providers list"));
         }
 
         // Check if provider's network uuid is valid
         if (networkUUID == null || networkUUID.isEmpty()) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid provider network or doesn't exist"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider network or doesn't exist"));
         }
 
         // Get chain root from addition request payload
         String chainRoot = blockAddition.getChainRootWithoutBlock();
 
-        /*
-        *   Check if provider's chain is valid by Comparing sent chainRoot
-        *   with the saved chainRoot (latest valid chain root)
-        */
-
         boolean isValidNetworkChainRoot;
 
-        // Check if sent root is valid
-        try
-        {
+        // Check if provider's chain is valid by Comparing sent chainRoot with the latest valid saved chain root
+        try {
             isValidNetworkChainRoot = chainRootUtil.checkNetworkChainRoot(networkUUID, chainRoot);
         }
-        catch (Exception Ex)
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-            );
+        catch (Exception Ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
 
         // If not valid
@@ -148,27 +127,21 @@ public class TransactionController
                 chainUtil.fetchChainForNode(providerUUID, networkUUID);
             }
             catch (BadRequestException Ex) {
-                return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid Chain Root or Bad Chain. Chain fetching failed, caused by: " + Ex.getMessage()),
-                    HttpStatus.BAD_REQUEST
-                );
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Chain Root or Bad Chain. Chain fetching failed, caused by: " + Ex.getMessage()));
             }
 
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid Chain Root or Bad Chain, chain fetching request was sent."),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Chain Root or Bad Chain, chain fetching request was sent."));
         }
 
         // Send a consent request for adding the block to chain to user
-        try
-        {
-            // Generate and construct a block using data in block addition request
+        try {
+            // Generate and construct a block using the data in the block addition request
             Block block = modelMapper.mapAdditionRequestToBlock(blockAddition);
 
             // Convert the block into a serializable block
             SerializableBlock sBlock = modelMapper.mapBlockToSerializableBlock(block);
 
+            // Construct and publish a GetUserConsent event
             GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
                 this,
                 sBlock,
@@ -179,26 +152,15 @@ public class TransactionController
 
             eventPublisher.publishEvent(getUserConsent);
         }
-        catch (Exception Ex)
-        {
-            if (Ex.getMessage().equals("User offline, a consent request notification was sent to user")) // Do you know any other way to do this ?
-            {
-                return new ResponseEntity<>(
-                    new ApiResponse(true, Ex.getMessage()),
-                    HttpStatus.OK
-                );
+        catch (Exception Ex) {
+            if (Ex.getMessage().equals("User offline, a consent request notification was sent to user")) {
+                return ResponseEntity.ok(new ApiResponse(true, Ex.getMessage()));
             }
 
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "User consent request was successfully sent"),
-            HttpStatus.ACCEPTED
-        );
+        return ResponseEntity.accepted().body(new ApiResponse(true, "User consent request was successfully sent"));
     }
 
 
@@ -248,18 +210,12 @@ public class TransactionController
             block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
         }
         catch (BadRequestException Ex) { // Catch mapping errors due to absence of any field
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()));
         }
 
         // Validate Consent Response.
         if (!isConsentResponseValid(consentResponse)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Provider has not made a consent request for this response"),
-                HttpStatus.NOT_FOUND
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
         }
 
         // Get user's EHR Details using their Address that was sent in the consent response
@@ -269,9 +225,7 @@ public class TransactionController
             ehrDetails = ehrDetailService.findEhrDetails(consentResponse.getUserAddress());
         }
         catch (ResourceNotFoundException Ex) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse(false, "Invalid user address in consent response." + Ex.getMessage())
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid user address in consent response." + Ex.getMessage()));
         }
 
         // Get patient info from block
@@ -291,10 +245,7 @@ public class TransactionController
             blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
         }
         catch (ResourceEmptyException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.NOT_FOUND
-            );
+            return new ResponseEntity<>(new ApiResponse(false, Ex.getMessage()), HttpStatus.NOT_FOUND);
         }
 
         // Delete the consent request that matches the response data from DB
@@ -303,10 +254,7 @@ public class TransactionController
         // Change provider's network ChainRoot to the new sent chainRootWithBlock.
         //changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "Block has been signed and Broad-casted successfully"),
-            HttpStatus.ACCEPTED
-        );
+        return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broad-casted successfully"));
     }
 
 
