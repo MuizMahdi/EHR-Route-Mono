@@ -11,10 +11,10 @@ public class ConsentRequestBlock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull @NotBlank private String hash;
+    @NotNull @NotBlank private String hash; //
     @NotNull @NotBlank private String previousHash;
-    @NotNull @NotBlank private String merkleLeafHash;
-    @NotNull @NotBlank private String transactionId;
+    @NotNull @NotBlank private String merkleLeafHash; //// whats the difference b/w hash and merkle leaf hash
+    @NotNull @NotBlank private String transactionId; //
     @NotNull @NotBlank private String senderPubKey;
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;

@@ -27,6 +27,10 @@ public class Network
     @JoinColumn(name = "root_id", nullable = false)
     private ChainRoot chainRoot;
 
+    @OneToOne(targetEntity = ChainRoot.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "previous_root_id")
+    private ChainRoot previousChainRoot;
+
     @ManyToMany(mappedBy = "networks")
     private Set<User> users = new HashSet<>();
 
@@ -87,6 +91,10 @@ public class Network
     public String getNetworkUUID() {
         return networkUUID;
     }
+    public ChainRoot getPreviousChainRoot() {
+        return previousChainRoot;
+    }
+
     public void setUsers(Set<User> users) {
         this.users = users;
     }
@@ -95,5 +103,8 @@ public class Network
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
+    }
+    public void setPreviousChainRoot(ChainRoot previousChainRoot) {
+        this.previousChainRoot = previousChainRoot;
     }
 }

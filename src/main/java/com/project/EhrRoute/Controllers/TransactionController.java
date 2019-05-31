@@ -214,7 +214,7 @@ public class TransactionController
         }
 
         // Validate Consent Response.
-        if (!isConsentResponseValid(consentResponse)) {
+        if (!consentRequestService.isConsentResponseValid(consentResponse)) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
         }
 
@@ -240,19 +240,11 @@ public class TransactionController
         // Sign the block.
         SerializableBlock signedBlock = signBlock(consentResponse, block);
 
-        try {
-            // Broadcast the signed block to the other provider nodes in network.
-            blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
-        }
-        catch (ResourceEmptyException Ex) {
-            return new ResponseEntity<>(new ApiResponse(false, Ex.getMessage()), HttpStatus.NOT_FOUND);
-        }
+        // Broadcast the signed block to the other provider nodes in network.
+        blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
 
         // Delete the consent request that matches the response data from DB
-        deleteMatchingConsentRequest(consentResponse);
-
-        // Change provider's network ChainRoot to the new sent chainRootWithBlock.
-        //changeNetworkChainRoot(consentResponse.getNetworkUUID(), consentResponse.getChainRootWithBlock());
+        //deleteMatchingConsentRequest(consentResponse);
 
         return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broad-casted successfully"));
     }
@@ -262,11 +254,8 @@ public class TransactionController
     public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception
     {
         // Validate Consent Request that the user responded to
-        if (!isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Provider has not made a consent request for this response"),
-                HttpStatus.NOT_FOUND
-            );
+        if (!consentRequestService.isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
         }
 
         // Get user's EHR Details using their Address that was sent in the consent response
@@ -306,10 +295,7 @@ public class TransactionController
             blockBroadcaster.broadcast(signedBlock, updateConsentResponse.getConsentResponse().getNetworkUUID());
         }
         catch (ResourceEmptyException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.NOT_FOUND
-            );
+            return new ResponseEntity<>(new ApiResponse(false, Ex.getMessage()), HttpStatus.NOT_FOUND);
         }
 
         // Get the update consent request using the updates EhrDetails
@@ -403,69 +389,6 @@ public class TransactionController
         SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
 
         return serializableBlock;
-    }
-
-    private boolean isConsentResponseValid(UserConsentResponse consentResponse)
-    {
-        // check if the provider has sent such a block to the user before
-        // or not, by checking the consent requests on DB made by the
-        // provider to validate the response.
-
-        boolean isResponseValid = false;
-
-        // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
-        if (findMatchingConsentRequest(consentResponse) != null)
-        {
-            isResponseValid = true;
-        }
-
-        return isResponseValid;
-    }
-
-    private ConsentRequestBlock findMatchingConsentRequest(UserConsentResponse consentResponse)
-    {
-        // Goes through the provider consent requests and checks if the hash of the transaction(transactionID)
-        // in the consent response equals any of the hashes of the provider requests to validate if the
-        // consent request that the user responded to is valid and was made by the provider or not.
-
-        // Provider UUID from consent response
-        String responseProviderUUID = consentResponse.getProviderUUID();
-
-        // Get the list of Consent requests made by that provider UUID
-        List<ConsentRequestBlock> providerConsentRequestsList = consentRequestService.findRequestsByProvider(responseProviderUUID);
-
-        // If the provider has any open(unanswered) consent requests
-        if (providerConsentRequestsList != null)
-        {
-            ArrayList<ConsentRequestBlock> providerConsentRequests = new ArrayList<>(
-                    providerConsentRequestsList
-            );
-
-            String responseTransactionId = consentResponse.getBlock().getTransaction().getTransactionId();
-
-            // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
-            for (ConsentRequestBlock request : providerConsentRequests) {
-                if (request.getTransactionId().equals(responseTransactionId)) {
-                    // return that request
-                    return request;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private void deleteMatchingConsentRequest(UserConsentResponse consentResponse)
-    {
-        ConsentRequestBlock consentRequest = findMatchingConsentRequest(consentResponse);
-
-        if (consentRequest != null)
-        {
-            System.out.println("[ Deleting Consent Request ]");
-            // delete consentRequest from DB
-            consentRequestService.deleteRequest(consentRequest);
-        }
-
     }
 
     private void changeNetworkChainRoot(String networkUUID, String chainRootWithBlock)
