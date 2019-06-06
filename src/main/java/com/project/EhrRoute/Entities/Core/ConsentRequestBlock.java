@@ -12,6 +12,7 @@ public class ConsentRequestBlock {
     private Long id;
 
     @NotNull @NotBlank private String hash; //
+    @NotNull @NotBlank private String requestUUID;
     @NotNull @NotBlank private String previousHash;
     @NotNull @NotBlank private String merkleLeafHash; //// whats the difference b/w hash and merkle leaf hash
     @NotNull @NotBlank private String transactionId; //
@@ -26,12 +27,13 @@ public class ConsentRequestBlock {
 
 
     // Transaction signature is blank when saved on patient consent requests because the patient signs and then adds it
-    private String signature;
+    private String signature; //
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String requestUUID, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
         this.hash = hash;
+        this.requestUUID = requestUUID;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
         this.blockIndex = blockIndex;
@@ -93,6 +95,9 @@ public class ConsentRequestBlock {
     public void setHash(String hash) {
         this.hash = hash;
     }
+    public String getRequestUUID() {
+        return requestUUID;
+    }
     public void setUserID(Long userID) {
         this.userID = userID;
     }
@@ -107,6 +112,9 @@ public class ConsentRequestBlock {
     }
     public void setBlockIndex(Long blockIndex) {
         this.blockIndex = blockIndex;
+    }
+    public void setRequestUUID(String requestUUID) {
+        this.requestUUID = requestUUID;
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;

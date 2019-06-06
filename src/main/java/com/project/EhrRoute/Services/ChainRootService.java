@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class ChainRootUtil
+public class ChainRootService
 {
     private NetworkService networkService;
 
     @Autowired
-    public ChainRootUtil(NetworkService networkService) {
+    public ChainRootService(NetworkService networkService) {
         this.networkService = networkService;
     }
 
@@ -48,6 +48,7 @@ public class ChainRootUtil
 
         return true;
     }
+
 
     public void changeNetworkChainRoot(String networkUUID, String chainRoot)
     {

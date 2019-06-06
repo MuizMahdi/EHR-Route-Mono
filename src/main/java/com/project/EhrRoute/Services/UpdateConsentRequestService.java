@@ -28,7 +28,7 @@ public class UpdateConsentRequestService
     public UpdateConsentRequest createUpdateConsentRequest(ConsentRequestBlock consentRequestBlock, EhrDetails ehrDetails)
     {
         // Validate Consent Request Block
-        consentRequestBlockService.checkConsentRequestExistence(consentRequestBlock);
+        consentRequestBlockService.consentRequestExists(consentRequestBlock);
 
         // Validate EHR Details
         ehrDetailService.checkEhrDetailsExistence(ehrDetails);

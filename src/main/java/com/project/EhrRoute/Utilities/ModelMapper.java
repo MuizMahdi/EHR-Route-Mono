@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 public class ModelMapper
 {
 
-private KeyUtil keyUtil;
+    private KeyUtil keyUtil;
+    private UuidUtil uuidUtil;
     private HashUtil hashUtil;
     private StringUtil stringUtil;
     private BlockHeader blockHeader;
@@ -40,8 +41,9 @@ private KeyUtil keyUtil;
 
 
     @Autowired
-    public ModelMapper(KeyUtil keyUtil, HashUtil hashUtil, StringUtil stringUtil, BlockHeader blockHeader, Transaction transaction, NetworkService networkService, ProviderService providerService) {
+    public ModelMapper(KeyUtil keyUtil, UuidUtil uuidUtil, HashUtil hashUtil, StringUtil stringUtil, BlockHeader blockHeader, Transaction transaction, NetworkService networkService, ProviderService providerService) {
         this.keyUtil = keyUtil;
+        this.uuidUtil = uuidUtil;
         this.hashUtil = hashUtil;
         this.stringUtil = stringUtil;
         this.blockHeader = blockHeader;
@@ -204,6 +206,7 @@ private KeyUtil keyUtil;
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
 
         consentRequest.setUserID(userID);
+        consentRequest.setRequestUUID(uuidUtil.generateUUID());
         consentRequest.setProviderUUID(providerUUID);
         consentRequest.setNetworkUUID(networkUUID);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
@@ -338,6 +341,7 @@ private KeyUtil keyUtil;
         SerializableBlock block = new SerializableBlock(blockHeader, transaction);
 
         return new UserConsentRequest(
+                consentRequestBlock.getRequestUUID(),
                 block,
                 consentRequestBlock.getProviderUUID(),
                 consentRequestBlock.getNetworkUUID(),

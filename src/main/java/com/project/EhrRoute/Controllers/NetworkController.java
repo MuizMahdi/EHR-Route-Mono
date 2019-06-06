@@ -6,12 +6,14 @@ import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Auth.VerificationToken;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkDetails;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
+import com.project.EhrRoute.Payload.App.NetworkRootUpdate;
 import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
@@ -35,7 +37,9 @@ public class NetworkController
 {
     private NetworkInvitationRequestService invitationRequestService;
     private VerificationTokenService verificationTokenService;
+    private ConsentRequestBlockService consentRequestService;
     private NotificationService notificationService;
+    private ChainRootService chainRootService;
     private NetworkService networkService;
     private UserService userService;
 
@@ -46,10 +50,12 @@ public class NetworkController
 
 
     @Autowired
-    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, NotificationService notificationService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
         this.invitationRequestService = invitationRequestService;
         this.verificationTokenService = verificationTokenService;
+        this.consentRequestService = consentRequestService;
         this.notificationService = notificationService;
+        this.chainRootService = chainRootService;
         this.networkService = networkService;
         this.userService = userService;
         this.genesisBlock = genesisBlock;
@@ -63,20 +69,14 @@ public class NetworkController
     public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
         if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not logged in"));
         }
 
         // Get current logged in user
         User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
 
         if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not found"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
         }
 
         // Initialize genesis block, a random network UUID is generated for every call,
@@ -107,14 +107,15 @@ public class NetworkController
         // Genesis block to be returned
         SerializableBlock genesis = modelMapper.mapBlockToSerializableBlock(genesisBlock.getBlock());
 
-        return new ResponseEntity<>(
-            genesis,
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(genesis);
     }
 
-
-    @GetMapping("/get-root")
+    /**
+     * Fetches a network merkle root given the network's UUID
+     * @param networkUUID   the network UUID
+     * @return              the network's merkle root
+     */
+    @GetMapping("/merkle-root")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getNetworkChainRoot(@RequestParam("networkuuid") String networkUUID)
     {
@@ -131,6 +132,28 @@ public class NetworkController
             new SimpleStringPayload(network.getChainRoot().getRoot()),
             HttpStatus.OK
         );
+    }
+
+
+    /**
+     * Finalizes the transaction by updating the network's merkle root and deleting the consent request on DB
+     * @param networkRootUpdate     the merkle root update request data
+     * @return                      HTTP 200 on success
+     */
+    @PostMapping("/merkle-root")
+    @PreAuthorize("hasRole('PROVIDER')")
+    public ResponseEntity updateNetworkMerkleRoot(@RequestBody NetworkRootUpdate networkRootUpdate)
+    {
+        // Get and validate the request by checking if there is a consent request with the UUID sent on the update request
+        ConsentRequestBlock consentRequest = consentRequestService.findConsentRequest(networkRootUpdate.getConsentRequestUUID());
+
+        // Change the network's root
+        chainRootService.changeNetworkChainRoot(networkRootUpdate.getNetworkUUID(), networkRootUpdate.getMerkleRoot());
+
+        // Delete the consent request
+        consentRequestService.deleteRequest(consentRequest);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Network's merkle root has been updated successfully"));
     }
 
 
@@ -381,5 +404,4 @@ public class NetworkController
         // Save user to persist changes
         userService.saveUser(invitedUser);
     }
-
 }

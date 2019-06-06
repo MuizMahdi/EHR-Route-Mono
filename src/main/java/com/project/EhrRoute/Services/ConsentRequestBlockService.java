@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.project.EhrRoute.Repositories.ConsentRequestBlockRepository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,7 +21,7 @@ public class ConsentRequestBlockService
 
 
     @Transactional
-    public void checkConsentRequestExistence(ConsentRequestBlock consentRequest) {
+    public void consentRequestExists(ConsentRequestBlock consentRequest) {
         if (!consentRequestRepository.existsById(consentRequest.getId())) {
             throw new ResourceNotFoundException("ConsentRequestBlock", "ID", consentRequest.getId());
         }
@@ -36,36 +34,20 @@ public class ConsentRequestBlockService
     }
 
 
+    /**
+     * Finds a consent request with consent request UUID
+     * @param consentRequestUUID            the UUID of the consent request generated on request creation
+     * @return                              the ConsentRequestBlock that has the UUID
+     * @throws ResourceNotFoundException    exception thrown when a request with the UUID not found
+     */
     @Transactional
-    public List<ConsentRequestBlock> findRequestsByProvider(String providerUUID) {
-        List<ConsentRequestBlock> providerRequests = consentRequestRepository.findByProviderUUID(providerUUID);
-
-        if (providerRequests.isEmpty() || providerRequests.size() < 1) {
-            return null;
-        }
-
-        return providerRequests;
+    public ConsentRequestBlock findConsentRequest(String consentRequestUUID) {
+        // return the consent request block using the UUID
+        return consentRequestRepository.findByRequestUUID(consentRequestUUID).orElseThrow(() -> {
+            return new ResourceNotFoundException("Consent Request", "UUID", consentRequestUUID);
+        });
     }
 
-
-    @Transactional
-    public void deleteRequest(ConsentRequestBlock consentRequest) {
-        consentRequestRepository.delete(consentRequest);
-    }
-
-
-    public void deleteMatchingConsentRequest(UserConsentResponse consentResponse) {
-        ConsentRequestBlock consentRequest = findMatchingConsentRequest(consentResponse);
-
-        if (consentRequest != null) {
-            deleteRequest(consentRequest);
-        }
-    }
-
-
-    public boolean isConsentResponseValid(UserConsentResponse consentResponse) {
-        return (findMatchingConsentRequest(consentResponse) != null);
-    }
 
     /**
      * Finds the respective consent request for a consent response
@@ -73,31 +55,26 @@ public class ConsentRequestBlockService
      * @return                  the request that the provider has made
      */
     public ConsentRequestBlock findMatchingConsentRequest(UserConsentResponse consentResponse) {
+        // Consent request UUID of the response
+        String consentRequestUUID = consentResponse.getConsentRequestUUID();
 
-        // The UUID of the provider that made the request
-        String responseProviderUUID = consentResponse.getProviderUUID();
+        // return the consent request block using the UUID
+        return consentRequestRepository.findByRequestUUID(consentRequestUUID).orElse(null);
+    }
 
-        // Get the list of Consent requests made by that provider
-        List<ConsentRequestBlock> providerConsentRequestsList = findRequestsByProvider(responseProviderUUID);
 
-        // If the provider has any open(unanswered) consent requests
-        if ((providerConsentRequestsList != null) && (!providerConsentRequestsList.isEmpty())) {
+    /**
+     * Validates consent response by checking if it has respective consent request
+     * @param consentResponse   the user's response for a consent request made by a provider
+     * @return                  boolean representation of the consent response existence
+     */
+    public boolean isConsentResponseValid(UserConsentResponse consentResponse) {
+        return (findMatchingConsentRequest(consentResponse) != null);
+    }
 
-            // Create an array list from the provider's requests
-            ArrayList<ConsentRequestBlock> providerConsentRequests = new ArrayList<>(providerConsentRequestsList);
 
-            String responseTransactionId = consentResponse.getBlock().getTransaction().getTransactionId();
-
-            // if a request that has transactionId identical to responseTransactionId is found in providerConsentRequests
-            for (ConsentRequestBlock request : providerConsentRequests) {
-                if (request.getTransactionId().equals(responseTransactionId)) {
-                    // return that request
-                    return request;
-                }
-            }
-
-        }
-
-        return null;
+    @Transactional
+    public void deleteRequest(ConsentRequestBlock consentRequest) {
+        consentRequestRepository.delete(consentRequest);
     }
 }

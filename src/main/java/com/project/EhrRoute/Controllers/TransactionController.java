@@ -2,6 +2,7 @@ package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Block;
 import com.project.EhrRoute.Core.BlockBroadcaster;
 import com.project.EhrRoute.Core.Transaction;
+import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
@@ -30,8 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RestController
@@ -50,16 +49,17 @@ public class TransactionController
 
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
+    private HashUtil hashUtil;
     private UuidUtil uuidUtil;
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
-    private ChainRootUtil chainRootUtil;
+    private ChainRootService chainRootService;
     private SimpleStringUtil simpleStringUtil;
     private BlockBroadcaster blockBroadcaster;
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UpdateConsentRequestService updateConsentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootUtil chainRootUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UpdateConsentRequestService updateConsentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
@@ -70,10 +70,11 @@ public class TransactionController
         this.updateConsentRequestService = updateConsentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
+        this.hashUtil = hashUtil;
         this.uuidUtil = uuidUtil;
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
-        this.chainRootUtil = chainRootUtil;
+        this.chainRootService = chainRootService;
         this.simpleStringUtil = simpleStringUtil;
         this.blockBroadcaster = blockBroadcaster;
     }
@@ -112,7 +113,7 @@ public class TransactionController
 
         // Check if provider's chain is valid by Comparing sent chainRoot with the latest valid saved chain root
         try {
-            isValidNetworkChainRoot = chainRootUtil.checkNetworkChainRoot(networkUUID, chainRoot);
+            isValidNetworkChainRoot = chainRootService.checkNetworkChainRoot(networkUUID, chainRoot);
         }
         catch (Exception Ex) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
@@ -238,13 +239,19 @@ public class TransactionController
         block.getTransaction().setRecord(record);
 
         // Sign the block.
-        SerializableBlock signedBlock = signBlock(consentResponse, block);
+        block = signBlock(consentResponse, block);
 
-        // Broadcast the signed block to the other provider nodes in network.
-        blockBroadcaster.broadcast(signedBlock, consentResponse.getNetworkUUID());
+        // Update the block
+        block = updateBlockLeafHash(block);
 
-        // Delete the consent request that matches the response data from DB
-        //deleteMatchingConsentRequest(consentResponse);
+        // Construct a block addition response
+        BlockResponse blockResponse = new BlockResponse(
+            modelMapper.mapBlockToSerializableBlock(block), // Get SerializableBlock from the updated block
+            new BlockMetadata(consentResponse.getConsentRequestUUID()) // Create block metadata
+        );
+
+        // Broadcast the block response to the providers (nodes) of the network.
+        blockBroadcaster.broadcast(blockResponse);
 
         return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broad-casted successfully"));
     }
@@ -288,11 +295,17 @@ public class TransactionController
         block.getTransaction().setRecord(record);
 
         // Sign the block.
-        SerializableBlock signedBlock = signBlock(updateConsentResponse.getConsentResponse(), block);
+        block = signBlock(updateConsentResponse.getConsentResponse(), block);
+        block = updateBlockLeafHash(block);
+
+        BlockResponse blockResponse = new BlockResponse(
+            modelMapper.mapBlockToSerializableBlock(block),
+            new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID())
+        );
 
         try {
             // Broadcast the signed block to the other provider nodes in network.
-            blockBroadcaster.broadcast(signedBlock, updateConsentResponse.getConsentResponse().getNetworkUUID());
+            blockBroadcaster.broadcast(blockResponse);
         }
         catch (ResourceEmptyException Ex) {
             return new ResponseEntity<>(new ApiResponse(false, Ex.getMessage()), HttpStatus.NOT_FOUND);
@@ -347,8 +360,9 @@ public class TransactionController
         }
 
         // If user exists (online) then send it as a notification through a server sent event.
-
+        /*
         UserConsentRequest userConsentRequest = new UserConsentRequest(
+            consentRequest
             event.getBlock(),
             event.getProviderUUID(),
             event.getNetworkUUID(),
@@ -366,10 +380,12 @@ public class TransactionController
             clustersContainer.getAppUsers().removeNode(stringUserID);
             throw new BadRequestException("An Error has occurred while sending SSE, user has been removed from AppUsers cluster.");
         }
+        */
     }
 
-    private SerializableBlock signBlock(UserConsentResponse consentResponse, Block block) throws Exception
-    {
+
+    private Block signBlock(UserConsentResponse consentResponse, Block block) throws Exception {
+
         // Get Transaction from Block
         Transaction transaction = block.getTransaction();
 
@@ -379,30 +395,29 @@ public class TransactionController
         // Sign transaction and get signature
         byte[] signature = rsaUtil.rsaSign(privateKey, transaction);
 
-        // Change the transaction signature
+        // Update the transaction signature
         transaction.setSignature(signature);
 
-        // Change the block transaction with the transaction that has the signature
+        // Update the block's transaction with the signed transaction
         block.setTransaction(transaction);
 
-        // Get SerializableBlock from the signed block
-        SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
+        return block;
 
-        return serializableBlock;
     }
 
-    private void changeNetworkChainRoot(String networkUUID, String chainRootWithBlock)
-    {
+    private Block updateBlockLeafHash(Block block) {
 
-        /*
-        Todo------------------------------------------------------------------|
-            Get networkUUID from NetworkService in DB by a query that finds
-            networkUUID of a provider since providersUUIDs are going to be
-            saved in networks in DB.
-        Todo------------------------------------------------------------------|
-        */
+        // Update the TxID
+        block.getTransaction().setTransactionId(
+            hashUtil.hashTransactionData(block.getTransaction())
+        );
 
-        // Change the provider's network chain root
-        chainRootUtil.changeNetworkChainRoot(networkUUID, chainRootWithBlock);
+        // Update the merkle leaf hash
+        block.getBlockHeader().setMerkleLeafHash(
+            hashUtil.SHA256(block.getTransaction().getTransactionId())
+        );
+
+        return block;
+
     }
 }
