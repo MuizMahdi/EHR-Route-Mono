@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -109,21 +111,13 @@ public class TransactionController
         // Get chain root from addition request payload
         String chainRoot = blockAddition.getChainRootWithoutBlock();
 
-        boolean isValidNetworkChainRoot;
-
         // Check if provider's chain is valid by Comparing sent chainRoot with the latest valid saved chain root
-        try {
-            isValidNetworkChainRoot = chainRootService.checkNetworkChainRoot(networkUUID, chainRoot);
-        }
-        catch (Exception Ex) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
-        }
+        boolean isValidNetworkChainRoot = chainRootService.checkNetworkChainRoot(networkUUID, chainRoot);
 
         // If not valid
         if (!isValidNetworkChainRoot) {
             // Fetch the chain from another provider in network the specified network in the BlockAddition request
             // and send it to this node with invalid chain.
-
             try {
                 chainUtil.fetchChainForNode(providerUUID, networkUUID);
             }
@@ -171,26 +165,20 @@ public class TransactionController
     {
         String providerUUID = updatedBlockAddition.getBlockAddition().getProviderUUID();
         String networkUUID = updatedBlockAddition.getBlockAddition().getNetworkUUID();
+        String userID = updatedBlockAddition.getBlockAddition().getEhrUserID(); // ID of the user to request their consent
 
-        // The ID of the user to get consent from
-        String userID = updatedBlockAddition.getBlockAddition().getEhrUserID();
-
-        // Validate Provider UUID and User ID
+        // Validate provider UUID and User ID
         if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse(false, "Invalid Provider UUID or User ID")
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider UUID or user ID"));
+        }
+
+        // Validate provider's network UUID
+        if (!uuidUtil.isValidUUID(networkUUID)) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider network or doesn't exist"));
         }
 
         // Validate userID
         userService.findUserById(Long.parseLong(userID));
-
-        // Check if provider's network uuid is valid
-        if (networkUUID == null || networkUUID.isEmpty()) {
-           return ResponseEntity.badRequest().body(
-               new ApiResponse(false, "Invalid provider network or doesn't exist")
-           );
-        }
 
         // Send a notification
         transactionService.sendUpdateConsentRequest(updatedBlockAddition.getBlockAddition(), updatedBlockAddition.getRecordUpdateData());
@@ -204,39 +192,15 @@ public class TransactionController
     //@PreAuthorize("hasRole('USER')")
     public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception
     {
-        Block block;
-
-        try {
-            // Get Block from SerializableBlock
-            block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
-        }
-        catch (BadRequestException Ex) { // Catch mapping errors due to absence of any field
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Block in Response, " + Ex.getMessage()));
-        }
-
         // Validate Consent Response.
         if (!consentRequestService.isConsentResponseValid(consentResponse)) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "A consent request has not been made for this response"));
         }
 
-        // Get user's EHR Details using their Address that was sent in the consent response
-        EhrDetails ehrDetails;
+        // TODO: SOLVE ISSUE: Serializing a JSON object into a Java Map (history in medical record serialization error)
 
-        try {
-            ehrDetails = ehrDetailService.findEhrDetails(consentResponse.getUserAddress());
-        }
-        catch (ResourceNotFoundException Ex) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid user address in consent response." + Ex.getMessage()));
-        }
-
-        // Get patient info from block
-        PatientInfo patientInfo = block.getTransaction().getRecord().getPatientInfo();
-
-        // Map EhrDetails data along with the patient info into a MedicalRecord
-        MedicalRecord record = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, patientInfo);
-
-        // Add the MedicalRecord into the block
-        block.getTransaction().setRecord(record);
+        // Map the SerializableBlock in response into a Block
+        Block block = modelMapper.mapSerializableBlockToBlock(consentResponse.getBlock());
 
         // Sign the block.
         block = signBlock(consentResponse, block);
@@ -253,71 +217,48 @@ public class TransactionController
         // Broadcast the block response to the providers (nodes) of the network.
         blockBroadcaster.broadcast(blockResponse);
 
-        return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broad-casted successfully"));
+        return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broadcasted successfully"));
     }
 
 
     @PostMapping("/give-update-consent")
     public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception
     {
-        // Validate Consent Request that the user responded to
+        // Validate the consent request that the user responded to
         if (!consentRequestService.isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
         }
 
-        // Get user's EHR Details using their Address that was sent in the consent response
-        EhrDetails ehrDetails = ehrDetailService.findEhrDetails(updateConsentResponse.getConsentResponse().getUserAddress());
-        ehrDetails.getAllergies().clear();
-        ehrDetails.getProblems().clear();
-
-        // Update the user's EhrDetails using values of the EhrDetails referenced in the UpdateConsentResponse
-        EhrDetails updatesEhrDetails = ehrDetailService.findEhrDetailsById(updateConsentResponse.getEhrDetailsId());
-
-        // Add the updated medical problems/conditions
-        updatesEhrDetails.getProblems().forEach(ehrDetails::addProblem);
-
-        // Add the updated allergies or drug reactions
-        updatesEhrDetails.getAllergies().forEach(ehrDetails::addAllergy);
-
-        // Persist changes
-        ehrDetailService.saveEhrDetails(ehrDetails);
-
         // Get Block from SerializableBlock in the consent request of the update consent response
         Block block = modelMapper.mapSerializableBlockToBlock(updateConsentResponse.getConsentResponse().getBlock());
 
-        // Get patient info from block
-        PatientInfo patientInfo = block.getTransaction().getRecord().getPatientInfo();
-
-        // Map EhrDetails data along with the patient info into a MedicalRecord
-        MedicalRecord record = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, patientInfo);
-
-        // Add the MedicalRecord into the block
-        block.getTransaction().setRecord(record);
-
-        // Sign the block.
+        // Sign and update the block.
         block = signBlock(updateConsentResponse.getConsentResponse(), block);
         block = updateBlockLeafHash(block);
 
+        // Construct a block addition response
         BlockResponse blockResponse = new BlockResponse(
             modelMapper.mapBlockToSerializableBlock(block),
             new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID())
         );
 
-        try {
-            // Broadcast the signed block to the other provider nodes in network.
-            blockBroadcaster.broadcast(blockResponse);
-        }
-        catch (ResourceEmptyException Ex) {
-            return new ResponseEntity<>(new ApiResponse(false, Ex.getMessage()), HttpStatus.NOT_FOUND);
-        }
+        // Broadcast the signed block to the other provider nodes in network.
+        blockBroadcaster.broadcast(blockResponse);
 
-        // Get the update consent request using the updates EhrDetails
-        UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequestByEhrDetail(updatesEhrDetails);
+        /* Clean up request data */
+        // Get the temp EHR details that contains the updated medical data
+        EhrDetails ehrDetails = ehrDetailService.findEhrDetails(updateConsentResponse.getEhrDetailsUuid());
+
+        // Get the update consent request using the temp EhrDetails
+        UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequestByEhrDetail(ehrDetails);
 
         // Delete the UpdateConsentRequest since the user has already responded to it
         updateConsentRequestService.deleteUpdateConsentRequest(updateConsentRequest);
 
-        return ResponseEntity.accepted().build();
+        // Delete the temp EHR details
+        ehrDetailService.deleteEhrDetails(ehrDetails);
+
+        return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }
 
 

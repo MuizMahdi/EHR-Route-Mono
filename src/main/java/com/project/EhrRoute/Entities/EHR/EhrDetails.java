@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Entity
@@ -14,7 +15,8 @@ public class EhrDetails
     private Long id;
 
     @NotNull
-    private String address;
+    @NotBlank
+    private String uuid;
 
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -28,9 +30,9 @@ public class EhrDetails
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "ehrDetail_allergies",
-            joinColumns = @JoinColumn(name = "ehr_details_id"),
-            inverseJoinColumns = @JoinColumn(name = "ehr_allergy_id")
+        name = "ehrDetail_allergies",
+        joinColumns = @JoinColumn(name = "ehr_details_id"),
+        inverseJoinColumns = @JoinColumn(name = "ehr_allergy_id")
     )
     private Set<EhrAllergies> allergies = new HashSet<>();
 
@@ -44,12 +46,11 @@ public class EhrDetails
     private Set<EhrHistory> history = new HashSet<>();
 
 
-    public EhrDetails() { }
-    public EhrDetails(@NotBlank String address) {
-        this.address = address;
+    public EhrDetails() {
+        this.uuid = UUID.randomUUID().toString();
     }
-    public EhrDetails(@NotBlank String address, Set<EhrProblems> problems, Set<EhrAllergies> allergies, Set<EhrHistory> history) {
-        this.address = address;
+    public EhrDetails(@NotBlank String uuid, Set<EhrProblems> problems, Set<EhrAllergies> allergies, Set<EhrHistory> history) {
+        this.uuid = uuid;
         this.problems = problems;
         this.allergies = allergies;
         this.history = history;
@@ -81,8 +82,8 @@ public class EhrDetails
     public Long getId() {
         return id;
     }
-    public String getAddress() {
-        return address;
+    public String getUuid() {
+        return uuid;
     }
     public Set<EhrHistory> getHistory() {
         return history;
@@ -97,8 +98,8 @@ public class EhrDetails
     public void setId(Long id) {
         this.id = id;
     }
-    public void setAddress(String address) {
-        this.address = address;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
     public void setHistory(Set<EhrHistory> history) {
         this.history = history;

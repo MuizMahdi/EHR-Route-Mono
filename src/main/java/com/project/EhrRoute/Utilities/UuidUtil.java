@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Utilities;
+import com.project.EhrRoute.Models.UuidSourceType;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
 
@@ -25,5 +26,9 @@ public class UuidUtil
         }
 
         return true;
+    }
+
+    public void validateResourceUUID(String UUID, UuidSourceType uuidType) {
+
     }
 }

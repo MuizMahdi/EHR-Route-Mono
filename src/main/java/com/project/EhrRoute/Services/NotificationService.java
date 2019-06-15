@@ -158,7 +158,7 @@ public class NotificationService
                 MedicalRecord updateRecordData = modelMapper.mapEhrDetailsToMedicalRecord(ehrDetails, new PatientInfo());
 
                 // Set the UserUpdateConsentRequest as notification reference
-                notificationReference = new UserUpdateConsentRequest(ehrDetails.getId(), userConsentRequest, updateRecordData);
+                notificationReference = new UserUpdateConsentRequest(ehrDetails.getUuid(), userConsentRequest, updateRecordData);
             }
 
             if (notificationReference == null) {

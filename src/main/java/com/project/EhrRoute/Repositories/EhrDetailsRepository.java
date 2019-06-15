@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EhrDetailsRepository extends JpaRepository<EhrDetails, Long>
 {
-    Optional<EhrDetails> findByAddress(String address);
+    Optional<EhrDetails> findByUuid(String uuid);
 }

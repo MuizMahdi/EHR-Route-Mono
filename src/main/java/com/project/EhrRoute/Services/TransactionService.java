@@ -50,13 +50,13 @@ public class TransactionService
         Block block = modelMapper.mapAdditionRequestToBlock(updatedBlockAddition);
 
         // Convert the block into a serializable block
-        SerializableBlock serializableBlockBlock = modelMapper.mapBlockToSerializableBlock(block);
+        SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
 
         // Construct and publish a GetUserUpdateConsent Event
         GetUserUpdateConsentEvent getUserConsent = new GetUserUpdateConsentEvent(
             this,
             recordUpdateData,
-            serializableBlockBlock,
+            serializableBlock,
             updatedBlockAddition.getProviderUUID(),
             updatedBlockAddition.getNetworkUUID(),
             updatedBlockAddition.getEhrUserID()
@@ -86,12 +86,9 @@ public class TransactionService
         // Persist the consent request
         consentRequestService.saveConsentRequest(consentRequest);
 
-        /*
-        *   Generate an EHR Detail (without an address) and add the EHR data into it.
-        *   This will be used as a temp EhrDetail until the user accepts or rejects the request.
-        */
-
-        EhrDetails ehrDetails = ehrDetailService.generateUserEhrDetails("");
+        /* Generate an EHR Detail and add the EHR proposed update data into it.
+        This will be used as a temp EhrDetail until the user accepts or rejects the request. */
+        EhrDetails ehrDetails = new EhrDetails();
 
         /* Get the EHR Data of the update consent request from the event */
         event.getRecordUpdateData().getConditions().forEach(medicalProblem -> {
@@ -104,17 +101,13 @@ public class TransactionService
             ehrDetails.addAllergy(ehrAllergy);
         });
 
-        // TODO: ADD HISTORY AS WELL
-
         // Persist changes
         ehrDetailService.saveEhrDetails(ehrDetails);
 
         // Create and save an UpdateConsentRequest
         UpdateConsentRequest updateConsentRequest = updateConsentRequestService.createUpdateConsentRequest(consentRequest, ehrDetails);
 
-
         // Send a notification to the user
         notificationService.notifyUser(consentRequest, updateConsentRequest);
-
     }
 }
