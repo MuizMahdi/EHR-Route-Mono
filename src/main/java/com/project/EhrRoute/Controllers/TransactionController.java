@@ -5,14 +5,11 @@ import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
-import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
-import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Events.GetUserConsentEvent;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.GeneralAppException;
-import com.project.EhrRoute.Exceptions.ResourceEmptyException;
-import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.*;
 import com.project.EhrRoute.Services.*;
@@ -23,16 +20,10 @@ import com.project.EhrRoute.Utilities.SimpleStringUtil;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import java.io.IOException;
 import java.security.PrivateKey;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
@@ -43,11 +34,9 @@ public class TransactionController
     private ApplicationEventPublisher eventPublisher;
 
     private UserService userService;
-    private EhrDetailService ehrDetailService;
     private TransactionService transactionService;
     private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
-    private UpdateConsentRequestService updateConsentRequestService;
 
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
@@ -61,15 +50,13 @@ public class TransactionController
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UpdateConsentRequestService updateConsentRequestService, UserService userService, EhrDetailService ehrDetailService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
-        this.ehrDetailService = ehrDetailService;
         this.transactionService = transactionService;
         this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
-        this.updateConsentRequestService = updateConsentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.hashUtil = hashUtil;
@@ -90,22 +77,16 @@ public class TransactionController
         String networkUUID = blockAddition.getNetworkUUID();
         String userID = blockAddition.getEhrUserID(); // The ID of the user to get consent from
 
-        // Check if Provider UUID and User ID are valid
-        if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid Provider UUID or User ID"));
-        }
+        // Validate provider and network UUID
+        uuidUtil.validateResourceUUID(providerUUID, UuidSourceType.PROVIDER);
+        uuidUtil.validateResourceUUID(networkUUID, UuidSourceType.NETWORK);
 
-        // Validate userID (exception thrown if not found)
+        // Validate user
         userService.findUserById(Long.parseLong(userID));
 
         // Check if provider exists in providers cluster
         if (!clustersContainer.getChainProviders().existsInCluster(providerUUID)) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "You are not in the providers list"));
-        }
-
-        // Check if provider's network uuid is valid
-        if (networkUUID == null || networkUUID.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider network or doesn't exist"));
         }
 
         // Get chain root from addition request payload
@@ -167,17 +148,11 @@ public class TransactionController
         String networkUUID = updatedBlockAddition.getBlockAddition().getNetworkUUID();
         String userID = updatedBlockAddition.getBlockAddition().getEhrUserID(); // ID of the user to request their consent
 
-        // Validate provider UUID and User ID
-        if (!uuidUtil.isValidUUID(providerUUID) || !simpleStringUtil.isValidNumber(userID)) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider UUID or user ID"));
-        }
+        // Validate provider and network UUID
+        uuidUtil.validateResourceUUID(providerUUID, UuidSourceType.PROVIDER);
+        uuidUtil.validateResourceUUID(networkUUID, UuidSourceType.NETWORK);
 
-        // Validate provider's network UUID
-        if (!uuidUtil.isValidUUID(networkUUID)) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid provider network or doesn't exist"));
-        }
-
-        // Validate userID
+        // Validate user
         userService.findUserById(Long.parseLong(userID));
 
         // Send a notification
@@ -250,8 +225,8 @@ public class TransactionController
 
 
     @EventListener
-    protected void getUserConsent(GetUserConsentEvent event)
-    {
+    protected void getUserConsent(GetUserConsentEvent event) {
+
         String stringUserID = event.getUserID();
         Long userID;
 
@@ -268,8 +243,7 @@ public class TransactionController
 
         // If user doesn't exist in users cluster (user offline or wrong userID)
         // Save a ConsentRequestBlock notification to DB for user to check when they login
-        if (!isUserExists)
-        {
+        if (!isUserExists) {
             // Create a consent request from block, user ID and provider UUID
             ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(
                 userID,
@@ -311,7 +285,6 @@ public class TransactionController
         */
     }
 
-
     private Block signBlock(UserConsentResponse consentResponse, Block block) throws Exception {
 
         // Get Transaction from Block
@@ -330,7 +303,6 @@ public class TransactionController
         block.setTransaction(transaction);
 
         return block;
-
     }
 
     private Block updateBlockLeafHash(Block block) {
@@ -346,6 +318,5 @@ public class TransactionController
         );
 
         return block;
-
     }
 }

@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Utilities;
+import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Models.UuidSourceType;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
@@ -12,8 +13,7 @@ public class UuidUtil
         return UUID.randomUUID().toString();
     }
 
-    public boolean isValidUUID(String uuid)
-    {
+    public boolean isValidUUID(String uuid) {
         if (uuid.isEmpty()) {
             return false;
         }
@@ -29,6 +29,8 @@ public class UuidUtil
     }
 
     public void validateResourceUUID(String UUID, UuidSourceType uuidType) {
-
+        if (!isValidUUID(UUID)) {
+            throw new BadRequestException("Invalid " + uuidType.toString().toLowerCase() + " UUID");
+        }
     }
 }
