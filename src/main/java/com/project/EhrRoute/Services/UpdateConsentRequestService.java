@@ -41,15 +41,21 @@ public class UpdateConsentRequestService
     }
 
     @Transactional
-    public UpdateConsentRequest findUpdateConsentRequestByEhrDetail(EhrDetails ehrDetails) {
+    public UpdateConsentRequest findUpdateConsentRequest(EhrDetails ehrDetails) {
         return updateConsentRequestRepository.findByEhrDetails(ehrDetails).orElseThrow(() ->
             new ResourceNotFoundException("UpdateConsentRequest", "EhrDetails Id", ehrDetails.getId())
         );
     }
 
     @Transactional
-    public void deleteUpdateConsentRequest(UpdateConsentRequest updateConsentRequest)
-    {
+    public UpdateConsentRequest findUpdateConsentRequest(ConsentRequestBlock consentRequestBlock) {
+        return updateConsentRequestRepository.findByConsentRequestBlock(consentRequestBlock).orElseThrow(() ->
+            new ResourceNotFoundException("UpdateConsentRequest", "consent request block Id", consentRequestBlock.getId())
+        );
+    }
+
+    @Transactional
+    public void deleteUpdateConsentRequest(UpdateConsentRequest updateConsentRequest) {
         updateConsentRequestRepository.delete(updateConsentRequest);
     }
 }

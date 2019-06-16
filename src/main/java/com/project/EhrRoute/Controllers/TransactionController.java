@@ -245,19 +245,6 @@ public class TransactionController
         // Broadcast the signed block to the other provider nodes in network.
         blockBroadcaster.broadcast(blockResponse);
 
-        /* Clean up request data */
-        // Get the temp EHR details that contains the updated medical data
-        EhrDetails ehrDetails = ehrDetailService.findEhrDetails(updateConsentResponse.getEhrDetailsUuid());
-
-        // Get the update consent request using the temp EhrDetails
-        UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequestByEhrDetail(ehrDetails);
-
-        // Delete the UpdateConsentRequest since the user has already responded to it
-        updateConsentRequestService.deleteUpdateConsentRequest(updateConsentRequest);
-
-        // Delete the temp EHR details
-        ehrDetailService.deleteEhrDetails(ehrDetails);
-
         return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }
 

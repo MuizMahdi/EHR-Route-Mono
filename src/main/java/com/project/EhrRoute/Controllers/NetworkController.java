@@ -8,6 +8,7 @@ import com.project.EhrRoute.Entities.Auth.VerificationToken;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
@@ -36,6 +37,7 @@ import java.util.List;
 public class NetworkController
 {
     private NetworkInvitationRequestService invitationRequestService;
+    private UpdateConsentRequestService updateConsentRequestService;
     private VerificationTokenService verificationTokenService;
     private ConsentRequestBlockService consentRequestService;
     private NotificationService notificationService;
@@ -50,7 +52,8 @@ public class NetworkController
 
 
     @Autowired
-    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+    public NetworkController(NetworkInvitationRequestService invitationRequestService, UpdateConsentRequestService updateConsentRequestService, VerificationTokenService verificationTokenService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+        this.updateConsentRequestService = updateConsentRequestService;
         this.invitationRequestService = invitationRequestService;
         this.verificationTokenService = verificationTokenService;
         this.consentRequestService = consentRequestService;
@@ -150,8 +153,16 @@ public class NetworkController
         // Change the network's root
         chainRootService.changeNetworkChainRoot(networkRootUpdate.getNetworkUUID(), networkRootUpdate.getMerkleRoot());
 
-        // Delete the consent request
-        consentRequestService.deleteRequest(consentRequest);
+        try {
+            // Delete the consent request
+            consentRequestService.deleteRequest(consentRequest);
+        }
+        catch (Exception Ex) {
+            // If consent request wasn't deleted because there is an update consent request foreign key constraint
+            // then find and delete the update consent request that has/mapped-to this consent request
+            UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequest(consentRequest);
+            updateConsentRequestService.deleteUpdateConsentRequest(updateConsentRequest);
+        }
 
         return ResponseEntity.ok(new ApiResponse(true, "Network's merkle root has been updated successfully"));
     }
