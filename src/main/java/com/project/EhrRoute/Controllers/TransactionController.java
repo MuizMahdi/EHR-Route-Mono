@@ -16,7 +16,6 @@ import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import com.project.EhrRoute.Utilities.ChainUtil;
-import com.project.EhrRoute.Utilities.SimpleStringUtil;
 import org.springframework.context.event.EventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +44,11 @@ public class TransactionController
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
     private ChainRootService chainRootService;
-    private SimpleStringUtil simpleStringUtil;
     private BlockBroadcaster blockBroadcaster;
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, SimpleStringUtil simpleStringUtil, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
@@ -64,7 +62,6 @@ public class TransactionController
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
         this.chainRootService = chainRootService;
-        this.simpleStringUtil = simpleStringUtil;
         this.blockBroadcaster = blockBroadcaster;
     }
 

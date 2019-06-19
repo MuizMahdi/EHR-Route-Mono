@@ -177,13 +177,11 @@ public class ChainController
             }
         }
 
-        if (consumerNetworkProviders.isEmpty()) // If no provider was found
-        {
+        if (consumerNetworkProviders.isEmpty()) { // If no provider was found
             // Send response to consumer
             consumerEmitter.send(new ApiResponse(false, "No provider available in your network"));
         }
-        else
-        {
+        else {
             // Todo: Check if first provider has a valid chain, if not then choose another, and so...
 
             // Get first provider from list
@@ -204,8 +202,7 @@ public class ChainController
 
 
     @EventListener
-    protected void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException
-    {
+    protected void sendChainToConsumer(SendChainToConsumerEvent event) throws IOException {
         String consumerUUID = event.getConsumerUUID();
 
         // Get consumer node with consumerUUID from consumers
