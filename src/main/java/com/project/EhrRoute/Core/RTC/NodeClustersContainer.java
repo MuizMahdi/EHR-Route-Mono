@@ -41,7 +41,14 @@ public class NodeClustersContainer implements Subject
     }
 
     /**
-     * Broadcasts keep-alive data to all available nodes of all clusters
+     * Removes a node from all of its registered Node Clusters
+     */
+    public void removeNode(Node node) {
+        nodesClusters.forEach((uuid, cluster) -> ((NodesCluster) cluster).removeObserver(node));
+    }
+
+    /**
+     * Broadcasts keep-alive heartbeat data to all available nodes of all clusters
      */
     @Override
     public void notifyObservers(Object notification) {

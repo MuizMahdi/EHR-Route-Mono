@@ -32,6 +32,9 @@ public class BlocksFetchRequest
     @PositiveOrZero
     private Long blocksRangeEnd;
 
+    // Indicates whether the blocks fetching is currently in process (false) or not (true)
+    private Boolean isPending;
+
 
     public BlocksFetchRequest() { }
     public BlocksFetchRequest(@NotNull @NotBlank String consumerUUID, @NotNull @NotBlank String networkUUID, @NotNull @PositiveOrZero Long blocksRangeBegin, @NotNull @PositiveOrZero Long blocksRangeEnd) {
@@ -39,11 +42,15 @@ public class BlocksFetchRequest
         this.networkUUID = networkUUID;
         this.blocksRangeBegin = blocksRangeBegin;
         this.blocksRangeEnd = blocksRangeEnd;
+        this.isPending = true; // Waiting for a node to send blocks
     }
 
 
     public Long getId() {
         return id;
+    }
+    public Boolean getPending() {
+        return isPending;
     }
     public String getNetworkUUID() {
         return networkUUID;
@@ -60,6 +67,9 @@ public class BlocksFetchRequest
 
     public void setId(Long id) {
         this.id = id;
+    }
+    public void setPending(Boolean pending) {
+        isPending = pending;
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;

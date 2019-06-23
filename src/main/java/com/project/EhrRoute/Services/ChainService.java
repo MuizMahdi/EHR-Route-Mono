@@ -37,9 +37,6 @@ public class ChainService
 
         // Create and save a blocks fetch request
         blocksFetchRequestService.saveBlocksFetchRequest(consumerUUID, networkUUID, rangeBegin, rangeEnd);
-
-
-
     }
 
 

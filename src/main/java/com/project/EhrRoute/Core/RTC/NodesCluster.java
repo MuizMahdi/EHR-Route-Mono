@@ -30,14 +30,14 @@ public class NodesCluster implements Subject, Observer
 
     @Override
     public void registerObserver(Observer node) {
-        providingNodes.put(node.getUUID(), node);
-        consumingNodes.put(node.getUUID(), node);
+        registerProvider(node);
+        registerConsumer(node);
     }
 
     @Override
     public void removeObserver(Observer node) {
-        providingNodes.remove(node.getUUID());
-        consumingNodes.remove(node.getUUID());
+        removeProvider(node);
+        removeConsumer(node);
     }
 
     /**

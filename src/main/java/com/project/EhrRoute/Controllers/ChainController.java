@@ -76,7 +76,7 @@ public class ChainController
     public ResponseEntity fetchChainBlocks(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser)
     {
         chainService.requestBlocksFetch(currentUser, consumerUUID, networkUUID, rangeBegin, rangeEnd);
-        return null;
+        return ResponseEntity.ok(new ApiResponse(true, "Blocks has been requested"));
     }
 
 
