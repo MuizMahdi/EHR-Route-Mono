@@ -7,10 +7,12 @@ import com.project.EhrRoute.Exceptions.InternalErrorException;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.RoleName;
+import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.SignUpRequest;
 import com.project.EhrRoute.Payload.Auth.UserInfo;
 import com.project.EhrRoute.Repositories.RoleRepository;
 import com.project.EhrRoute.Repositories.UserRepository;
+import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -195,9 +197,6 @@ public class UserService
 
     @Transactional
     public boolean userHasNetwork(User user, Network network) {
-
-        boolean hasNetwork = false;
-
         if (user == null || network == null) {
             throw new BadRequestException("Invalid network or user");
         }
@@ -205,11 +204,11 @@ public class UserService
         // Iterate through user networks and check if network exists
         for (Network userNetwork : user.getNetworks()) {
             if (userNetwork.equals(network)) {
-                hasNetwork = true;
+                return true;
             }
         }
 
-        return hasNetwork;
+        return false;
     }
 
 

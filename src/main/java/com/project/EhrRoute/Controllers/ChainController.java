@@ -11,9 +11,13 @@ import com.dropbox.core.v2.users.FullAccount;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
 import com.project.EhrRoute.Events.SendChainToConsumerEvent;
+import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.ChainFetchRequest;
 import com.project.EhrRoute.Payload.Core.SerializableChain;
+import com.project.EhrRoute.Security.CurrentUser;
+import com.project.EhrRoute.Security.UserPrincipal;
+import com.project.EhrRoute.Services.ChainService;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.slf4j.Logger;
@@ -38,6 +42,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/chain")
+@PreAuthorize("hasRole('PROVIDER')")
 public class ChainController
 {
     private final Logger logger = LoggerFactory.getLogger(ChainController.class);
@@ -47,17 +52,41 @@ public class ChainController
 
     private ApplicationEventPublisher eventPublisher;
     private ClustersContainer clustersContainer;
+    private ChainService chainService;
     private UuidUtil uuidUtil;
 
     @Autowired
-    public ChainController(UuidUtil uuidUtil, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher) {
+    public ChainController(UuidUtil uuidUtil, ChainService chainService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher) {
         this.uuidUtil = uuidUtil;
+        this.chainService = chainService;
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
     }
 
 
-    // Publishes a SendChainToConsumerEvent with the chain download uri to the node that needs it
+    /**
+     * Fetches a range of blocks from the blockchain of another node in the specified network
+     * @param consumerUUID      Node UUID of the node that wants to receive (consume) blocks
+     * @param networkUUID       Network UUID from which another node is asked for sending blocks
+     * @param rangeBegin        The index of the first block to fetch
+     * @param rangeEnd          The index of the last block to fetch
+     * @return HTTP 200         Returns HTTP OK then the node receives the blocks through SSE
+     */
+    @GetMapping()
+    public ResponseEntity fetchChainBlocks(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser)
+    {
+        chainService.requestBlocksFetch(currentUser, consumerUUID, networkUUID, rangeBegin, rangeEnd);
+        return null;
+    }
+
+
+    @PostMapping()
+    public ResponseEntity sendChainBlock()
+    {
+        return null;
+    }
+
+
     @RequestMapping(method = RequestMethod.POST, consumes = { "multipart/form-data" })
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity chainSend(@RequestPart("file") MultipartFile chainFile, @RequestParam("consumeruuid") String consumerUUID, @RequestParam("networkuuid") String networkUUID) throws DbxException, IOException
@@ -122,7 +151,6 @@ public class ChainController
     }
 
 
-    // Publishes a GetChainFromProviderEvent with the node uuid that needs chain from a certain network
     @GetMapping("/chainget")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity ChainGet(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID)

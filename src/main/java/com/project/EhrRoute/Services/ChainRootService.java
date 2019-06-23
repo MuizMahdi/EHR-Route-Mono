@@ -18,25 +18,18 @@ public class ChainRootService
 
 
     // Returns true if the network's current chain root equals chainRoot
-    public boolean checkNetworkChainRoot(String networkUUID, String chainRoot)
-    {
-        Network network = networkService.findByNetUUID(networkUUID);
+    public boolean checkNetworkChainRoot(String networkUUID, String chainRoot) {
 
-        // If it doesn't exist in DB
-        if (network == null) {
-            throw new BadRequestException("Invalid Network");
-        }
+        Network network = networkService.findNetwork(networkUUID);
 
         if (chainRoot.isEmpty()) {
             throw new BadRequestException("Invalid Chain Root");
         }
 
-        //ChainRoot networkCurrentChainRoot = chainRootRepository.findByNetwork(network).orElse(null);
-
         // Latest chain root of the network
         ChainRoot networkCurrentChainRoot = network.getChainRoot();
 
-        if (networkCurrentChainRoot == null) {
+        if (networkCurrentChainRoot == null || networkCurrentChainRoot.getRoot().isEmpty()) {
             throw new BadRequestException("Network has no Chain Root");
         }
 
@@ -50,13 +43,9 @@ public class ChainRootService
     }
 
 
-    public void changeNetworkChainRoot(String networkUUID, String chainRoot)
-    {
-        Network network = networkService.findByNetUUID(networkUUID);
+    public void changeNetworkChainRoot(String networkUUID, String chainRoot) {
 
-        if (network == null) {
-            throw new BadRequestException("Invalid Network");
-        }
+        Network network = networkService.findNetwork(networkUUID);
 
         if (chainRoot.isEmpty()) {
             throw new BadRequestException("Invalid Chain Root");
@@ -64,9 +53,9 @@ public class ChainRootService
 
         ChainRoot newChainRoot = new ChainRoot(chainRoot);
 
-       network.setChainRoot(newChainRoot);
+        network.setChainRoot(newChainRoot);
 
-       networkService.saveNetwork(network);
+        networkService.saveNetwork(network);
     }
 
 }

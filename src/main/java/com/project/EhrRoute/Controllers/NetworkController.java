@@ -122,19 +122,9 @@ public class NetworkController
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getNetworkChainRoot(@RequestParam("networkuuid") String networkUUID)
     {
-        Network network = networkService.findByNetUUID(networkUUID);
+        Network network = networkService.findNetwork(networkUUID);
 
-        if (network == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "A Network with networkUUID: " + networkUUID + " was not found"),
-                HttpStatus.NOT_FOUND
-            );
-        }
-
-        return new ResponseEntity<>(
-            new SimpleStringPayload(network.getChainRoot().getRoot()),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new SimpleStringPayload(network.getChainRoot().getRoot()));
     }
 
 
@@ -230,38 +220,21 @@ public class NetworkController
         // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
         User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getRecipientUsername());
         User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderUsername());
-        Network network = networkService.findByNetUUID(invitationRequest.getNetworkUUID());
+        Network network = networkService.findNetwork(invitationRequest.getNetworkUUID());
 
         // Validate recipient
         if (recipient == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid recipient username or email on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid recipient username on invitation request"));
         }
 
         // Validate sender
         if (sender == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid sender username on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        // Validate network
-        if (network == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid network on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid sender username on invitation request"));
         }
 
         // Check if recipient is already on network
         if (userService.userHasNetwork(recipient, network)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User is already on the network"),
-                HttpStatus.CONFLICT
-            );
+            return new ResponseEntity<>(new ApiResponse(false, "User is already on the network"), HttpStatus.CONFLICT);
         }
 
         // Create a Notification object
@@ -286,10 +259,7 @@ public class NetworkController
         // Persist notification
         notificationService.saveNotification(notification);
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "A network invitation request notification has been successfully sent"),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "A network invitation request notification has been successfully sent"));
     }
 
 
@@ -391,8 +361,8 @@ public class NetworkController
         );
     }
 
-    private void addUserNetwork(String invitedUserUsername, String networkUUID) throws UsernameNotFoundException, NullUserNetworkException
-    {
+    private void addUserNetwork(String invitedUserUsername, String networkUUID) {
+
         // Get the invited User object
         User invitedUser = userService.findUserByUsernameOrEmail(invitedUserUsername);
 
@@ -402,12 +372,7 @@ public class NetworkController
         }
 
         // Get the network of networkUUID
-        Network network = networkService.findByNetUUID(networkUUID);
-
-        // Handle network not found on DB
-        if (network == null) {
-            throw new NullUserNetworkException("A network with networkUUID: [" + networkUUID + "] was not found. Adding network to user networks failed.");
-        }
+        Network network = networkService.findNetwork(networkUUID);
 
         // Add network to user networks if no error occurred
         invitedUser.addNetwork(network);
