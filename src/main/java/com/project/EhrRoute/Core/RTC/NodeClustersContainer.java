@@ -63,16 +63,17 @@ public class NodeClustersContainer implements Subject
      * @param networkUUID   The network UUID of the nodes cluster
      * @return              The nodes cluster of the network
      */
-    public Observer findNodesCluster(String networkUUID) {
-        return nodesClusters.get(networkUUID);
-    }
+    public Optional<Observer> findNodesCluster(String networkUUID) {
+        Optional<Observer> nodesCluster;
 
-    /**
-     * Finds if a cluster exists or not by network UUID
-     * @return      Boolean that indicates the cluster's existence
-     */
-    public boolean clusterExists(String networkUUID) {
-        return (findNodesCluster(networkUUID) != null);
+        try {
+            nodesCluster= Optional.of(nodesClusters.get(networkUUID));
+        }
+        catch (NullPointerException Ex) {
+            return Optional.empty();
+        }
+
+        return nodesCluster;
     }
 
 

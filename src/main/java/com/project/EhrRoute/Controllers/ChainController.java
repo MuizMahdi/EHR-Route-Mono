@@ -2,21 +2,20 @@ package com.project.EhrRoute.Controllers;
 import com.dropbox.core.*;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.sharing.CreateSharedLinkWithSettingsErrorException;
 import com.dropbox.core.v2.sharing.ListSharedLinksResult;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
-import com.dropbox.core.v2.users.FullAccount;
 import com.project.EhrRoute.Core.Node;
 import com.project.EhrRoute.Events.GetChainFromProviderEvent;
 import com.project.EhrRoute.Events.SendChainToConsumerEvent;
-import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
+import com.project.EhrRoute.Payload.Core.BlockFetchResponse;
+import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
 import com.project.EhrRoute.Payload.Core.ChainFetchRequest;
-import com.project.EhrRoute.Payload.Core.SerializableChain;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
+import com.project.EhrRoute.Services.BlocksFetchRequestService;
 import com.project.EhrRoute.Services.ChainService;
 import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Utilities.UuidUtil;
@@ -27,14 +26,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -73,17 +70,27 @@ public class ChainController
      * @return HTTP 200         Returns HTTP OK then the node receives the blocks through SSE
      */
     @GetMapping()
-    public ResponseEntity fetchChainBlocks(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity fetchChainBlocks(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser) {
+
         chainService.requestBlocksFetch(currentUser, consumerUUID, networkUUID, rangeBegin, rangeEnd);
+
         return ResponseEntity.ok(new ApiResponse(true, "Blocks has been requested"));
+
     }
 
 
+    /**
+     * Sends a block sent by a provider node to a consumer node in response to a blocks fetch request
+     * @param blockFetchResponse    The provider response containing the block and the fetch request info
+     * @return HTTP 202             Returns HTTP ACCEPTED when block gets successfully sent to the consumer
+     */
     @PostMapping()
-    public ResponseEntity sendChainBlock()
-    {
-        return null;
+    public ResponseEntity sendChainBlock(@RequestBody BlockFetchResponse blockFetchResponse) {
+
+        chainService.sendFetchedBlock(blockFetchResponse);
+
+        return ResponseEntity.accepted().build();
+
     }
 
 

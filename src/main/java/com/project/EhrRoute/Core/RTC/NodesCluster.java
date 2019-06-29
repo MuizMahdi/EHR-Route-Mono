@@ -114,7 +114,17 @@ public class NodesCluster implements Subject, Observer
      * @return              Optional of the node
      */
     public Optional<Observer> findConsumer(String nodeUUID) {
-        return Optional.of(consumingNodes.get(nodeUUID));
+
+        Observer consumerNode;
+
+        try {
+            consumerNode = consumingNodes.get(nodeUUID);
+        }
+        catch (NullPointerException Ex) {
+            return Optional.empty();
+        }
+
+        return Optional.of(consumerNode);
     }
 
     /**
@@ -123,7 +133,33 @@ public class NodesCluster implements Subject, Observer
      * @return              Optional of the node
      */
     public Optional<Observer> findProvider(String nodeUUID) {
-        return Optional.of(providingNodes.get(nodeUUID));
+        Observer provider;
+
+        try {
+            provider = providingNodes.get(nodeUUID);
+        }
+        catch (NullPointerException Ex) {
+            return Optional.empty();
+        }
+
+        return Optional.of(provider);
+    }
+
+    /**
+     * Finds a random node from the providers of the cluster
+     * @return      The node (observer) or an empty instance
+     */
+    public Optional<Observer> getRandomProvider() {
+        Optional<Observer> randomNode;
+
+        try {
+            randomNode = providingNodes.values().parallelStream().findAny();
+        }
+        catch (NullPointerException Ex) {
+            return Optional.empty();
+        }
+
+        return randomNode;
     }
 
 

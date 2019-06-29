@@ -66,7 +66,7 @@ public class NetworkService
 
 
     @Transactional
-    private String getNetworkChainRoot(String networkUUID) {
+    public String getNetworkChainRoot(String networkUUID) {
         return networkRepository.getNetworkChainRootByNetworkUUID(networkUUID).orElseThrow(() ->
             new NullUserNetworkException("Chain root for a network with UUID " + networkUUID + " was not found")
         );

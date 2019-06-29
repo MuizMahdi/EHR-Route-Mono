@@ -1,4 +1,4 @@
-package com.project.EhrRoute.Payload.Core;
+package com.project.EhrRoute.Payload.Core.SSEs;
 
 public class BlockMetadata
 {

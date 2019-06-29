@@ -1,6 +1,6 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.Block;
-import com.project.EhrRoute.Core.BlockBroadcaster;
+import com.project.EhrRoute.Core.BlockTransmitter;
 import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
@@ -12,6 +12,8 @@ import com.project.EhrRoute.Exceptions.GeneralAppException;
 import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.*;
+import com.project.EhrRoute.Payload.Core.SSEs.BlockMetadata;
+import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
 import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
@@ -44,11 +46,11 @@ public class TransactionController
     private ChainUtil chainUtil;
     private ModelMapper modelMapper;
     private ChainRootService chainRootService;
-    private BlockBroadcaster blockBroadcaster;
+    private BlockTransmitter blockTransmitter;
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockBroadcaster blockBroadcaster) {
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockTransmitter blockTransmitter) {
         this.eventPublisher = eventPublisher;
         this.clustersContainer = clustersContainer;
         this.userService = userService;
@@ -62,7 +64,7 @@ public class TransactionController
         this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
         this.chainRootService = chainRootService;
-        this.blockBroadcaster = blockBroadcaster;
+        this.blockTransmitter = blockTransmitter;
     }
 
 
@@ -187,7 +189,7 @@ public class TransactionController
         );
 
         // Broadcast the block response to the providers (nodes) of the network.
-        blockBroadcaster.broadcast(blockResponse);
+        blockTransmitter.broadcast(blockResponse);
 
         return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broadcasted successfully"));
     }
@@ -215,7 +217,7 @@ public class TransactionController
         );
 
         // Broadcast the signed block to the other provider nodes in network.
-        blockBroadcaster.broadcast(blockResponse);
+        blockTransmitter.broadcast(blockResponse);
 
         return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }

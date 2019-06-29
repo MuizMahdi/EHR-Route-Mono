@@ -6,11 +6,13 @@ import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Events.SseKeepAliveEvent;
 import com.project.EhrRoute.Models.NodeType;
+import com.project.EhrRoute.Models.Observer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -35,15 +37,14 @@ public class ClustersService
         Set<Network> userNetworks = user.getNetworks();
 
         if (userNetworks.size() > 0) {
-            userNetworks.forEach(network -> {
-                // If a node cluster exists for the network
-                if (clustersContainer.clusterExists(network.getNetworkUUID())) {
-                    // Get the cluster
-                    NodesCluster networkCluster = (NodesCluster) clustersContainer.findNodesCluster(network.getNetworkUUID());
-                    // Add the user's node to the cluster
-                    registerClusterNode(node, nodeType, networkCluster);
-                }
-                else {
+            for (Network network : userNetworks) {
+                // Get the network's nodes cluster
+                Optional<Observer> networkNodesCluster = clustersContainer.findNodesCluster(network.getNetworkUUID());
+
+                // Add the user's node to the cluster if a node cluster exists for the network
+                networkNodesCluster.ifPresent(cluster -> registerClusterNode(node, nodeType, (NodesCluster) cluster));
+
+                if (!networkNodesCluster.isPresent()) {
                     // Create a cluster
                     NodesCluster networkCluster = new NodesCluster(network.getNetworkUUID());
                     // Add the user's node to the cluster
@@ -51,7 +52,7 @@ public class ClustersService
                     // Add the cluster to the container
                     clustersContainer.registerObserver(networkCluster);
                 }
-            });
+            }
         }
     }
 
@@ -79,9 +80,8 @@ public class ClustersService
 
         if (userNetworks.size() > 0) {
             userNetworks.forEach(network -> {
-                if (clustersContainer.clusterExists(network.getNetworkUUID())) {
-                    clusters.add((NodesCluster) clustersContainer.findNodesCluster(network.getNetworkUUID()));
-                }
+                Optional<Observer> nodesCluster = clustersContainer.findNodesCluster(network.getNetworkUUID());
+                nodesCluster.ifPresent(cluster -> clusters.add((NodesCluster) cluster));
             });
         }
 
@@ -97,16 +97,14 @@ public class ClustersService
         List<NodesCluster> userNodesClusters = getUserNetworksClusters(user);
 
         userNodesClusters.forEach(cluster -> {
-            if (cluster.findConsumer(nodeUUID).isPresent()) {
-                Node consumer = (Node) cluster.findConsumer(nodeUUID).get();
-                consumer.getEmitter().complete();
+            cluster.findConsumer(nodeUUID).ifPresent(consumer -> {
+                ((Node) consumer).getEmitter().complete();
                 cluster.removeConsumer(consumer);
-            }
-            if (cluster.findProvider(nodeUUID).isPresent()) {
-                Node provider = (Node) cluster.findProvider(nodeUUID).get();
-                provider.getEmitter().complete();
+            });
+            cluster.findProvider(nodeUUID).ifPresent(provider -> {
+                ((Node) provider).getEmitter().complete();
                 cluster.removeProvider(provider);
-            }
+            });
         });
     }
 

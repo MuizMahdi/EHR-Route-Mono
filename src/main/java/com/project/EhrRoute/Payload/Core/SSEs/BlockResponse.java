@@ -1,4 +1,6 @@
-package com.project.EhrRoute.Payload.Core;
+package com.project.EhrRoute.Payload.Core.SSEs;
+
+import com.project.EhrRoute.Payload.Core.SerializableBlock;
 
 public class BlockResponse
 {
