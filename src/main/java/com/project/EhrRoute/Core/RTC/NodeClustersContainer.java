@@ -48,6 +48,22 @@ public class NodeClustersContainer implements Subject
     }
 
     /**
+     * Removes a node from a network's cluster's providers list
+     */
+    public void removeClusterProviderNode(String nodeUUID, String networkUUID) {
+        // Get the network's nodes cluster
+        Optional<Observer> networkCluster = findNodesCluster(networkUUID);
+        // If the network's cluster exists
+        networkCluster.ifPresent(cluster -> {
+            // If the node is in the providers list
+            ((NodesCluster) cluster).findProvider(nodeUUID).ifPresent(providerNode ->
+                // Remove the node from the providers
+                ((NodesCluster) cluster).removeProvider(providerNode)
+            );
+        });
+    }
+
+    /**
      * Broadcasts keep-alive heartbeat data to all available nodes of all clusters
      */
     @Override

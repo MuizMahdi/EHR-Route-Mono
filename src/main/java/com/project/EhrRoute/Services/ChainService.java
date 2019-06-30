@@ -1,10 +1,12 @@
 package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Core.BlockTransmitter;
+import com.project.EhrRoute.Core.RTC.NodeClustersContainer;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Core.BlocksFetchRequest;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Models.Observer;
 import com.project.EhrRoute.Payload.Core.BlockFetchResponse;
 import com.project.EhrRoute.Security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +21,20 @@ public class ChainService
     private UserService userService;
     private NetworkService networkService;
     private BlockTransmitter blockTransmitter;
+    private NodeClustersContainer clustersContainer;
     private BlocksFetchRequestService blocksFetchRequestService;
 
     @Autowired
-    public ChainService(UserService userService, NetworkService networkService, BlockTransmitter blockTransmitter, BlocksFetchRequestService blocksFetchRequestService) {
+    public ChainService(UserService userService, NetworkService networkService, BlockTransmitter blockTransmitter, NodeClustersContainer clustersContainer, BlocksFetchRequestService blocksFetchRequestService) {
         this.userService = userService;
         this.networkService = networkService;
         this.blockTransmitter = blockTransmitter;
+        this.clustersContainer = clustersContainer;
         this.blocksFetchRequestService = blocksFetchRequestService;
     }
 
 
     public void requestBlocksFetch(UserPrincipal recipientUser, String consumerUUID, String networkUUID, int rangeBegin, int rangeEnd) {
-
         // Get user
         User recipient = userService.findUserById(recipientUser.getId());
 
@@ -45,6 +48,9 @@ public class ChainService
 
         // Create and save a blocks fetch request
         blocksFetchRequestService.saveBlocksFetchRequest(consumerUUID, networkUUID, rangeBegin, rangeEnd);
+
+        // Remove the node from the providers list of the network of request blocks (so the same node wouldn't be picked as a provider for their own request)
+        clustersContainer.removeClusterProviderNode(consumerUUID, networkUUID);
     }
 
 

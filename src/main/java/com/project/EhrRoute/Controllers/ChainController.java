@@ -70,7 +70,7 @@ public class ChainController
      * @return HTTP 200         Returns HTTP OK then the node receives the blocks through SSE
      */
     @GetMapping()
-    public ResponseEntity fetchChainBlocks(@RequestParam("consumeruuid") String consumerUUID, @RequestParam("netuuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser) {
+    public ResponseEntity fetchChainBlocks(@RequestParam("consumer-uuid") String consumerUUID, @RequestParam("network-uuid") String networkUUID, @RequestParam("range-begin") Integer rangeBegin, @RequestParam("range-end") Integer rangeEnd, @CurrentUser UserPrincipal currentUser) {
 
         chainService.requestBlocksFetch(currentUser, consumerUUID, networkUUID, rangeBegin, rangeEnd);
 

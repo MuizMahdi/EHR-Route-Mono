@@ -87,7 +87,7 @@ public class ClustersController
         // Add the user's node to the user's networks' clusters' providers list
         clustersService.subscribeUserNode(user, userNode, NodeType.CONSUMER);
 
-        logger.info("Node [" + nodeUUID + "] has been added to its networks' clusters' providers list.");
+        logger.info("Node [" + nodeUUID + "] has been added to its networks' clusters' consumers list.");
 
         // Remove the emitter on timeout/error/completion
         emitter.onTimeout(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
