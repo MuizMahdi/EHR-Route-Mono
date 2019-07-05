@@ -4,19 +4,16 @@ import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
 import com.project.EhrRoute.Entities.EHR.*;
 import com.project.EhrRoute.Events.GetUserUpdateConsentEvent;
+import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Core.BlockAddition;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
-import com.project.EhrRoute.Payload.Core.UserUpdateConsentResponse;
 import com.project.EhrRoute.Payload.EHR.RecordUpdateData;
 import com.project.EhrRoute.Utilities.ModelMapper;
+import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -24,22 +21,64 @@ public class TransactionService
 {
     private ModelMapper modelMapper;
     private ApplicationEventPublisher eventPublisher;
-
     private UpdateConsentRequestService updateConsentRequestService;
     private ConsentRequestBlockService consentRequestService;
-
     private NotificationService notificationService;
+    private ChainRootService chainRootService;
     private EhrDetailService ehrDetailService;
+    private UserService userService;
+    private UuidUtil uuidUtil;
 
 
     @Autowired
-    public TransactionService(ModelMapper modelMapper, ApplicationEventPublisher eventPublisher, UpdateConsentRequestService updateConsentRequestService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, EhrDetailService ehrDetailService) {
+    public TransactionService(ModelMapper modelMapper, ApplicationEventPublisher eventPublisher, UpdateConsentRequestService updateConsentRequestService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, EhrDetailService ehrDetailService, UserService userService, UuidUtil uuidUtil) {
         this.modelMapper = modelMapper;
         this.eventPublisher = eventPublisher;
         this.updateConsentRequestService = updateConsentRequestService;
         this.consentRequestService = consentRequestService;
         this.notificationService = notificationService;
+        this.chainRootService = chainRootService;
         this.ehrDetailService = ehrDetailService;
+        this.userService = userService;
+        this.uuidUtil = uuidUtil;
+    }
+
+
+    public void getUserConsent(BlockAddition blockAdditionRequest) {
+        String providerUUID = blockAdditionRequest.getProviderUUID(); // The node UUID
+        String networkUUID = blockAdditionRequest.getNetworkUUID();
+        String userID = blockAdditionRequest.getEhrUserID(); // ID of the user to get consent from
+        String chainRoot = blockAdditionRequest.getChainRootWithoutBlock(); // The node's local chain merkle root
+
+        // Validate UUIDs
+        uuidUtil.validateResourceUUID(providerUUID, UuidSourceType.PROVIDER);
+        uuidUtil.validateResourceUUID(networkUUID, UuidSourceType.NETWORK);
+
+        // Validate user
+        userService.findUserById(Long.parseLong(userID));
+
+        // Validate node's chain
+        if (!chainRootService.isChainRootValid(networkUUID, chainRoot)) {
+            // TODO: Check if node has latest chain blocks,
+            // TODO: If blocks are missing then create a fetch request for the missing blocks;
+            // TODO: If all blocks are present then create a fetch request for the whole chain
+        }
+
+        // Generate and construct a block using the data in the block addition request
+        Block block = modelMapper.mapAdditionRequestToBlock(blockAdditionRequest);
+        SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
+
+        sendConsentRequest(serializableBlock, providerUUID, networkUUID, Long.parseLong(userID));
+    }
+
+
+    private void sendConsentRequest(SerializableBlock block, String providerUUID, String networkUUID, Long userId) {
+        // Create a consent request
+        ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(userId, providerUUID, networkUUID, block);
+        // Persist the consent request
+        consentRequestService.saveConsentRequest(consentRequest);
+        // Send a notification to the user
+        notificationService.notifyUser(consentRequest);
     }
 
 

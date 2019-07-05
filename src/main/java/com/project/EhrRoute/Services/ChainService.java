@@ -6,12 +6,11 @@ import com.project.EhrRoute.Entities.Core.BlocksFetchRequest;
 import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
-import com.project.EhrRoute.Models.Observer;
+import com.project.EhrRoute.Models.BlockSource;
 import com.project.EhrRoute.Payload.Core.BlockFetchResponse;
 import com.project.EhrRoute.Security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 
@@ -33,7 +32,14 @@ public class ChainService
         this.blocksFetchRequestService = blocksFetchRequestService;
     }
 
-
+    /**
+     *
+     * @param recipientUser
+     * @param consumerUUID
+     * @param networkUUID
+     * @param rangeBegin
+     * @param rangeEnd
+     */
     public void requestBlocksFetch(UserPrincipal recipientUser, String consumerUUID, String networkUUID, int rangeBegin, int rangeEnd) {
         // Get user
         User recipient = userService.findUserById(recipientUser.getId());
@@ -53,7 +59,10 @@ public class ChainService
         clustersContainer.removeClusterProviderNode(consumerUUID, networkUUID);
     }
 
-
+    /**
+     *
+     * @param blockFetchResponse
+     */
     public void sendFetchedBlock(BlockFetchResponse blockFetchResponse) {
 
         String consumerUUID = blockFetchResponse.getConsumerUUID();
@@ -72,6 +81,9 @@ public class ChainService
         if (!realChainRoot.equals(blockFetchResponse.getNetworkChainRoot())) {
             throw new BadRequestException("Invalid chain root for the network with UUID of " + networkUUID);
         }
+
+        // Set the block source type
+        blockFetchResponse.getBlockResponse().getMetadata().setBlockSource(BlockSource.FETCH_REQUEST.toString());
 
         // Send the block to the consumer with consumerUUID
         blockTransmitter.transmit(blockFetchResponse.getBlockResponse(), networkUUID, consumerUUID);

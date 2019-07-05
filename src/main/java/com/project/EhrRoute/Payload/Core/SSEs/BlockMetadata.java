@@ -3,17 +3,25 @@ package com.project.EhrRoute.Payload.Core.SSEs;
 public class BlockMetadata
 {
     // The UUID of the consent request that resulted in this block's generation and broadcasting
-    private String consentRequestUUID;
+    private String requestUUID;
+    private String blockSource;
 
     public BlockMetadata() { }
-    public BlockMetadata(String consentRequestUUID) {
-        this.consentRequestUUID = consentRequestUUID;
+    public BlockMetadata(String requestUUID, String blockSource) {
+        this.requestUUID = requestUUID;
+        this.blockSource = blockSource;
     }
 
-    public String getConsentRequestUUID() {
-        return consentRequestUUID;
+    public String getRequestUUID() {
+        return requestUUID;
     }
-    public void setConsentRequestUUID(String consentRequestUUID) {
-        this.consentRequestUUID = consentRequestUUID;
+    public String getBlockSource() {
+        return blockSource;
+    }
+    public void setRequestUUID(String requestUUID) {
+        this.requestUUID = requestUUID;
+    }
+    public void setBlockSource(String blockSource) {
+        this.blockSource = blockSource;
     }
 }

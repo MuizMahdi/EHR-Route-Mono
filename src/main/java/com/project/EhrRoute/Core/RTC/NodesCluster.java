@@ -114,17 +114,13 @@ public class NodesCluster implements Subject, Observer
      * @return              Optional of the node
      */
     public Optional<Observer> findConsumer(String nodeUUID) {
+        Observer consumer = consumingNodes.get(nodeUUID);
 
-        Observer consumerNode;
-
-        try {
-            consumerNode = consumingNodes.get(nodeUUID);
-        }
-        catch (NullPointerException Ex) {
+        if (consumer == null) {
             return Optional.empty();
         }
 
-        return Optional.of(consumerNode);
+        return Optional.of(consumer);
     }
 
     /**
@@ -133,12 +129,9 @@ public class NodesCluster implements Subject, Observer
      * @return              Optional of the node
      */
     public Optional<Observer> findProvider(String nodeUUID) {
-        Observer provider;
+        Observer provider = providingNodes.get(nodeUUID);
 
-        try {
-            provider = providingNodes.get(nodeUUID);
-        }
-        catch (NullPointerException Ex) {
+        if (provider == null) {
             return Optional.empty();
         }
 

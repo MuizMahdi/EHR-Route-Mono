@@ -63,9 +63,15 @@ public class BlocksFetchRequestService
     }
 
 
+    /**
+     * Checks if a node has a pending blocks fetch request for a specific network
+     * @param consumerUUID      The node UUID
+     * @param networkUUID       The network which the node has requested blocks for
+     * @return                  A boolean indicating the request existence
+     */
     @Transactional
     public boolean blocksFetchRequestExists(String consumerUUID, String networkUUID) {
-        return blocksFetchRequestRepository.exists(consumerUUID, networkUUID).isPresent();
+        return blocksFetchRequestRepository.findByConsumerUUIDAndNetworkUUID(consumerUUID, networkUUID).isPresent();
     }
 
 

@@ -5,10 +5,7 @@ import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.HashUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
-import com.project.EhrRoute.Events.GetUserConsentEvent;
-import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
-import com.project.EhrRoute.Exceptions.BadRequestException;
-import com.project.EhrRoute.Exceptions.GeneralAppException;
+import com.project.EhrRoute.Models.BlockSource;
 import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.*;
@@ -17,9 +14,6 @@ import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
 import com.project.EhrRoute.Services.*;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
-import com.project.EhrRoute.Utilities.ChainUtil;
-import org.springframework.context.event.EventListener;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,47 +25,36 @@ import java.security.PrivateKey;
 @RequestMapping("/transaction")
 public class TransactionController
 {
-    private ClustersContainer clustersContainer;
-    private ApplicationEventPublisher eventPublisher;
-
     private UserService userService;
     private TransactionService transactionService;
-    private NotificationService notificationService;
     private ConsentRequestBlockService consentRequestService;
-
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private HashUtil hashUtil;
     private UuidUtil uuidUtil;
-    private ChainUtil chainUtil;
     private ModelMapper modelMapper;
-    private ChainRootService chainRootService;
     private BlockTransmitter blockTransmitter;
 
 
     @Autowired
-    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, NotificationService notificationService, ChainRootService chainRootService, ClustersContainer clustersContainer, ApplicationEventPublisher eventPublisher, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ChainUtil chainUtil, ModelMapper modelMapper, BlockTransmitter blockTransmitter) {
-        this.eventPublisher = eventPublisher;
-        this.clustersContainer = clustersContainer;
+    public TransactionController(ConsentRequestBlockService consentRequestService, UserService userService, TransactionService transactionService, RsaUtil rsaUtil, KeyUtil keyUtil, HashUtil hashUtil, UuidUtil uuidUtil, ModelMapper modelMapper, BlockTransmitter blockTransmitter) {
         this.userService = userService;
         this.transactionService = transactionService;
-        this.notificationService = notificationService;
         this.consentRequestService = consentRequestService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.hashUtil = hashUtil;
         this.uuidUtil = uuidUtil;
-        this.chainUtil = chainUtil;
         this.modelMapper = modelMapper;
-        this.chainRootService = chainRootService;
         this.blockTransmitter = blockTransmitter;
     }
 
 
-    @PostMapping("/getConsent")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    @PostMapping("/consent-request")
+    @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition)
     {
+        /*
         String providerUUID = blockAddition.getProviderUUID();
         String networkUUID = blockAddition.getNetworkUUID();
         String userID = blockAddition.getEhrUserID(); // The ID of the user to get consent from
@@ -117,13 +100,7 @@ public class TransactionController
             SerializableBlock sBlock = modelMapper.mapBlockToSerializableBlock(block);
 
             // Construct and publish a GetUserConsent event
-            GetUserConsentEvent getUserConsent = new GetUserConsentEvent(
-                this,
-                sBlock,
-                providerUUID,
-                blockAddition.getNetworkUUID(),
-                userID
-            );
+            GetUserConsentEvent getUserConsent = new GetUserConsentEvent(this, sBlock, providerUUID, blockAddition.getNetworkUUID(), userID);
 
             eventPublisher.publishEvent(getUserConsent);
         }
@@ -134,13 +111,14 @@ public class TransactionController
 
             return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
-
-        return ResponseEntity.accepted().body(new ApiResponse(true, "User consent request was successfully sent"));
+        */
+        transactionService.getUserConsent(blockAddition);
+        return ResponseEntity.accepted().body(new ApiResponse(true, "Consent request was sent"));
     }
 
 
     @PostMapping("/get-update-consent")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity getUserUpdateConsent(@RequestBody UpdatedBlockAddition updatedBlockAddition)
     {
         String providerUUID = updatedBlockAddition.getBlockAddition().getProviderUUID();
@@ -185,7 +163,7 @@ public class TransactionController
         // Construct a block addition response
         BlockResponse blockResponse = new BlockResponse(
             modelMapper.mapBlockToSerializableBlock(block), // Get SerializableBlock from the updated block
-            new BlockMetadata(consentResponse.getConsentRequestUUID()) // Create block metadata
+            new BlockMetadata(consentResponse.getConsentRequestUUID(), BlockSource.BROADCAST.toString()) // Create block metadata
         );
 
         // Broadcast the block response to the providers (nodes) of the network.
@@ -213,7 +191,7 @@ public class TransactionController
         // Construct a block addition response
         BlockResponse blockResponse = new BlockResponse(
             modelMapper.mapBlockToSerializableBlock(block),
-            new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID())
+            new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID(), BlockSource.BROADCAST.toString())
         );
 
         // Broadcast the signed block to the other provider nodes in network.
@@ -222,7 +200,7 @@ public class TransactionController
         return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }
 
-
+/*
     @EventListener
     protected void getUserConsent(GetUserConsentEvent event) {
 
@@ -259,30 +237,8 @@ public class TransactionController
 
             throw new GeneralAppException("User offline, a consent request notification was sent to user");
         }
-
-        // If user exists (online) then send it as a notification through a server sent event.
-        /*
-        UserConsentRequest userConsentRequest = new UserConsentRequest(
-            consentRequest
-            event.getBlock(),
-            event.getProviderUUID(),
-            event.getNetworkUUID(),
-            userID
-        );
-
-        // Get user emitter from users cluster
-        SseEmitter userEmitter = clustersContainer.getAppUsers().getNodeEmitter(stringUserID);
-
-        // Send the consent request with block data to user
-        try {
-            userEmitter.send(userConsentRequest, MediaType.APPLICATION_JSON);
-        }
-        catch (IOException Ex) {
-            clustersContainer.getAppUsers().removeNode(stringUserID);
-            throw new BadRequestException("An Error has occurred while sending SSE, user has been removed from AppUsers cluster.");
-        }
-        */
     }
+*/
 
     private Block signBlock(UserConsentResponse consentResponse, Block block) throws Exception {
 

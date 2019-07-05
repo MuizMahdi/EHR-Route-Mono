@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Controllers;
+import com.project.EhrRoute.Core.RTC.Node;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Models.NodeType;
 import com.project.EhrRoute.Models.UuidSourceType;
@@ -16,11 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import java.io.IOException;
 
 
 @RestController
 @RequestMapping("/cluster")
+@PreAuthorize("hasRole('PROVIDER')")
 public class ClustersController
 {
     private final Logger logger = LoggerFactory.getLogger(ClustersController.class);
@@ -39,20 +40,19 @@ public class ClustersController
 
 
     @GetMapping("/providers")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
-    public SseEmitter subscribeProviderNode(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser) throws IOException
+    public SseEmitter subscribeProviderNode(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser)
     {
-        // Create an emitter for the node
-        SseEmitter emitter = new SseEmitter(2592000000L);
-
         // Validate node UUID
         uuidUtil.validateResourceUUID(nodeUUID, UuidSourceType.NODE);
+
+        // Create an emitter for the node
+        SseEmitter emitter = new SseEmitter(2592000000L);
 
         // Get current user
         User user = userService.findUserById(currentUser.getId());
 
         // Create a node for the user
-        com.project.EhrRoute.Core.RTC.Node userNode = new com.project.EhrRoute.Core.RTC.Node(nodeUUID, emitter);
+        Node userNode = new Node(nodeUUID, emitter);
 
         // Add the user's node to the user's networks' clusters' providers list
         clustersService.subscribeUserNode(user, userNode, NodeType.PROVIDER);
@@ -69,20 +69,19 @@ public class ClustersController
 
 
     @GetMapping("/consumers")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
-    public SseEmitter subscribeConsumerNode(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser) throws IOException
+    public SseEmitter subscribeConsumerNode(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser)
     {
-        // Create an emitter for the node
-        SseEmitter emitter = new SseEmitter(2592000000L);
-
         // Validate node UUID
         uuidUtil.validateResourceUUID(nodeUUID, UuidSourceType.NODE);
+
+        // Create an emitter for the node
+        SseEmitter emitter = new SseEmitter(2592000000L);
 
         // Get current user
         User user = userService.findUserById(currentUser.getId());
 
         // Create a node for the user
-        com.project.EhrRoute.Core.RTC.Node userNode = new com.project.EhrRoute.Core.RTC.Node(nodeUUID, emitter);
+        Node userNode = new Node(nodeUUID, emitter);
 
         // Add the user's node to the user's networks' clusters' providers list
         clustersService.subscribeUserNode(user, userNode, NodeType.CONSUMER);
@@ -99,9 +98,11 @@ public class ClustersController
 
 
     @GetMapping("/close")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity closeConnection(@RequestParam("nodeuuid") String nodeUUID, @CurrentUser UserPrincipal currentUser)
     {
+        // Validate node UUID
+        uuidUtil.validateResourceUUID(nodeUUID, UuidSourceType.NODE);
+
         // Get current user
         User user = userService.findUserById(currentUser.getId());
 

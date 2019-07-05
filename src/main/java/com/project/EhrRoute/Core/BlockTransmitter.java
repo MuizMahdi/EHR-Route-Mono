@@ -8,6 +8,7 @@ import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
 import com.project.EhrRoute.Services.ClustersContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

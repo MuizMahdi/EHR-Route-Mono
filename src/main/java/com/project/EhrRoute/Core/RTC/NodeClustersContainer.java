@@ -2,7 +2,6 @@ package com.project.EhrRoute.Core.RTC;
 import com.project.EhrRoute.Models.Observer;
 import com.project.EhrRoute.Models.Subject;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 

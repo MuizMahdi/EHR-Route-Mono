@@ -20,10 +20,12 @@ import java.util.Set;
 public class ClustersService
 {
     private NodeClustersContainer clustersContainer;
+    private BlocksFetchRequestService blocksFetchRequestService;
 
     @Autowired
-    public ClustersService(NodeClustersContainer clustersContainer) {
+    public ClustersService(NodeClustersContainer clustersContainer, BlocksFetchRequestService blocksFetchRequestService) {
         this.clustersContainer = clustersContainer;
+        this.blocksFetchRequestService = blocksFetchRequestService;
     }
 
     /**
@@ -51,6 +53,14 @@ public class ClustersService
                     registerClusterNode(node, nodeType, networkCluster);
                     // Add the cluster to the container
                     clustersContainer.registerObserver(networkCluster);
+                }
+
+                if (nodeType.equals(NodeType.PROVIDER)) {
+                    // If node has any pending blocks fetch request for the network
+                    if (blocksFetchRequestService.blocksFetchRequestExists(node.getUUID(), network.getNetworkUUID())) {
+                        // Unsubscribe the node from the providers list
+                        clustersContainer.removeClusterProviderNode(node.getNodeUUID(), network.getNetworkUUID());
+                    }
                 }
             }
         }

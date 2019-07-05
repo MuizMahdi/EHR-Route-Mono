@@ -12,7 +12,4 @@ public interface BlocksFetchRequestRepository extends JpaRepository<BlocksFetchR
 {
     @Query("SELECT r FROM BlocksFetchRequest r WHERE r.consumerUUID = :consumerUUID AND r.networkUUID = :networkUUID")
     Optional<BlocksFetchRequest> findByConsumerUUIDAndNetworkUUID(@Param("consumerUUID") String consumerUuid, @Param("networkUUID") String networkUuid);
-
-    @Query("SELECT r FROM BlocksFetchRequest r WHERE r.consumerUUID = :consumerUUID AND r.networkUUID = :networkUUID")
-    Optional<BlocksFetchRequest> exists(@Param("consumerUUID") String consumerUuid, @Param("networkUUID") String networkUuid);
 }

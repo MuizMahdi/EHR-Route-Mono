@@ -263,10 +263,9 @@ public class ModelMapper
         String invitationToken = invitationResponse.getInvitationToken();
 
         // Validate NetworkInvitationResponse fields
-        if (
-                senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
-                        networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty())
-        {
+        if (senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
+            networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty()
+        ) {
             throw new ResourceEmptyException("Invalid invitation response");
         }
 

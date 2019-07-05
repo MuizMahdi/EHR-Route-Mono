@@ -18,7 +18,7 @@ public class ChainRootService
 
 
     // Returns true if the network's current chain root equals chainRoot
-    public boolean checkNetworkChainRoot(String networkUUID, String chainRoot) {
+    public boolean isChainRootValid(String networkUUID, String chainRoot) {
 
         Network network = networkService.findNetwork(networkUUID);
 
