@@ -16,7 +16,6 @@ public class Transaction
 
     private byte[] transactionId; // Hash of transaction
     private MedicalRecord record;
-    private PublicKey senderPubKey; // Sender's public key.
     private Address senderAddress;
     private Address recipientAddress;
     private byte[] signature;
@@ -29,19 +28,16 @@ public class Transaction
     }
 
     public Transaction() { }
-    public Transaction(MedicalRecord record, PublicKey senderPubKey, Address recipientAddress) throws GeneralSecurityException {
+    public Transaction(MedicalRecord record, Address senderAddress, Address recipientAddress) throws GeneralSecurityException {
         this.record = record;
-        this.senderPubKey = senderPubKey;
         this.recipientAddress = recipientAddress;
-        this.senderAddress = new Address();
-        this.senderAddress.generateAddress(senderPubKey);
+        this.senderAddress = senderAddress;
     }
 
     public String getTransactionData()
     {
         String data =
         jsonUtil.createJson(record) +
-        keyUtil.getStringFromPublicKey(senderPubKey) +
         senderAddress.getAddress() +
         recipientAddress.getAddress();
 
@@ -54,9 +50,6 @@ public class Transaction
     public void setSignature(byte[] signature) {
         this.signature = signature;
     }
-    public PublicKey getSenderPubKey() {
-        return senderPubKey;
-    }
     public MedicalRecord getRecord() {
         return record;
     }
@@ -65,9 +58,6 @@ public class Transaction
     }
     public void setTransactionId(byte[] transactionId) {
         this.transactionId = transactionId;
-    }
-    public void setSenderPubKey(PublicKey senderPubKey) {
-        this.senderPubKey = senderPubKey;
     }
     public byte[] getTransactionId() {
         return transactionId;

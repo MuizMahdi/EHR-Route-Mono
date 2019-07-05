@@ -57,7 +57,6 @@ public class GenesisBlock
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
 
         transaction.setRecipientAddress(recipientAddress);
-        transaction.setSenderPubKey(keyPair.getPublic());
         transaction.setSenderAddress(senderAddress);
         transaction.setRecord(record);
         transaction.setTransactionId(hashUtil.hashTransactionData(transaction));

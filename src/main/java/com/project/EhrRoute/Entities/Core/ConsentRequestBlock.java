@@ -16,7 +16,6 @@ public class ConsentRequestBlock {
     @NotNull @NotBlank private String previousHash;
     @NotNull @NotBlank private String merkleLeafHash; //// whats the difference b/w hash and merkle leaf hash
     @NotNull @NotBlank private String transactionId; //
-    @NotNull @NotBlank private String senderPubKey;
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;
     @NotNull @NotBlank private String networkUUID;
@@ -39,7 +38,6 @@ public class ConsentRequestBlock {
         this.blockIndex = blockIndex;
         this.merkleLeafHash = merkleLeafHash;
         this.transactionId = transactionId;
-        this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
         this.networkUUID = networkUUID;
@@ -75,9 +73,6 @@ public class ConsentRequestBlock {
     }
     public String getPreviousHash() {
         return previousHash;
-    }
-    public String getSenderPubKey() {
-        return senderPubKey;
     }
     public String getTransactionId() {
         return transactionId;
@@ -121,9 +116,6 @@ public class ConsentRequestBlock {
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
-    }
-    public void setSenderPubKey(String senderPubKey) {
-        this.senderPubKey = senderPubKey;
     }
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;

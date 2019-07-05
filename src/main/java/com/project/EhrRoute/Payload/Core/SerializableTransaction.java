@@ -5,16 +5,14 @@ public class SerializableTransaction
 {
     private String transactionId;
     private MedicalRecord record;
-    private String senderPubKey;
     private String senderAddress;
     private String recipientAddress;
     private String signature;
 
     public SerializableTransaction() { }
-    public SerializableTransaction(String transactionId, MedicalRecord record, String senderPubKey, String senderAddress, String recipientAddress, String signature) {
+    public SerializableTransaction(String transactionId, MedicalRecord record, String senderAddress, String recipientAddress, String signature) {
         this.transactionId = transactionId;
         this.record = record;
-        this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
         this.signature = signature;
@@ -25,9 +23,6 @@ public class SerializableTransaction
     }
     public MedicalRecord getRecord() {
         return record;
-    }
-    public String getSenderPubKey() {
-        return senderPubKey;
     }
     public String getSenderAddress() {
         return senderAddress;
@@ -44,9 +39,6 @@ public class SerializableTransaction
     public void setSignature(String signature) {
         this.signature = signature;
     }
-    public void setSenderPubKey(String senderPubKey) {
-        this.senderPubKey = senderPubKey;
-    }
     public void setSenderAddress(String senderAddress) {
         this.senderAddress = senderAddress;
     }
@@ -62,7 +54,6 @@ public class SerializableTransaction
         return "SerializableTransaction{" +
                 "transactionId='" + transactionId + '\'' +
                 ", record=" + record +
-                ", senderPubKey='" + senderPubKey + '\'' +
                 ", senderAddress='" + senderAddress + '\'' +
                 ", recipientAddress='" + recipientAddress + '\'' +
                 ", signature='" + signature + '\'' +

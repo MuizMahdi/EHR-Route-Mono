@@ -77,10 +77,6 @@ public class ModelMapper
         serializableTransaction.setTransactionId(stringUtil.base64EncodeBytes(blockTxID));
         serializableTransaction.setRecord(block.getTransaction().getRecord());
 
-        PublicKey publicKey = block.getTransaction().getSenderPubKey();
-        String stringPublicKey = keyUtil.getStringFromPublicKey(publicKey);
-        serializableTransaction.setSenderPubKey(stringPublicKey);
-
         serializableTransaction.setSenderAddress(block.getTransaction().getSenderAddress().getAddress());
         serializableTransaction.setRecipientAddress(block.getTransaction().getRecipientAddress().getAddress());
 
@@ -141,10 +137,6 @@ public class ModelMapper
         senderAddress.setAddress(stringSenderAddress);
         transaction.setSenderAddress(senderAddress);
 
-        String stringSenderPubKey = serializableBlock.getTransaction().getSenderPubKey();
-        PublicKey senderPubKey = keyUtil.getPublicKeyFromString(stringSenderPubKey);
-        transaction.setSenderPubKey(senderPubKey);
-
         block.setTransaction(transaction);
 
         return block;
@@ -177,8 +169,6 @@ public class ModelMapper
 
         transaction.setSenderAddress(senderAddress);
 
-        PublicKey senderPubKey = keyUtil.getPublicKeyFromString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1bYsqwRE7Yj5y9C3Ahv2vcr7NMYGU2us23tlGbEpogrPbilirid4gRnjZXLNZdgDyTmtxiBFa5WT9nC1kuxrdbFcMIBECCkeTcJL3Zlv3iY5c4DmCMKwf4jBm4gCeXWan8PccrsruDNxP5u2rkj6ywSVDrvRobhXGL9i/IuqoSwIDAQAB");
-        transaction.setSenderPubKey(senderPubKey);
         transaction.setRecord(new MedicalRecord());
 
         // Signature is added when patient gives consent for block addition (sharing their EHR)
@@ -211,7 +201,6 @@ public class ModelMapper
         consentRequest.setNetworkUUID(networkUUID);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
-        consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());
         consentRequest.setTransactionId(block.getTransaction().getTransactionId());
         consentRequest.setMerkleLeafHash(block.getBlockHeader().getMerkleLeafHash());
         consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
@@ -322,7 +311,6 @@ public class ModelMapper
         SerializableTransaction transaction = new SerializableTransaction(
                 consentRequestBlock.getTransactionId(),
                 medicalRecord,
-                consentRequestBlock.getSenderPubKey(),
                 consentRequestBlock.getSenderAddress(),
                 consentRequestBlock.getRecipientAddress(),
                 consentRequestBlock.getSignature()
