@@ -94,9 +94,12 @@ public class ChainService
         blocksRequest.setBlocksRangeBegin(blocksRequest.getBlocksRangeBegin() + 1);
         blocksFetchRequestService.saveBlocksFetchRequest(blocksRequest);
 
-        // Delete blocks fetch request if no more requested blocks are left (range begin > range end)
+        // If no more requested blocks are left (range begin > range end)
         if (blocksRequest.getBlocksRangeBegin() > blocksRequest.getBlocksRangeEnd()) {
+            // Delete blocks fetch request
             blocksFetchRequestService.deleteBlocksFetchRequest(blocksRequest);
+            // Resubscribe the node to the providers list of the network
+            clustersContainer.registerClusterProviderNode(blockFetchResponse.getConsumerUUID(), blockFetchResponse.getNetworkUUID());
         }
     }
 }

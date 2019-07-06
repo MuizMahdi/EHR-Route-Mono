@@ -53,6 +53,8 @@ public class NodeClustersContainer implements Subject
 
     /**
      * Removes a node from a network's cluster's providers list
+     * @param nodeUUID      The node UUID
+     * @param networkUUID   The network to remove the node from
      */
     public void removeClusterProviderNode(String nodeUUID, String networkUUID) {
         // Get the network's nodes cluster
@@ -68,6 +70,19 @@ public class NodeClustersContainer implements Subject
     }
 
     /**
+     * Adds a node to a network's cluster's providers list
+     * @param nodeUUID      The node UUID
+     * @param networkUUID   The network to add the node to
+     */
+    public void registerClusterProviderNode(String nodeUUID, String networkUUID) {
+        findNodesCluster(networkUUID).ifPresent(nodeCluster -> {
+            ((NodesCluster) nodeCluster).findConsumer(nodeUUID).ifPresent(consumerNode -> {
+                ((NodesCluster) nodeCluster).registerProvider(consumerNode);
+            });
+        });
+    }
+
+    /**
      * Broadcasts keep-alive heartbeat data to all available nodes of all clusters
      */
     @Override
@@ -76,7 +91,6 @@ public class NodeClustersContainer implements Subject
             ((NodesCluster) cluster).notifyObservers(notification);
         });
     }
-
 
     /**
      * Finds a nodes cluster by the cluster's network UUID
