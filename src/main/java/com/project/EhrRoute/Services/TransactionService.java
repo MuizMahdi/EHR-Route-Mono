@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 public class TransactionService
 {
     private ModelMapper modelMapper;
-    private ApplicationEventPublisher eventPublisher;
     private UpdateConsentRequestService updateConsentRequestService;
     private ConsentRequestBlockService consentRequestService;
     private NotificationService notificationService;
@@ -35,9 +34,8 @@ public class TransactionService
 
 
     @Autowired
-    public TransactionService(ModelMapper modelMapper, ApplicationEventPublisher eventPublisher, UpdateConsentRequestService updateConsentRequestService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, EhrDetailService ehrDetailService, UserService userService, BlockTransmitter blockTransmitter, BlockUtil blockUtil, UuidUtil uuidUtil) {
+    public TransactionService(ModelMapper modelMapper, UpdateConsentRequestService updateConsentRequestService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, EhrDetailService ehrDetailService, UserService userService, BlockTransmitter blockTransmitter, BlockUtil blockUtil, UuidUtil uuidUtil) {
         this.modelMapper = modelMapper;
-        this.eventPublisher = eventPublisher;
         this.updateConsentRequestService = updateConsentRequestService;
         this.consentRequestService = consentRequestService;
         this.notificationService = notificationService;

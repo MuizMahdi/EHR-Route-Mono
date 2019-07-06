@@ -1,5 +1,4 @@
 package com.project.EhrRoute.Controllers;
-import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.*;
 import com.project.EhrRoute.Services.*;
@@ -14,15 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/transaction")
 public class TransactionController
 {
-    private UuidUtil uuidUtil;
-    private UserService userService;
     private TransactionService transactionService;
 
 
     @Autowired
-    public TransactionController(UuidUtil uuidUtil, UserService userService, TransactionService transactionService) {
-        this.uuidUtil = uuidUtil;
-        this.userService = userService;
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
