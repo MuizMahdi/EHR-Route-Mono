@@ -49,10 +49,10 @@ public class ClustersService
                 if (!networkNodesCluster.isPresent()) {
                     // Create a cluster
                     NodesCluster networkCluster = new NodesCluster(network.getNetworkUUID());
-                    // Add the user's node to the cluster
-                    registerClusterNode(node, nodeType, networkCluster);
                     // Add the cluster to the container
                     clustersContainer.registerObserver(networkCluster);
+                    // Add the user's node to the cluster
+                    registerClusterNode(node, nodeType, networkCluster);
                 }
 
                 if (nodeType.equals(NodeType.PROVIDER)) {

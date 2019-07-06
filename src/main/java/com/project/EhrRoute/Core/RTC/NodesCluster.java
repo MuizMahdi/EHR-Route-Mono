@@ -2,8 +2,9 @@ package com.project.EhrRoute.Core.RTC;
 import com.project.EhrRoute.Models.Observer;
 import com.project.EhrRoute.Models.Subject;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,7 +21,6 @@ public class NodesCluster implements Subject, Observer
     private HashMap<String, Observer> consumingNodes; // Nodes that receive data
     private String networkUUID;
 
-
     public NodesCluster(String networkUUID) {
         this.networkUUID = networkUUID;
         this.providingNodes = new HashMap<>();
@@ -29,9 +29,9 @@ public class NodesCluster implements Subject, Observer
 
 
     @Override
-    public void registerObserver(Observer node) {
-        registerProvider(node);
-        registerConsumer(node);
+    public void registerObserver(Observer observer) {
+        registerProvider(observer);
+        registerConsumer(observer);
     }
 
     @Override
@@ -40,11 +40,18 @@ public class NodesCluster implements Subject, Observer
         removeConsumer(node);
     }
 
+    public void removeObserver(String nodeUUID) {
+        removeProvider(nodeUUID);
+        removeConsumer(nodeUUID);
+    }
+
     /**
      * Broadcasts keep-alive data to all available providers and consumers in the cluster
      */
     @Override
     public void notifyObservers(Object notification) {
+        System.out.println("---- { SENDING GLOBAL HEART BEAT [3] } ----");
+        System.out.println("PROVIDERS: " + providingNodes.size() + "     CONSUMERS: " + consumingNodes.size());
         // Send keep-alive data to all providers
         keepAliveNodes(notification, providingNodes);
         // Send keep-alive data to all consumers
@@ -75,12 +82,16 @@ public class NodesCluster implements Subject, Observer
                 Node node = (Node) clusterEntry.getValue();
                 String nodeUUID = (String) clusterEntry.getKey();
 
+                SseEmitter.SseEventBuilder message = SseEmitter.event().data(notification).name(NodeMessageType.HEART_BEAT.toString());
+
                 try {
+                    System.out.println("SENDING HEART BEAT TO NODE: " + nodeUUID);
                     // Send keep-alive data
-                    node.getEmitter().send(notification, MediaType.APPLICATION_JSON);
+                    node.getEmitter().send(message);
                 }
                 // In case an error occurs during event transmission
                 catch (Exception Ex) {
+                    System.out.println("REMOVING A MOTHERFUCKER FROM THE CLUSTERS LIST FFS");
                     // Remove provider map using iterator entry to avoid ConcurrentModificationException
                     nodesIterator.remove();
                     // Remove the provider from cluster
@@ -100,12 +111,20 @@ public class NodesCluster implements Subject, Observer
         providingNodes.remove(node.getUUID());
     }
 
+    public void removeProvider(String nodeUUID) {
+        providingNodes.remove(nodeUUID);
+    }
+
     public void registerConsumer(Observer node) {
         consumingNodes.put(node.getUUID(), node);
     }
 
     public void removeConsumer(Observer node) {
         consumingNodes.remove(node.getUUID());
+    }
+
+    public void removeConsumer(String nodeUUID) {
+        consumingNodes.remove(nodeUUID);
     }
 
     /**

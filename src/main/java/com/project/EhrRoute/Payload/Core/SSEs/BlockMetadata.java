@@ -7,6 +7,9 @@ public class BlockMetadata
     private String blockSource;
 
     public BlockMetadata() { }
+    public BlockMetadata(String requestUUID) {
+        this.requestUUID = requestUUID;
+    }
     public BlockMetadata(String requestUUID, String blockSource) {
         this.requestUUID = requestUUID;
         this.blockSource = blockSource;

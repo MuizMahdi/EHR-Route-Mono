@@ -1,12 +1,12 @@
 package com.project.EhrRoute.Controllers;
 import com.project.EhrRoute.Core.RTC.Node;
+import com.project.EhrRoute.Core.RTC.NodeClustersContainer;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Models.NodeType;
 import com.project.EhrRoute.Models.UuidSourceType;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
-import com.project.EhrRoute.Services.ClustersContainer;
 import com.project.EhrRoute.Services.ClustersService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.UuidUtil;
@@ -25,13 +25,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ClustersController
 {
     private final Logger logger = LoggerFactory.getLogger(ClustersController.class);
-    private ClustersContainer clustersContainer;
+    private NodeClustersContainer clustersContainer;
     private ClustersService clustersService;
     private UserService userService;
     private UuidUtil uuidUtil;
 
     @Autowired
-    public ClustersController(ClustersContainer clustersContainer, ClustersService clustersService, UserService userService, UuidUtil uuidUtil) {
+    public ClustersController(NodeClustersContainer clustersContainer, ClustersService clustersService, UserService userService, UuidUtil uuidUtil) {
         this.clustersContainer = clustersContainer;
         this.clustersService = clustersService;
         this.userService = userService;
@@ -57,12 +57,12 @@ public class ClustersController
         // Add the user's node to the user's networks' clusters' providers list
         clustersService.subscribeUserNode(user, userNode, NodeType.PROVIDER);
 
-        logger.info("Node [" + nodeUUID + "] has been added to its networks' clusters' providers list.");
+        logger.info("-----[ NODE [" + nodeUUID + "] SUBSCRIBED TO PROVIDERS ]-----");
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onError(error -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onCompletion(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
+        emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
+        emitter.onError(error -> clustersContainer.removeNode(nodeUUID));
+        emitter.onCompletion(() -> clustersContainer.removeNode(nodeUUID));
 
         return emitter;
     }
@@ -86,12 +86,12 @@ public class ClustersController
         // Add the user's node to the user's networks' clusters' providers list
         clustersService.subscribeUserNode(user, userNode, NodeType.CONSUMER);
 
-        logger.info("Node [" + nodeUUID + "] has been added to its networks' clusters' consumers list.");
+        logger.info("-----[ NODE [" + nodeUUID + "] SUBSCRIBED TO CONSUMERS ]-----");
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onError(error -> clustersContainer.getChainProviders().removeNode(nodeUUID));
-        emitter.onCompletion(() -> clustersContainer.getChainProviders().removeNode(nodeUUID));
+        emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
+        emitter.onError(error -> clustersContainer.removeNode(nodeUUID));
+        emitter.onCompletion(() -> clustersContainer.removeNode(nodeUUID));
 
         return emitter;
     }

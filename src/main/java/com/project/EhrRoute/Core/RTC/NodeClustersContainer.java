@@ -14,7 +14,8 @@ import java.util.Optional;
 @Component
 public class NodeClustersContainer implements Subject
 {
-    private HashMap<String, Observer> nodesClusters; // Clusters mapped by their network UUID "<Cluster's network UUID, Cluster>"
+    private HashMap<String, Observer> nodesClusters;
+    // Clusters mapped by their network UUID "<Cluster's network UUID, Cluster>"
 
     public NodeClustersContainer() {
         this.nodesClusters = new HashMap<>();
@@ -44,6 +45,10 @@ public class NodeClustersContainer implements Subject
      */
     public void removeNode(Node node) {
         nodesClusters.forEach((uuid, cluster) -> ((NodesCluster) cluster).removeObserver(node));
+    }
+
+    public void removeNode(String nodeUUID) {
+        nodesClusters.forEach((uuid, cluster) -> ((NodesCluster) cluster).removeObserver(nodeUUID));
     }
 
     /**

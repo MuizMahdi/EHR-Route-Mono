@@ -20,7 +20,7 @@ public class NodesEventScheduler
     /**
      * Sends an event every 30 seconds to keep the connection alive and to filter out disconnected nodes
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 10000)
     public void sendNodesHeartBeat() {
         SseKeepAliveEvent event = new SseKeepAliveEvent("0");
         eventPublisher.publishEvent(event);

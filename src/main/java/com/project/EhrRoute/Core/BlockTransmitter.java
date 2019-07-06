@@ -3,84 +3,56 @@ import com.project.EhrRoute.Core.RTC.*;
 import com.project.EhrRoute.Core.RTC.Node;
 import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
+import com.project.EhrRoute.Models.BlockSource;
 import com.project.EhrRoute.Models.Observer;
 import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
-import com.project.EhrRoute.Payload.Core.SerializableBlock;
-import com.project.EhrRoute.Services.ClustersContainer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.util.Optional;
 
 
 @Component
 public class BlockTransmitter
 {
-    private ClustersContainer clustersContainer;
-    private NodeClustersContainer nodeClustersContainer;
+    private NodeClustersContainer clustersContainer;
     private NodeMessageTransmitter nodeMessageTransmitter;
 
+
     @Autowired
-    public BlockTransmitter(ClustersContainer clustersContainer, NodeClustersContainer nodeClustersContainer, NodeMessageTransmitter nodeMessageTransmitter) {
+    public BlockTransmitter(NodeClustersContainer clustersContainer, NodeMessageTransmitter nodeMessageTransmitter) {
         this.clustersContainer = clustersContainer;
-        this.nodeClustersContainer = nodeClustersContainer;
         this.nodeMessageTransmitter = nodeMessageTransmitter;
-    }
-
-
-    public void broadcast(SerializableBlock block, String networkUUID) throws ResourceEmptyException {
-
-        // Get NodeCluster of consumers in network, throws ResourceEmptyException if no consumers found
-        NodeCluster networkChainConsumers = clustersContainer.getConsumersByNetwork(networkUUID);
-
-        // Send SSEs with block to all consumers in the node's network
-        networkChainConsumers.getCluster().forEach((consumerUUID, consumerNode) -> {
-            try {
-                Long blockID = block.getBlockHeader().getIndex();
-
-                // Send block through a SSE
-                SseEmitter.SseEventBuilder event = SseEmitter.event().data(block).id(blockID.toString()).name("block");
-                consumerNode.getEmitter().send(event);
-            }
-            catch (Exception Ex) {
-                clustersContainer.getChainConsumers().removeNode(consumerUUID);
-                networkChainConsumers.removeNode(consumerUUID);
-            }
-        });
     }
 
 
     public void broadcast(BlockResponse block) throws ResourceEmptyException {
 
-        // Get NodeCluster of consumers in network, throws ResourceEmptyException if no consumers found
-        NodeCluster networkChainConsumers = clustersContainer.getConsumersByNetwork(block.getBlock().getBlockHeader().getNetworkUUID());
+        Optional<Observer> cluster = clustersContainer.findNodesCluster(block.getBlock().getBlockHeader().getNetworkUUID());
 
-        // Send SSEs with block to all consumers in the node's network
-        networkChainConsumers.getCluster().forEach((consumerUUID, consumerNode) -> {
-            try {
-                Long blockID = block.getBlock().getBlockHeader().getIndex();
+        if (!cluster.isPresent()) {
+            throw new ResourceNotFoundException("Nodes Cluster", "Network UUID", block.getBlock().getBlockHeader().getNetworkUUID());
+        }
 
-                // Send block through a SSE
-                SseEmitter.SseEventBuilder event = SseEmitter.event().data(block).id(blockID.toString()).name("block");
-                consumerNode.getEmitter().send(event);
-            }
-            catch (Exception Ex) {
-                clustersContainer.getChainConsumers().removeNode(consumerUUID);
-                networkChainConsumers.removeNode(consumerUUID);
-            }
+        block.getMetadata().setBlockSource(BlockSource.BROADCAST.toString());
+
+        NodesCluster networkNodesCluster = (NodesCluster) cluster.get();
+
+        networkNodesCluster.getConsumingNodes().forEach((nodeUUID, node) -> {
+            Long blockId = block.getBlock().getBlockHeader().getIndex();
+            nodeMessageTransmitter.sendMessage((Node) node, NodeMessageType.BLOCK, block, blockId.toString());
         });
     }
 
 
     public void transmit(BlockResponse blockResponse, String networkUUID, String consumerUUID) {
 
-        if (!nodeClustersContainer.findNodesCluster(networkUUID).isPresent()) {
+        Optional<Observer> cluster = clustersContainer.findNodesCluster(networkUUID);
+
+        if (!cluster.isPresent()) {
             throw new ResourceNotFoundException("Nodes Cluster", "Network UUID", networkUUID);
         }
 
-        NodesCluster networkNodesCluster = (NodesCluster) nodeClustersContainer.findNodesCluster(networkUUID).get();
+        NodesCluster networkNodesCluster = (NodesCluster) cluster.get();
 
         // Get the consumer
         Optional<Observer> consumer = networkNodesCluster.findConsumer(consumerUUID);
