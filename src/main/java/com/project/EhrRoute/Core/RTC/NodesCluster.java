@@ -50,8 +50,6 @@ public class NodesCluster implements Subject, Observer
      */
     @Override
     public void notifyObservers(Object notification) {
-        System.out.println("---- { SENDING GLOBAL HEART BEAT [3] } ----");
-        System.out.println("PROVIDERS: " + providingNodes.size() + "     CONSUMERS: " + consumingNodes.size());
         // Send keep-alive data to all providers
         keepAliveNodes(notification, providingNodes);
         // Send keep-alive data to all consumers
@@ -69,7 +67,6 @@ public class NodesCluster implements Subject, Observer
 
     private void keepAliveNodes(Object notification, HashMap<String, Observer> nodesList) {
         if (!nodesList.isEmpty()) {
-
             // Cluster iterator
             Iterator nodesIterator = nodesList.entrySet().iterator();
 
@@ -85,13 +82,11 @@ public class NodesCluster implements Subject, Observer
                 SseEmitter.SseEventBuilder message = SseEmitter.event().data(notification).name(NodeMessageType.HEART_BEAT.toString());
 
                 try {
-                    System.out.println("SENDING HEART BEAT TO NODE: " + nodeUUID);
                     // Send keep-alive data
                     node.getEmitter().send(message);
                 }
                 // In case an error occurs during event transmission
                 catch (Exception Ex) {
-                    System.out.println("REMOVING A MOTHERFUCKER FROM THE CLUSTERS LIST FFS");
                     // Remove provider map using iterator entry to avoid ConcurrentModificationException
                     nodesIterator.remove();
                     // Remove the provider from cluster

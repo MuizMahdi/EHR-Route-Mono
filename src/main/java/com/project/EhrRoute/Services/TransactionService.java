@@ -1,31 +1,21 @@
 package com.project.EhrRoute.Services;
 import com.project.EhrRoute.Core.Block;
 import com.project.EhrRoute.Core.BlockTransmitter;
-import com.project.EhrRoute.Core.Transaction;
 import com.project.EhrRoute.Core.Utilities.BlockUtil;
 import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
 import com.project.EhrRoute.Entities.EHR.*;
-import com.project.EhrRoute.Events.GetUserUpdateConsentEvent;
 import com.project.EhrRoute.Exceptions.BadRequestException;
-import com.project.EhrRoute.Models.BlockSource;
 import com.project.EhrRoute.Models.UuidSourceType;
-import com.project.EhrRoute.Payload.Auth.ApiResponse;
-import com.project.EhrRoute.Payload.Core.BlockAddition;
+import com.project.EhrRoute.Payload.Core.*;
 import com.project.EhrRoute.Payload.Core.SSEs.BlockMetadata;
 import com.project.EhrRoute.Payload.Core.SSEs.BlockResponse;
-import com.project.EhrRoute.Payload.Core.SerializableBlock;
-import com.project.EhrRoute.Payload.Core.UserConsentResponse;
 import com.project.EhrRoute.Payload.EHR.RecordUpdateData;
 import com.project.EhrRoute.Utilities.ModelMapper;
 import com.project.EhrRoute.Utilities.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.security.PrivateKey;
 
 
 @Service
@@ -131,45 +121,66 @@ public class TransactionService
     }
 
 
+    public void getUserUpdateConsent(UpdatedBlockAddition updatedBlockAddition) {
+        String providerUUID = updatedBlockAddition.getBlockAddition().getProviderUUID();
+        String networkUUID = updatedBlockAddition.getBlockAddition().getNetworkUUID();
+        String userID = updatedBlockAddition.getBlockAddition().getEhrUserID();
+        String chainRoot = updatedBlockAddition.getBlockAddition().getChainRootWithoutBlock(); // The node's local chain merkle root
 
-    public void sendUpdateConsentRequest(BlockAddition updatedBlockAddition, RecordUpdateData recordUpdateData) {
-        // Send a consent request for adding the block to chain to user
-        // Generate and construct a block using data in block addition request
-        Block block = modelMapper.mapAdditionRequestToBlock(updatedBlockAddition);
+        uuidUtil.validateResourceUUID(providerUUID, UuidSourceType.PROVIDER);
+        uuidUtil.validateResourceUUID(networkUUID, UuidSourceType.NETWORK);
 
-        // Convert the block into a serializable block
+        // Validate user
+        userService.findUserById(Long.parseLong(userID));
+
+        // Validate node's chain
+        if (!chainRootService.isChainRootValid(networkUUID, chainRoot)) {
+            // TODO
+        }
+
+        // Generate and construct a block using the data in the block addition request
+        Block block = modelMapper.mapAdditionRequestToBlock(updatedBlockAddition.getBlockAddition());
         SerializableBlock serializableBlock = modelMapper.mapBlockToSerializableBlock(block);
 
-        // Construct and publish a GetUserUpdateConsent Event
-        GetUserUpdateConsentEvent getUserConsent = new GetUserUpdateConsentEvent(
-            this,
-            recordUpdateData,
-            serializableBlock,
-            updatedBlockAddition.getProviderUUID(),
-            updatedBlockAddition.getNetworkUUID(),
-            updatedBlockAddition.getEhrUserID()
-        );
-
-        eventPublisher.publishEvent(getUserConsent);
+        // Send a notification
+        sendUpdateConsentRequest(serializableBlock, updatedBlockAddition.getRecordUpdateData(), providerUUID, networkUUID, Long.parseLong(userID));
     }
 
 
-    @EventListener
-    protected void getUserUpdateConsent(GetUserUpdateConsentEvent event)
-    {
-        Long userID = Long.parseLong(event.getUserID());
+    public void giveUserUpdateConsent(UserUpdateConsentResponse updateConsentResponse) {
+        // Validate the consent request that the user responded to
+        if (!consentRequestService.isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
+            throw new BadRequestException("Invalid update consent response");
+        }
 
-        /*
-        *   Create and save an UpdateConsentRequest type notification for the user
-        */
+        // Get Block from SerializableBlock in the consent request of the update consent response
+        Block block = modelMapper.mapSerializableBlockToBlock(updateConsentResponse.getConsentResponse().getBlock());
 
-        // Create a consent request from block, user ID and provider UUID
-        ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(
-            userID,
-            event.getProviderUUID(),
-            event.getNetworkUUID(), // NetworkUUID of the provider
-            event.getBlock()
+        // Sign the block
+        try {
+            block = blockUtil.signBlock(updateConsentResponse.getConsentResponse().getUserPrivateKey(), block);
+        }
+        catch (Exception Ex) {
+            throw new BadRequestException("Invalid private key");
+        }
+
+        // Update the block
+        block = blockUtil.updateBlockLeafHash(block);
+
+        // Construct a block addition response
+        BlockResponse blockResponse = new BlockResponse(
+            modelMapper.mapBlockToSerializableBlock(block),
+            new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID())
         );
+
+        // Broadcast the signed block to the other provider nodes in network.
+        blockTransmitter.broadcast(blockResponse);
+    }
+
+
+    private void sendUpdateConsentRequest(SerializableBlock block, RecordUpdateData recordUpdateData, String providerUUID, String networkUUID, Long userId) {
+        // Create a consent request from block, user ID and provider UUID
+        ConsentRequestBlock consentRequest = modelMapper.mapToConsentRequestBlock(userId, providerUUID, networkUUID, block);
 
         // Persist the consent request
         consentRequestService.saveConsentRequest(consentRequest);
@@ -179,12 +190,12 @@ public class TransactionService
         EhrDetails ehrDetails = new EhrDetails();
 
         /* Get the EHR Data of the update consent request from the event */
-        event.getRecordUpdateData().getConditions().forEach(medicalProblem -> {
+        recordUpdateData.getConditions().forEach(medicalProblem -> {
             EhrProblems ehrProblem = new EhrProblems(medicalProblem);
             ehrDetails.addProblem(ehrProblem);
         });
 
-        event.getRecordUpdateData().getAllergies().forEach(allergy -> {
+        recordUpdateData.getAllergies().forEach(allergy -> {
             EhrAllergies ehrAllergy = new EhrAllergies(allergy);
             ehrDetails.addAllergy(ehrAllergy);
         });

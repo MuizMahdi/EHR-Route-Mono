@@ -45,53 +45,20 @@ public class TransactionController
     }
 
 
-    @PostMapping("/get-update-consent")
+    @PostMapping("/record-update-consent-request")
     @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity getUserUpdateConsent(@RequestBody UpdatedBlockAddition updatedBlockAddition)
     {
-        String providerUUID = updatedBlockAddition.getBlockAddition().getProviderUUID();
-        String networkUUID = updatedBlockAddition.getBlockAddition().getNetworkUUID();
-        String userID = updatedBlockAddition.getBlockAddition().getEhrUserID();
-
-        uuidUtil.validateResourceUUID(providerUUID, UuidSourceType.PROVIDER);
-        uuidUtil.validateResourceUUID(networkUUID, UuidSourceType.NETWORK);
-
-        // Validate user
-        userService.findUserById(Long.parseLong(userID));
-
-        // Send a notification
-        transactionService.sendUpdateConsentRequest(updatedBlockAddition.getBlockAddition(), updatedBlockAddition.getRecordUpdateData());
-
-        return ResponseEntity.accepted().build();
+        transactionService.getUserUpdateConsent(updatedBlockAddition);
+        return ResponseEntity.accepted().body("Update consent request was sent");
     }
 
 
-    @PostMapping("/give-update-consent")
+    @PostMapping("/record-update-consent-response")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception
     {
-        /*
-                // Validate the consent request that the user responded to
-                if (!consentRequestService.isConsentResponseValid(updateConsentResponse.getConsentResponse())) {
-                    return ResponseEntity.badRequest().body(new ApiResponse(false, "Provider has not made a consent request for this response"));
-                }
-
-                // Get Block from SerializableBlock in the consent request of the update consent response
-                Block block = modelMapper.mapSerializableBlockToBlock(updateConsentResponse.getConsentResponse().getBlock());
-
-                // Sign and update the block.
-                block = signBlock(updateConsentResponse.getConsentResponse(), block);
-                block = updateBlockLeafHash(block);
-
-                // Construct a block addition response
-                BlockResponse blockResponse = new BlockResponse(
-                    modelMapper.mapBlockToSerializableBlock(block),
-                    new BlockMetadata(updateConsentResponse.getConsentResponse().getConsentRequestUUID(), BlockSource.BROADCAST.toString())
-                );
-
-                // Broadcast the signed block to the other provider nodes in network.
-                blockTransmitter.broadcast(blockResponse);
-        */
+        transactionService.giveUserUpdateConsent(updateConsentResponse);
         return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }
 }
