@@ -1,5 +1,4 @@
 package com.project.EhrRoute.Core;
-
 import com.project.EhrRoute.Core.Utilities.HashUtil;
 
 public class Block
@@ -13,9 +12,7 @@ public class Block
         this.blockHeader = blockHeader;
     }
 
-    public void initBlock()
-    {
-        // Initialize the block header's merkle leaf hash
+    public void initBlock() {
         HashUtil hashUtil = new HashUtil();
         blockHeader.setMerkleLeafHash(hashUtil.SHA256(transaction.getTransactionId()));
     }

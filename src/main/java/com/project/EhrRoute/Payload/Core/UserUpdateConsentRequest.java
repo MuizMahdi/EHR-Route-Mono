@@ -4,13 +4,13 @@ import com.project.EhrRoute.Entities.EHR.MedicalRecord;
 
 public class UserUpdateConsentRequest
 {
-    private Long ehrDetailsId;
+    private String ehrDetailsUuid;
     private UserConsentRequest userConsentRequest;
     private MedicalRecord updateMedicalRecord;
 
 
-    public UserUpdateConsentRequest(Long ehrDetailsId, UserConsentRequest userConsentRequest, MedicalRecord updateMedicalRecord) {
-        this.ehrDetailsId = ehrDetailsId;
+    public UserUpdateConsentRequest(String ehrDetailsUuid, UserConsentRequest userConsentRequest, MedicalRecord updateMedicalRecord) {
+        this.ehrDetailsUuid = ehrDetailsUuid;
         this.userConsentRequest = userConsentRequest;
         this.updateMedicalRecord = updateMedicalRecord;
     }
@@ -22,12 +22,12 @@ public class UserUpdateConsentRequest
     public void setUserConsentRequest(UserConsentRequest userConsentRequest) {
         this.userConsentRequest = userConsentRequest;
     }
-    public void setEhrDetailsId(Long ehrDetailsId) {
-        this.ehrDetailsId = ehrDetailsId;
+    public void setEhrDetailsUuid(String ehrDetailsUuid) {
+        this.ehrDetailsUuid = ehrDetailsUuid;
     }
 
-    public Long getEhrDetailsId() {
-        return ehrDetailsId;
+    public String getEhrDetailsUuid() {
+        return ehrDetailsUuid;
     }
     public MedicalRecord getUpdateMedicalRecord() {
         return updateMedicalRecord;

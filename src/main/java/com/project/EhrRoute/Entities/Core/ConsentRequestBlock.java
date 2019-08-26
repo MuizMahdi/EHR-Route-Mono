@@ -11,11 +11,11 @@ public class ConsentRequestBlock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull @NotBlank private String hash;
+    @NotNull @NotBlank private String hash; //
+    @NotNull @NotBlank private String requestUUID;
     @NotNull @NotBlank private String previousHash;
-    @NotNull @NotBlank private String merkleLeafHash;
-    @NotNull @NotBlank private String transactionId;
-    @NotNull @NotBlank private String senderPubKey;
+    @NotNull @NotBlank private String merkleLeafHash; //// whats the difference b/w hash and merkle leaf hash
+    @NotNull @NotBlank private String transactionId; //
     @NotNull @NotBlank private String senderAddress;
     @NotNull @NotBlank private String recipientAddress;
     @NotNull @NotBlank private String networkUUID;
@@ -26,18 +26,18 @@ public class ConsentRequestBlock {
 
 
     // Transaction signature is blank when saved on patient consent requests because the patient signs and then adds it
-    private String signature;
+    private String signature; //
 
 
     public ConsentRequestBlock() { }
-    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
+    public ConsentRequestBlock(@NotBlank String hash, @NotBlank String requestUUID, @NotBlank String previousHash, @NotBlank Long timeStamp, @NotBlank Long blockIndex, @NotBlank String merkleLeafHash, @NotBlank String transactionId, @NotBlank String senderPubKey, @NotBlank String senderAddress, @NotBlank String recipientAddress, String networkUUID, String signature, @NotBlank Long userID, @NotBlank String providerUUID) {
         this.hash = hash;
+        this.requestUUID = requestUUID;
         this.previousHash = previousHash;
         this.timeStamp = timeStamp;
         this.blockIndex = blockIndex;
         this.merkleLeafHash = merkleLeafHash;
         this.transactionId = transactionId;
-        this.senderPubKey = senderPubKey;
         this.senderAddress = senderAddress;
         this.recipientAddress = recipientAddress;
         this.networkUUID = networkUUID;
@@ -74,9 +74,6 @@ public class ConsentRequestBlock {
     public String getPreviousHash() {
         return previousHash;
     }
-    public String getSenderPubKey() {
-        return senderPubKey;
-    }
     public String getTransactionId() {
         return transactionId;
     }
@@ -93,6 +90,9 @@ public class ConsentRequestBlock {
     public void setHash(String hash) {
         this.hash = hash;
     }
+    public String getRequestUUID() {
+        return requestUUID;
+    }
     public void setUserID(Long userID) {
         this.userID = userID;
     }
@@ -108,14 +108,14 @@ public class ConsentRequestBlock {
     public void setBlockIndex(Long blockIndex) {
         this.blockIndex = blockIndex;
     }
+    public void setRequestUUID(String requestUUID) {
+        this.requestUUID = requestUUID;
+    }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
     }
     public void setProviderUUID(String providerUUID) {
         this.providerUUID = providerUUID;
-    }
-    public void setSenderPubKey(String senderPubKey) {
-        this.senderPubKey = senderPubKey;
     }
     public void setPreviousHash(String previousHash) {
         this.previousHash = previousHash;

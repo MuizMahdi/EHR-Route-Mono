@@ -43,14 +43,12 @@ public class AddressUtil
         return address;
     }
 
-    public boolean confirmTransactionSenderAddress(Transaction transaction) throws GeneralSecurityException
-    {
+    public boolean confirmTransactionSenderAddress(Transaction transaction) {
         String senderAddress = transaction.getSenderAddress().getAddress();
-        PublicKey senderPubKey = transaction.getSenderPubKey();
 
-        if (senderAddress == null || senderAddress.isEmpty() ||
-            senderPubKey == null || !senderAddress.equals(generateAddress(senderPubKey))
-        ) {
+        // TODO: Get Sender's public key from DB and generate an address to validate sender address
+
+        if (senderAddress == null || senderAddress.isEmpty()) {
             return false;
         }
 

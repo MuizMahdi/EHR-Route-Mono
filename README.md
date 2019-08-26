@@ -7,7 +7,7 @@ Genetic studies, cancer/chronic disease registries, substance abuse, population 
 
 <br/><br/>
 
-![EHRouteLogoImage](https://i.imgur.com/0uLOP8W.png)
+![EHRouteLogoImage](https://i.imgur.com/7GLw3np.png)
 
 <br/>
 

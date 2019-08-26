@@ -30,8 +30,10 @@ public class NetworkService
 
 
     @Transactional
-    public Network findByNetUUID(String netUUID) {
-        return networkRepository.findByNetworkUUID(netUUID).orElse(null);
+    public Network findNetwork(String networkUUID) {
+        return networkRepository.findByNetworkUUID(networkUUID).orElseThrow(() ->
+            new NullUserNetworkException("Network with UUID " + networkUUID + " was not found")
+        );
     }
 
 
@@ -64,7 +66,7 @@ public class NetworkService
 
 
     @Transactional
-    private String getNetworkChainRoot(String networkUUID) {
+    public String getNetworkChainRoot(String networkUUID) {
         return networkRepository.getNetworkChainRootByNetworkUUID(networkUUID).orElseThrow(() ->
             new NullUserNetworkException("Chain root for a network with UUID " + networkUUID + " was not found")
         );
@@ -72,15 +74,10 @@ public class NetworkService
 
 
     @Transactional
-    public User getNetworkRandomMember(String networkUUID)
-    {
-        // Get the network using the UUID
-        Network network = findByNetUUID(networkUUID);
+    public User getNetworkRandomMember(String networkUUID) {
 
-        // Validate network
-        if (network == null) {
-            throw new NullUserNetworkException("Network with UUID: " + networkUUID + ", was not found");
-        }
+        // Get the network using the UUID
+        Network network = findNetwork(networkUUID);
 
         // Get network's users set
         Set<User> networkUsers = network.getUsers();
@@ -112,8 +109,8 @@ public class NetworkService
 
 
     @Transactional
-    private List<String> getNetworkInstitutions(String networkUUID)
-    {
+    private List<String> getNetworkInstitutions(String networkUUID) {
+
         List<String> networkMembersInstitutions = new ArrayList<>();
 
         Set<User> networkProviders = getNetworkMembers(networkUUID);
@@ -134,31 +131,22 @@ public class NetworkService
 
 
     @Transactional
-    private List<String> getNetworkMembersNames(String networkUUID)
-    {
+    private List<String> getNetworkMembersNames(String networkUUID) {
         Set<User> networkMembers = getNetworkMembers(networkUUID);
         return networkMembers.stream().map(User::getName).collect(Collectors.toList());
     }
 
 
     @Transactional
-    private Set<User> getNetworkMembers(String networkUUID)
-    {
+    private Set<User> getNetworkMembers(String networkUUID) {
         // Get the network using the UUID
-        Network network = findByNetUUID(networkUUID);
-
-        // Validate network
-        if (network == null) {
-            throw new NullUserNetworkException("Network with UUID: " + networkUUID + ", was not found");
-        }
-
+        Network network = findNetwork(networkUUID);
         return network.getUsers();
     }
 
 
     @Transactional
-    public NetworkDetails getNetworkDetails(String networkUUID)
-    {
+    public NetworkDetails getNetworkDetails(String networkUUID) {
         return new NetworkDetails(
             networkUUID,
             getNetworkNameByUuid(networkUUID),

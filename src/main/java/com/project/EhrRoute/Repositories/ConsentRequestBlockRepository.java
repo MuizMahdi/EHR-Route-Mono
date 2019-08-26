@@ -13,6 +13,9 @@ public interface ConsentRequestBlockRepository extends JpaRepository<ConsentRequ
 {
     Optional<ConsentRequestBlock> findByUserID(Long userID);
 
+    @Query("SELECT Rq FROM ConsentRequestBlock Rq WHERE Rq.requestUUID = :requestUuid")
+    Optional<ConsentRequestBlock> findByRequestUUID(@Param("requestUuid") String requestUUID);
+
     @Query("SELECT Rq FROM ConsentRequestBlock Rq WHERE Rq.providerUUID = :providerUuid")
     List<ConsentRequestBlock> findByProviderUUID(@Param("providerUuid") String providerUUID);
 }

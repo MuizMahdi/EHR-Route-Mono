@@ -27,27 +27,18 @@ public class EhrDetailService
 
 
     @Transactional
-    public EhrDetails findEhrDetails(String address) {
-        return ehrDetailsRepository.findByAddress(address).orElseThrow(() ->
-            new ResourceNotFoundException("EHR Details", "address", address)
+    public EhrDetails findEhrDetails(String uuid) {
+        return ehrDetailsRepository.findByUuid(uuid).orElseThrow(() ->
+            new ResourceNotFoundException("EHR Details", "UUID", uuid)
         );
     }
 
 
     @Transactional
-    public EhrDetails findEhrDetailsById(Long id) {
+    public EhrDetails findEhrDetails(Long id) {
         return ehrDetailsRepository.findById(id).orElseThrow(() ->
             new ResourceNotFoundException("EHR Details", "Id", id)
         );
-    }
-
-
-    @Transactional
-    public EhrDetails generateUserEhrDetails(String address) {
-        // Create EhrDetails using address
-        EhrDetails ehrDetails = new EhrDetails(address);
-        // Persist it
-        return ehrDetailsRepository.save(ehrDetails);
     }
 
 

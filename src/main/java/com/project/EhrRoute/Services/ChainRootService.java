@@ -7,36 +7,29 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class ChainRootUtil
+public class ChainRootService
 {
     private NetworkService networkService;
 
     @Autowired
-    public ChainRootUtil(NetworkService networkService) {
+    public ChainRootService(NetworkService networkService) {
         this.networkService = networkService;
     }
 
 
     // Returns true if the network's current chain root equals chainRoot
-    public boolean checkNetworkChainRoot(String networkUUID, String chainRoot)
-    {
-        Network network = networkService.findByNetUUID(networkUUID);
+    public boolean isChainRootValid(String networkUUID, String chainRoot) {
 
-        // If it doesn't exist in DB
-        if (network == null) {
-            throw new BadRequestException("Invalid Network");
-        }
+        Network network = networkService.findNetwork(networkUUID);
 
         if (chainRoot.isEmpty()) {
             throw new BadRequestException("Invalid Chain Root");
         }
 
-        //ChainRoot networkCurrentChainRoot = chainRootRepository.findByNetwork(network).orElse(null);
-
         // Latest chain root of the network
         ChainRoot networkCurrentChainRoot = network.getChainRoot();
 
-        if (networkCurrentChainRoot == null) {
+        if (networkCurrentChainRoot == null || networkCurrentChainRoot.getRoot().isEmpty()) {
             throw new BadRequestException("Network has no Chain Root");
         }
 
@@ -49,13 +42,10 @@ public class ChainRootUtil
         return true;
     }
 
-    public void changeNetworkChainRoot(String networkUUID, String chainRoot)
-    {
-        Network network = networkService.findByNetUUID(networkUUID);
 
-        if (network == null) {
-            throw new BadRequestException("Invalid Network");
-        }
+    public void changeNetworkChainRoot(String networkUUID, String chainRoot) {
+
+        Network network = networkService.findNetwork(networkUUID);
 
         if (chainRoot.isEmpty()) {
             throw new BadRequestException("Invalid Chain Root");
@@ -63,9 +53,9 @@ public class ChainRootUtil
 
         ChainRoot newChainRoot = new ChainRoot(chainRoot);
 
-       network.setChainRoot(newChainRoot);
+        network.setChainRoot(newChainRoot);
 
-       networkService.saveNetwork(network);
+        networkService.saveNetwork(network);
     }
 
 }

@@ -14,6 +14,9 @@ public class BlockAddition
     public BlockAddition() { }
     public BlockAddition(String chainRootWithoutBlock, String previousBlockIndex, String previousBlockHash, String senderAddress, String providerUUID, String networkUUI, String ehrUserID) {
         this.chainRootWithoutBlock = chainRootWithoutBlock;
+        this.previousBlockIndex = previousBlockIndex;
+        this.previousBlockHash = previousBlockHash;
+        this.senderAddress = senderAddress;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUI;
         this.ehrUserID = ehrUserID;

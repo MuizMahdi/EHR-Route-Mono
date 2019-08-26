@@ -6,16 +6,18 @@ public class UserConsentResponse
     private SerializableBlock block;
     private String userPrivateKey;
     private String userAddress;
+    private String consentRequestUUID;
     private String providerUUID;
     private String networkUUID;
     private Long userID;
 
 
     public UserConsentResponse() { }
-    public UserConsentResponse(SerializableBlock block, String userPrivateKey, String userAddress, String providerUUID, String networkUUID, Long userID) {
+    public UserConsentResponse(SerializableBlock block, String userPrivateKey, String userAddress, String consentRequestUUID, String providerUUID, String networkUUID, Long userID) {
         this.block = block;
         this.userPrivateKey = userPrivateKey;
         this.userAddress = userAddress;
+        this.consentRequestUUID = consentRequestUUID;
         this.providerUUID = providerUUID;
         this.networkUUID = networkUUID;
         this.userID = userID;
@@ -40,6 +42,10 @@ public class UserConsentResponse
     public String getUserPrivateKey() {
         return userPrivateKey;
     }
+    public String getConsentRequestUUID() {
+        return consentRequestUUID;
+    }
+
     public void setUserID(Long userID) {
         this.userID = userID;
     }
@@ -57,5 +63,8 @@ public class UserConsentResponse
     }
     public void setUserPrivateKey(String userPrivateKey) {
         this.userPrivateKey = userPrivateKey;
+    }
+    public void setConsentRequestUUID(String consentRequestUUID) {
+        this.consentRequestUUID = consentRequestUUID;
     }
 }

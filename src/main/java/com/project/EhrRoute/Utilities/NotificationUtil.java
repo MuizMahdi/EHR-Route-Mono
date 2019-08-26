@@ -22,43 +22,36 @@ public class NotificationUtil
     }
 
 
-    public String getNotificationMessage(Notification notification) throws InvalidNotificationException
-    {
-        if (notification.getType() == null)
-        {
+    public String getNotificationMessage(Notification notification) {
+
+        if (notification.getType() == null) {
             throw new InvalidNotificationException("Invalid notification type in notification");
         }
 
-        if (notification.getType() == NotificationType.CONSENT_REQUEST)
-        {
+        if (notification.getType() == NotificationType.CONSENT_REQUEST) {
             return ConsentRequestNotificationMessageBuilder(notification);
         }
 
-        if (notification.getType() == NotificationType.NETWORK_INVITATION)
-        {
+        if (notification.getType() == NotificationType.NETWORK_INVITATION) {
             return NetworkInvitationNotificationMessageBuilder(notification);
         }
 
-        // Returns null if something wrong happens
         return null;
     }
 
-    private String ConsentRequestNotificationMessageBuilder(Notification notification) throws InvalidNotificationException
-    {
+    private String ConsentRequestNotificationMessageBuilder(Notification notification) {
+
         ConsentRequestBlock consentRequestBlock = (ConsentRequestBlock) notification.getReference();
         String requesterNetworkName;
 
-        if (consentRequestBlock == null)
-        {
+        if (consentRequestBlock == null) {
             throw new InvalidNotificationException("Invalid or null Consent Request in notification");
         }
 
-        try
-        {
+        try {
             requesterNetworkName = getConsentRequestNetworkName(consentRequestBlock);
         }
-        catch (NullUserNetworkException Ex)
-        {
+        catch (NullUserNetworkException Ex) {
             throw new InvalidNotificationException("Invalid Consent Request, caused by " + Ex.getMessage());
         }
 
@@ -70,12 +63,11 @@ public class NotificationUtil
         return message;
     }
 
-    private String NetworkInvitationNotificationMessageBuilder(Notification notification) throws InvalidNotificationException
-    {
+    private String NetworkInvitationNotificationMessageBuilder(Notification notification) {
+
         NetworkInvitationRequest invitationRequest = (NetworkInvitationRequest) notification.getReference();
 
-        if (invitationRequest == null)
-        {
+        if (invitationRequest == null) {
             throw new InvalidNotificationException("Invalid or null Network Invitation Request in notification");
         }
 
@@ -88,13 +80,14 @@ public class NotificationUtil
         return message;
     }
 
-    private String getConsentRequestNetworkName(ConsentRequestBlock consentRequestBlock) throws NullUserNetworkException
-    {
-        Network network = networkService.findByNetUUID(consentRequestBlock.getNetworkUUID());
+    private String getConsentRequestNetworkName(ConsentRequestBlock consentRequestBlock) {
+        Network network;
 
-        if (network == null || network.getName().isEmpty() || network.getName() == null)
-        {
-            throw new NullUserNetworkException("Invalid network with UUID: [" + consentRequestBlock.getNetworkUUID() + "] in consent request block");
+        try {
+            network = networkService.findNetwork(consentRequestBlock.getNetworkUUID());
+        }
+        catch (NullUserNetworkException Ex) {
+            throw new NullUserNetworkException(Ex.getMessage() + " in consent request block");
         }
 
         return network.getName();

@@ -6,12 +6,15 @@ import com.project.EhrRoute.Entities.App.Notification;
 import com.project.EhrRoute.Entities.Auth.User;
 import com.project.EhrRoute.Entities.Auth.VerificationToken;
 import com.project.EhrRoute.Entities.Core.ChainRoot;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.Network;
+import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
+import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
-import com.project.EhrRoute.Exceptions.ResourceEmptyException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkDetails;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
+import com.project.EhrRoute.Payload.App.NetworkRootUpdate;
 import com.project.EhrRoute.Payload.App.SimpleStringPayload;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Core.SerializableBlock;
@@ -23,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import java.util.Calendar;
 import java.util.List;
@@ -34,22 +36,26 @@ import java.util.List;
 public class NetworkController
 {
     private NetworkInvitationRequestService invitationRequestService;
+    private UpdateConsentRequestService updateConsentRequestService;
     private VerificationTokenService verificationTokenService;
+    private ConsentRequestBlockService consentRequestService;
     private NotificationService notificationService;
+    private ChainRootService chainRootService;
     private NetworkService networkService;
     private UserService userService;
-
     private GenesisBlock genesisBlock;
-
     private ModelMapper modelMapper;
     private StringUtil stringUtil;
 
 
     @Autowired
-    public NetworkController(NetworkInvitationRequestService invitationRequestService, VerificationTokenService verificationTokenService, NotificationService notificationService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+    public NetworkController(NetworkInvitationRequestService invitationRequestService, UpdateConsentRequestService updateConsentRequestService, VerificationTokenService verificationTokenService, ConsentRequestBlockService consentRequestService, NotificationService notificationService, ChainRootService chainRootService, NetworkService networkService, UserService userService, GenesisBlock genesisBlock, ModelMapper modelMapper, StringUtil stringUtil) {
+        this.updateConsentRequestService = updateConsentRequestService;
         this.invitationRequestService = invitationRequestService;
         this.verificationTokenService = verificationTokenService;
+        this.consentRequestService = consentRequestService;
         this.notificationService = notificationService;
+        this.chainRootService = chainRootService;
         this.networkService = networkService;
         this.userService = userService;
         this.genesisBlock = genesisBlock;
@@ -63,20 +69,14 @@ public class NetworkController
     public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
         if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not logged in"));
         }
 
         // Get current logged in user
         User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
 
         if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not found"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
         }
 
         // Initialize genesis block, a random network UUID is generated for every call,
@@ -107,30 +107,51 @@ public class NetworkController
         // Genesis block to be returned
         SerializableBlock genesis = modelMapper.mapBlockToSerializableBlock(genesisBlock.getBlock());
 
-        return new ResponseEntity<>(
-            genesis,
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(genesis);
     }
 
-
-    @GetMapping("/get-root")
+    /**
+     * Fetches a network merkle root given the network's UUID
+     * @param networkUUID   the network UUID
+     * @return              the network's merkle root
+     */
+    @GetMapping("/merkle-root")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getNetworkChainRoot(@RequestParam("networkuuid") String networkUUID)
     {
-        Network network = networkService.findByNetUUID(networkUUID);
+        Network network = networkService.findNetwork(networkUUID);
 
-        if (network == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "A Network with networkUUID: " + networkUUID + " was not found"),
-                HttpStatus.NOT_FOUND
-            );
+        return ResponseEntity.ok(new SimpleStringPayload(network.getChainRoot().getRoot()));
+    }
+
+
+    /**
+     * Finalizes the transaction by updating the network's merkle root and deleting the consent request on DB
+     * @param networkRootUpdate     the merkle root update request data
+     * @return                      HTTP 200 on success
+     */
+    @PostMapping("/merkle-root")
+    @PreAuthorize("hasRole('PROVIDER')")
+    public ResponseEntity updateNetworkMerkleRoot(@RequestBody NetworkRootUpdate networkRootUpdate)
+    {
+        // Get and validate the request by checking if there is a consent request with the UUID sent on the update request
+        ConsentRequestBlock consentRequest = consentRequestService.findConsentRequest(networkRootUpdate.getConsentRequestUUID());
+
+        // Change the network's root
+        chainRootService.changeNetworkChainRoot(networkRootUpdate.getNetworkUUID(), networkRootUpdate.getMerkleRoot());
+
+        try {
+            // Delete the consent request
+            consentRequestService.deleteRequest(consentRequest);
+        }
+        catch (Exception Ex) {
+            // If consent request wasn't deleted because there is an update consent request foreign key constraint
+            // then find and delete the update consent request that has/mapped-to this consent request
+            UpdateConsentRequest updateConsentRequest = updateConsentRequestService.findUpdateConsentRequest(consentRequest);
+            updateConsentRequestService.deleteUpdateConsentRequest(updateConsentRequest);
         }
 
-        return new ResponseEntity<>(
-            new SimpleStringPayload(network.getChainRoot().getRoot()),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "Network's merkle root has been updated successfully"));
     }
 
 
@@ -196,38 +217,21 @@ public class NetworkController
         // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
         User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getRecipientUsername());
         User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderUsername());
-        Network network = networkService.findByNetUUID(invitationRequest.getNetworkUUID());
+        Network network = networkService.findNetwork(invitationRequest.getNetworkUUID());
 
         // Validate recipient
         if (recipient == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid recipient username or email on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid recipient username on invitation request"));
         }
 
         // Validate sender
         if (sender == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid sender username on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        // Validate network
-        if (network == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid network on invitation request"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid sender username on invitation request"));
         }
 
         // Check if recipient is already on network
         if (userService.userHasNetwork(recipient, network)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User is already on the network"),
-                HttpStatus.CONFLICT
-            );
+            return new ResponseEntity<>(new ApiResponse(false, "User is already on the network"), HttpStatus.CONFLICT);
         }
 
         // Create a Notification object
@@ -252,10 +256,7 @@ public class NetworkController
         // Persist notification
         notificationService.saveNotification(notification);
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "A network invitation request notification has been successfully sent"),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "A network invitation request notification has been successfully sent"));
     }
 
 
@@ -263,33 +264,10 @@ public class NetworkController
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationResponse)
     {
-        NetworkInvitationRequest invitationRequest;
-
-        try
-        {
-            // Get NetworkInvitationRequest object from invitation response
-            invitationRequest = modelMapper.mapInvitationResponseToRequest(invitationResponse);
-        }
-        catch (ResourceEmptyException Ex) // Catch null or empty response fields
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(true, "Invalid invitation response object"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        // Validate invitation request of response
-        boolean requestExists = invitationRequestService.validateInvitationRequestExistence(invitationRequest);
-
-        /*
-        *   Verify token in response and its expiration date -
-        *   (by getting token from DB using tokenService and checking if expired)
-        *   after validating the response existence
-        */
+        NetworkInvitationRequest invitationRequest = modelMapper.mapInvitationResponseToRequest(invitationResponse);
 
         // If a request with the response values exist on DB
-        if (requestExists)
-        {
+        if (invitationRequestService.invitationRequestExists(invitationRequest)) {
             // Get current calendar time(used to check if invitation token is expired)
             Calendar cal = Calendar.getInstance();
 
@@ -297,83 +275,37 @@ public class NetworkController
             VerificationToken token = verificationTokenService.getVerificationToken(invitationResponse.getInvitationToken());
 
             // Invalid token check
-            if (token == null)
-            {
-                return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid invitation token in response"),
-                    HttpStatus.BAD_REQUEST
-                );
+            if (token == null) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid invitation token in response"));
             }
 
             // Expired token check
-            if ((token.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0)
-            {
-                return new ResponseEntity<>(
-                    new ApiResponse(false, "Expired invitation request"),
-                    HttpStatus.BAD_REQUEST
-                );
+            if ((token.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Expired invitation request"));
             }
 
-            // Add Network to User networks if token is valid (not expired and exists)
-            try
-            {
-                addUserNetwork(invitationResponse.getRecipientUsername(), invitationResponse.getNetworkUUID());
-            }
-            catch (Exception Ex)
-            {
-                // If a user with the recipient name of response was not found
-                if (Ex.getClass().equals(UsernameNotFoundException.class))
-                {
-                    return new ResponseEntity<>(
-                        new ApiResponse(false, Ex.getMessage()),
-                        HttpStatus.BAD_REQUEST
-                    );
-                }
-
-                // If a network with the network UUID of response was not found
-                if (Ex.getClass().equals(NullUserNetworkException.class))
-                {
-                    return new ResponseEntity<>(
-                        new ApiResponse(false, Ex.getMessage()),
-                        HttpStatus.BAD_REQUEST
-                    );
-                }
-            }
-
+            // Add Network to User's networks
+            addUserNetwork(invitationResponse.getRecipientUsername(), invitationResponse.getNetworkUUID());
         }
-        // If a request with the response values doesn't exist on DB
-        else
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(true, "An invitation request wasn't sent with such invitation response values. Invalid invitation."),
-                HttpStatus.BAD_REQUEST
-            );
+        else {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invitation request doesn't exist"));
         }
 
-        // If no error occurred, and everything was valid, send an OK response.
-        return new ResponseEntity<>(
-            new ApiResponse(true, "An invitation request wasn't sent with such invitation response values. Invalid invitation."),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "Invitation request accepted"));
     }
 
-    private void addUserNetwork(String invitedUserUsername, String networkUUID) throws UsernameNotFoundException, NullUserNetworkException
-    {
+    private void addUserNetwork(String invitedUserUsername, String networkUUID) {
+
         // Get the invited User object
         User invitedUser = userService.findUserByUsernameOrEmail(invitedUserUsername);
 
         // Handle user not found on DB
         if (invitedUser == null) {
-            throw new UsernameNotFoundException("A user with username: " + invitedUserUsername + " was not found. Adding network to user networks failed.");
+            throw new BadRequestException("A user with username: " + invitedUserUsername + " was not found. Adding network to user networks failed.");
         }
 
         // Get the network of networkUUID
-        Network network = networkService.findByNetUUID(networkUUID);
-
-        // Handle network not found on DB
-        if (network == null) {
-            throw new NullUserNetworkException("A network with networkUUID: [" + networkUUID + "] was not found. Adding network to user networks failed.");
-        }
+        Network network = networkService.findNetwork(networkUUID);
 
         // Add network to user networks if no error occurred
         invitedUser.addNetwork(network);
@@ -381,5 +313,4 @@ public class NetworkController
         // Save user to persist changes
         userService.saveUser(invitedUser);
     }
-
 }

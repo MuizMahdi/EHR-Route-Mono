@@ -1,4 +1,5 @@
 package com.project.EhrRoute.Repositories;
+import com.project.EhrRoute.Entities.Core.ConsentRequestBlock;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
 import com.project.EhrRoute.Entities.EHR.EhrDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,5 @@ import java.util.Optional;
 public interface UpdateConsentRequestRepository extends JpaRepository<UpdateConsentRequest, Long>
 {
     Optional<UpdateConsentRequest> findByEhrDetails(EhrDetails ehrDetails);
+    Optional<UpdateConsentRequest> findByConsentRequestBlock(ConsentRequestBlock consentRequestBlock);
 }

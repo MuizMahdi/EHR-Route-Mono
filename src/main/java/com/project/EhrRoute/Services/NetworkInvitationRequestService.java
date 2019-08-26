@@ -44,25 +44,12 @@ public class NetworkInvitationRequestService
 
 
     @Transactional
-    public void saveInvitationRequest(NetworkInvitationRequest invitationRequest)
-    {
+    public void saveInvitationRequest(NetworkInvitationRequest invitationRequest) {
         networkInvitationRequestRepository.save(invitationRequest);
     }
 
-
-    public boolean validateInvitationRequestExistence(NetworkInvitationRequest invitationRequest)
-    {
-        // Check if a network invitation request exists in DB by the values of 'invitationRequest'
-        boolean existsByToken = networkInvitationRequestRepository.existsByInvitationToken(invitationRequest.getInvitationToken());
-        boolean existsByNetUUID = networkInvitationRequestRepository.existsByNetworkUUID(invitationRequest.getNetworkUUID());
-        boolean existsBySenderName = networkInvitationRequestRepository.existsBySenderName(invitationRequest.getSenderName());
-
-        // If valid (all exist)
-        if (existsByToken && existsByNetUUID && existsBySenderName) {
-            return true;
-        }
-
-        // If invalid
-        return false;
+    @Transactional
+    public boolean invitationRequestExists(NetworkInvitationRequest invitationRequest) {
+        return networkInvitationRequestRepository.findByInvitationTokenAndNetworkNameAndSenderName(invitationRequest.getInvitationToken(), invitationRequest.getNetworkUUID(), invitationRequest.getSenderName()).isPresent();
     }
 }

@@ -81,11 +81,13 @@ public class AddressController
         String publicKey = keyUtil.getStringFromPublicKey(pubKey);
         String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
+        /*
         // Check if user doesn't have a 'Provider' or 'Admin' role
         if (!userService.userHasRole(user, RoleName.ROLE_PROVIDER) && !userService.userHasRole(user, RoleName.ROLE_ADMIN)) {
             // Generate an EHR detail using user's address
             ehrDetailService.generateUserEhrDetails(address);
         }
+        */
 
         // Return Address Response
         return new ResponseEntity<>(

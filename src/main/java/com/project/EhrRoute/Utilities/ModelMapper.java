@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 public class ModelMapper
 {
 
-private KeyUtil keyUtil;
+    private KeyUtil keyUtil;
+    private UuidUtil uuidUtil;
     private HashUtil hashUtil;
     private StringUtil stringUtil;
     private BlockHeader blockHeader;
@@ -40,8 +41,9 @@ private KeyUtil keyUtil;
 
 
     @Autowired
-    public ModelMapper(KeyUtil keyUtil, HashUtil hashUtil, StringUtil stringUtil, BlockHeader blockHeader, Transaction transaction, NetworkService networkService, ProviderService providerService) {
+    public ModelMapper(KeyUtil keyUtil, UuidUtil uuidUtil, HashUtil hashUtil, StringUtil stringUtil, BlockHeader blockHeader, Transaction transaction, NetworkService networkService, ProviderService providerService) {
         this.keyUtil = keyUtil;
+        this.uuidUtil = uuidUtil;
         this.hashUtil = hashUtil;
         this.stringUtil = stringUtil;
         this.blockHeader = blockHeader;
@@ -74,10 +76,6 @@ private KeyUtil keyUtil;
         byte[] blockTxID = block.getTransaction().getTransactionId();
         serializableTransaction.setTransactionId(stringUtil.base64EncodeBytes(blockTxID));
         serializableTransaction.setRecord(block.getTransaction().getRecord());
-
-        PublicKey publicKey = block.getTransaction().getSenderPubKey();
-        String stringPublicKey = keyUtil.getStringFromPublicKey(publicKey);
-        serializableTransaction.setSenderPubKey(stringPublicKey);
 
         serializableTransaction.setSenderAddress(block.getTransaction().getSenderAddress().getAddress());
         serializableTransaction.setRecipientAddress(block.getTransaction().getRecipientAddress().getAddress());
@@ -139,10 +137,6 @@ private KeyUtil keyUtil;
         senderAddress.setAddress(stringSenderAddress);
         transaction.setSenderAddress(senderAddress);
 
-        String stringSenderPubKey = serializableBlock.getTransaction().getSenderPubKey();
-        PublicKey senderPubKey = keyUtil.getPublicKeyFromString(stringSenderPubKey);
-        transaction.setSenderPubKey(senderPubKey);
-
         block.setTransaction(transaction);
 
         return block;
@@ -175,8 +169,6 @@ private KeyUtil keyUtil;
 
         transaction.setSenderAddress(senderAddress);
 
-        PublicKey senderPubKey = keyUtil.getPublicKeyFromString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1bYsqwRE7Yj5y9C3Ahv2vcr7NMYGU2us23tlGbEpogrPbilirid4gRnjZXLNZdgDyTmtxiBFa5WT9nC1kuxrdbFcMIBECCkeTcJL3Zlv3iY5c4DmCMKwf4jBm4gCeXWan8PccrsruDNxP5u2rkj6ywSVDrvRobhXGL9i/IuqoSwIDAQAB");
-        transaction.setSenderPubKey(senderPubKey);
         transaction.setRecord(new MedicalRecord());
 
         // Signature is added when patient gives consent for block addition (sharing their EHR)
@@ -204,11 +196,11 @@ private KeyUtil keyUtil;
         ConsentRequestBlock consentRequest = new ConsentRequestBlock();
 
         consentRequest.setUserID(userID);
+        consentRequest.setRequestUUID(uuidUtil.generateUUID());
         consentRequest.setProviderUUID(providerUUID);
         consentRequest.setNetworkUUID(networkUUID);
         consentRequest.setRecipientAddress(block.getTransaction().getRecipientAddress());
         consentRequest.setSenderAddress(block.getTransaction().getSenderAddress());
-        consentRequest.setSenderPubKey(block.getTransaction().getSenderPubKey());
         consentRequest.setTransactionId(block.getTransaction().getTransactionId());
         consentRequest.setMerkleLeafHash(block.getBlockHeader().getMerkleLeafHash());
         consentRequest.setBlockIndex(block.getBlockHeader().getIndex());
@@ -260,10 +252,9 @@ private KeyUtil keyUtil;
         String invitationToken = invitationResponse.getInvitationToken();
 
         // Validate NetworkInvitationResponse fields
-        if (
-                senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
-                        networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty())
-        {
+        if (senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
+            networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty()
+        ) {
             throw new ResourceEmptyException("Invalid invitation response");
         }
 
@@ -320,7 +311,6 @@ private KeyUtil keyUtil;
         SerializableTransaction transaction = new SerializableTransaction(
                 consentRequestBlock.getTransactionId(),
                 medicalRecord,
-                consentRequestBlock.getSenderPubKey(),
                 consentRequestBlock.getSenderAddress(),
                 consentRequestBlock.getRecipientAddress(),
                 consentRequestBlock.getSignature()
@@ -338,6 +328,7 @@ private KeyUtil keyUtil;
         SerializableBlock block = new SerializableBlock(blockHeader, transaction);
 
         return new UserConsentRequest(
+                consentRequestBlock.getRequestUUID(),
                 block,
                 consentRequestBlock.getProviderUUID(),
                 consentRequestBlock.getNetworkUUID(),
