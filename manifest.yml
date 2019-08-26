@@ -1,7 +1,13 @@
 ---
 applications:
 - name: ehrroute
-random-route: true
-path: build/libs/EhrRoute-0.0.1-SNAPSHOT.jar
-memory: 256M
-instances: 1
+  random-route: true
+  path: build/libs/EhrRoute-0.0.1-SNAPSHOT.jar
+  memory: 256M
+  instances: 1
+  services:
+    - "ehrroute-db"
+  #timeout: 600
+  #env:
+  #  JAVA_OPTS: '-Xss228k -Xmx170M -XX:ReservedCodeCacheSize=40M -XX:MaxDirectMemorySize=10M'
+  #  JBP_CONFIG_OPEN_JDK_JRE: '{ memory_calculator: { stack_threads: 35} }'
