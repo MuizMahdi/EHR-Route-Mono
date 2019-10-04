@@ -112,11 +112,7 @@ public class AuthController
         String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
         eventPublisher.publishEvent(new RegistrationCompleteEvent(user, appUrl));
 
-        URI location = ServletUriComponentsBuilder
-        .fromCurrentContextPath().path("/users/{username}")
-        .buildAndExpand(user.getUsername()).toUri();
-
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
     }
 
 
@@ -169,14 +165,7 @@ public class AuthController
     public ResponseEntity<?> roleChangeToken(@Valid @RequestBody RoleChangeRequest roleChangeRequest, @CurrentUser UserPrincipal currentUser)
     {
         // User who's role is going to be changed
-        User user = userService.findUserByUsernameOrEmail(roleChangeRequest.getUsername());
-
-        if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User doesn't exists"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
+        User user = userService.findUserByAddress(roleChangeRequest.getAddress());
 
         // Get current app url
         String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toString();
@@ -190,11 +179,7 @@ public class AuthController
         // Send a role change token to the user's email
         eventPublisher.publishEvent(new RoleChangeEvent(user, appUrl, role, providerInstitution));
 
-        URI location = ServletUriComponentsBuilder
-        .fromCurrentContextPath().path("/users/{username}")
-        .buildAndExpand(user.getUsername()).toUri();
-
-        return ResponseEntity.created(location).body(new ApiResponse(true, "Role change token sent successfully"));
+        return ResponseEntity.ok(new ApiResponse(true, "Role change token sent successfully"));
     }
 
 

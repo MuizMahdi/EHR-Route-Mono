@@ -88,7 +88,7 @@ public class UserService
 
         return new UserInfo(
             userID,
-            user.getUsername(),
+            user.getAddress(),
             user.getEmail(),
             userRoles,
             user.isFirstLogin(),
@@ -116,6 +116,14 @@ public class UserService
 
 
     @Transactional
+    public User findUserByAddress(String address) {
+        return userRepository.findByAddress(address).orElseThrow(() ->
+            new ResourceNotFoundException("User", "address", address)
+        );
+    }
+
+
+    @Transactional
     public boolean isValidUserUsername(String username) {
         return findUserByUsernameOrEmail(username) != null;
     }
@@ -137,10 +145,10 @@ public class UserService
 
 
     @Transactional
-    public Set<Role> findUserRoles(String username) {
+    public Set<Role> findUserRoles(Long id) {
         // Find user by username
-        User user = userRepository.findByUsername(username).orElseThrow(() ->
-           new ResourceNotFoundException("User", "username", username)
+        User user = userRepository.findById(id).orElseThrow(() ->
+           new ResourceNotFoundException("User", "ID", id)
         );
 
         // Return user roles
@@ -169,11 +177,7 @@ public class UserService
         Set<Network> userNetworks = user.getNetworks();
 
         if (userNetworks == null || userNetworks.isEmpty()) {
-            throw new NullUserNetworkException(
-                "User with username: [" +
-                user.getUsername() +
-                "] is not registered in any network."
-            );
+            throw new ResourceNotFoundException("Networks", "user with address", user.getAddress());
         }
 
         return userNetworks;

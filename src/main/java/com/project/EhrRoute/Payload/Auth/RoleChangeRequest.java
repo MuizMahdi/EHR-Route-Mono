@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 public class RoleChangeRequest
 {
     @NotBlank
-    private String username;
+    private String address;
 
     @NotBlank
     private String role;
@@ -12,13 +12,13 @@ public class RoleChangeRequest
     public String getRole() {
         return role;
     }
-    public String getUsername() {
-        return username;
+    public String getAddress() {
+        return address;
     }
     public void setRole(String role) {
         this.role = role;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

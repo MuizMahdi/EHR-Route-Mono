@@ -6,10 +6,6 @@ import javax.validation.constraints.Size;
 public class SignUpRequest
 {
     @NotBlank
-    @Size(min=4, max=40)
-    private String name;
-
-    @NotBlank
     @Size(min=3, max=15)
     private String username;
 
@@ -22,9 +18,6 @@ public class SignUpRequest
     @Size(min=6, max=20)
     private String password;
 
-    public String getName() {
-        return name;
-    }
     public String getEmail() {
         return email;
     }
@@ -35,9 +28,6 @@ public class SignUpRequest
         return password;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
     public void setEmail(String email) {
         this.email = email;
     }

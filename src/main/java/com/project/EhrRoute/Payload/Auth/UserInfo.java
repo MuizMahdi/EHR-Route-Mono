@@ -5,17 +5,16 @@ import java.util.List;
 public class UserInfo
 {
     private Long id;
-    private String username;
-    private String name;
+    private String address;
     private String email;
     private List<String> roles;
     private boolean isFirstLogin;
     private boolean hasAddedInfo;
 
 
-    public UserInfo(Long id, String username, String email, List<String> roles, boolean isFirstLogin, boolean hasAddedInfo) {
+    public UserInfo(Long id, String address, String email, List<String> roles, boolean isFirstLogin, boolean hasAddedInfo) {
         this.id = id;
-        this.username = username;
+        this.address = address;
         this.email = email;
         this.roles = roles;
         this.isFirstLogin = isFirstLogin;
@@ -29,8 +28,8 @@ public class UserInfo
     public String getEmail() {
         return email;
     }
-    public String getUsername() {
-        return username;
+    public String getAddress() {
+        return address;
     }
     public List<String> getRoles() {
         return roles;
@@ -51,8 +50,8 @@ public class UserInfo
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setAddress(String address) {
+        this.address = address;
     }
     public void setFirstLogin(boolean isFirstLogin) {
         this.isFirstLogin = isFirstLogin;

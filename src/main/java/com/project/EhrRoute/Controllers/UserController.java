@@ -77,7 +77,7 @@ public class UserController
 
         try {
             // Get the user's set of Role
-            userRoles = userService.findUserRoles(currentUser.getUsername());
+            userRoles = userService.findUserRoles(currentUser.getId());
         }
         catch(ResourceNotFoundException Ex) {
             return new ResponseEntity<>(
