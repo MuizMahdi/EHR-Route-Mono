@@ -47,19 +47,26 @@ public class User extends DateAudit
     @Column(name = "hasAddedInfo")
     private boolean hasAddedInfo;
 
+    @Column(name = "address")
+    private String address;
+
+    @Lob
+    @Column(name = "publicKey")
+    private String publicKey;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_network",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "network_id")
+        name = "user_network",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "network_id")
     )
     private Set<Network> networks;
 
@@ -71,12 +78,13 @@ public class User extends DateAudit
         this.email = email;
         this.password = password;
         this.isEnabled = true;
-
         // Gets changed to false after first login
         this.isFirstLogin = true;
-
-        // Indicates whether a user has added their personal info (which gets added to their EHR/Block upon giving consent)
+        // Indicates whether a user has added their personal info (which gets saved locally on their devices)
         this.hasAddedInfo = false;
+        // Address and public key are added after account verification on first login
+        this.address = "";
+        this.publicKey = "";
     }
 
 
@@ -100,6 +108,9 @@ public class User extends DateAudit
     public Set<Role> getRoles() {
         return roles;
     }
+    public String getAddress() {
+        return address;
+    }
     public String getUsername() {
         return username;
     }
@@ -108,6 +119,9 @@ public class User extends DateAudit
     }
     public boolean isEnabled() {
         return isEnabled;
+    }
+    public String getPublicKey() {
+        return publicKey;
     }
     public Set<Network> getNetworks() {
         return networks;
@@ -134,11 +148,17 @@ public class User extends DateAudit
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
     }
+    public void setAddress(String address) {
+        this.address = address;
+    }
     public void setUsername(String username) {
         this.username = username;
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
     public void setNetworks(Set<Network> networks) {
         this.networks = networks;

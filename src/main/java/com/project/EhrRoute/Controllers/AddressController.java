@@ -65,10 +65,6 @@ public class AddressController
             );
         }
 
-        // Update user as non-first login
-        user.setFirstLogin(false);
-        userService.saveUser(user);
-
         // Generate keypair
         KeyPair keyPair = rsaUtil.rsaGenerateKeyPair();
         PublicKey pubKey = keyPair.getPublic();
@@ -81,6 +77,16 @@ public class AddressController
         String publicKey = keyUtil.getStringFromPublicKey(pubKey);
         String privateKey = keyUtil.getStringFromPrivateKey(privKey);
 
+        // Save user's address and public key
+        user.setAddress(address);
+        user.setPublicKey(publicKey);
+
+        // Update user's first login status
+        user.setFirstLogin(false);
+
+        // Persist updates
+        userService.saveUser(user);
+
         /*
         // Check if user doesn't have a 'Provider' or 'Admin' role
         if (!userService.userHasRole(user, RoleName.ROLE_PROVIDER) && !userService.userHasRole(user, RoleName.ROLE_ADMIN)) {
@@ -90,10 +96,7 @@ public class AddressController
         */
 
         // Return Address Response
-        return new ResponseEntity<>(
-            new AddressResponse(address, publicKey, privateKey),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new AddressResponse(address, publicKey, privateKey));
     }
 
 }
