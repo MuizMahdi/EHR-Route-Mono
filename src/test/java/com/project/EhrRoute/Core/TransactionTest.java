@@ -39,7 +39,6 @@ public class TransactionTest
         Address recipientAddress = mock(Address.class);
         transaction.setSenderAddress(senderAddress);
         transaction.setRecipientAddress(recipientAddress);
-        transaction.setSenderPubKey(publicKey);
         transaction.setRecord(medicalRecord);
 
         when(jsonUtil.createJson(medicalRecord)).thenReturn("RecordJson");

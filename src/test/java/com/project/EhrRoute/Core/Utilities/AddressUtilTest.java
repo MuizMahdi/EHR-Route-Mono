@@ -76,7 +76,6 @@ public class AddressUtilTest
             when(address.getAddress()).thenReturn("Address");
 
             Transaction transaction = mock(Transaction.class);
-            when(transaction.getSenderPubKey()).thenReturn(publicKey);
             when(transaction.getSenderAddress()).thenReturn(address);
 
             addressUtil.confirmTransactionSenderAddress(transaction);
