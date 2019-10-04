@@ -13,10 +13,9 @@ public class UserInfo
     private boolean hasAddedInfo;
 
 
-    public UserInfo(Long id, String username, String name, String email, List<String> roles, boolean isFirstLogin, boolean hasAddedInfo) {
+    public UserInfo(Long id, String username, String email, List<String> roles, boolean isFirstLogin, boolean hasAddedInfo) {
         this.id = id;
         this.username = username;
-        this.name = name;
         this.email = email;
         this.roles = roles;
         this.isFirstLogin = isFirstLogin;
@@ -26,9 +25,6 @@ public class UserInfo
 
     public Long getId() {
         return id;
-    }
-    public String getName() {
-        return name;
     }
     public String getEmail() {
         return email;
@@ -48,9 +44,6 @@ public class UserInfo
 
     public void setId(Long id) {
         this.id = id;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public void setEmail(String email) {
         this.email = email;

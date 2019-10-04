@@ -49,10 +49,9 @@ public class UserService
     public User createUser(SignUpRequest request) {
         // Create user from request data
         User user = new User(
-                request.getName(),
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword()
+            request.getUsername(),
+            request.getEmail(),
+            request.getPassword()
         );
 
         // Bcrypt hash the password
@@ -90,7 +89,6 @@ public class UserService
         return new UserInfo(
             userID,
             user.getUsername(),
-            user.getName(),
             user.getEmail(),
             userRoles,
             user.isFirstLogin(),

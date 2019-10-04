@@ -9,10 +9,8 @@ import com.project.EhrRoute.Repositories.NetworkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -133,7 +131,9 @@ public class NetworkService
     @Transactional
     private List<String> getNetworkMembersNames(String networkUUID) {
         Set<User> networkMembers = getNetworkMembers(networkUUID);
-        return networkMembers.stream().map(User::getName).collect(Collectors.toList());
+        // TODO: TEMPORARILY RETURN FORGED ARRAY UNTIL CHANGE
+        // networkMembers.stream().map(User::getName).collect(Collectors.toList());
+        return new ArrayList<>(Arrays.asList("MemberA", "MemberB", "MemberC"));
     }
 
 

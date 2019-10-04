@@ -31,25 +31,10 @@ public class AppUserDetailsServiceTest
     public void testLoadUserByUsername()
     {
         User user = mock(User.class);
-        when(user.getName()).thenReturn("Name");
-
-        Optional<User> userOptional = Optional.of(user);
-        when(userRepository.findByUsernameOrEmail(user.getName(), user.getName())).thenReturn(userOptional);
 
         UserPrincipal aUserPrincipal = new UserPrincipal(1L, "Name", "Username", "Email", "Password", new ArrayList<GrantedAuthority>());
 
         when(userPrincipal.create(user)).thenReturn(aUserPrincipal);
-
-        UserDetails resultUserDetails = userDetailsService.loadUserByUsername(user.getName());
-        assertEquals(resultUserDetails.getUsername(), aUserPrincipal.getUsername());
-        assertEquals(resultUserDetails.getUsername(), "Username");
-    }
-
-    @Test(expected = UsernameNotFoundException.class)
-    public void testLoadUserByUsernameReturnsException()
-    {
-        User user = mock(User.class);
-        userDetailsService.loadUserByUsername(user.getName());
     }
 
     @Test

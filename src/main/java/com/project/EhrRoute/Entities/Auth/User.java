@@ -21,10 +21,6 @@ public class User extends DateAudit
     private Long id;
 
     @NotBlank
-    @Size(max=40)
-    private String name;
-
-    @NotBlank
     @Size(max=15)
     private String username;
 
@@ -72,8 +68,7 @@ public class User extends DateAudit
 
 
     public User() { }
-    public User(@NotBlank @Size(max = 40) String name, @NotBlank @Size(max = 15) String username, @NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
-        this.name = name;
+    public User(@NotBlank @Size(max = 15) String username, @NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -98,9 +93,6 @@ public class User extends DateAudit
 
     public Long getId() {
         return id;
-    }
-    public String getName() {
-        return name;
     }
     public String getEmail() {
         return email;
@@ -135,9 +127,6 @@ public class User extends DateAudit
 
     public void setId(Long id) {
         this.id = id;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public void setEmail(String email) {
         this.email = email;
