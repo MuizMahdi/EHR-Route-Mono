@@ -61,11 +61,7 @@ public class AuthController
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInRequest signInRequest)
     {
         // Get User
-        User user = userService.findUserByUsernameOrEmail(signInRequest.getUsernameOrEmail());
-
-        if(user == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User doesn't exist, wrong login credentials"));
-        }
+        User user = userService.findUserByAddressOrEmail(signInRequest.getAddressOrEmail());
 
         if (!user.isEnabled()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "User didn't verify email"));
@@ -74,7 +70,7 @@ public class AuthController
         // Auth
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                signInRequest.getUsernameOrEmail(),
+                signInRequest.getAddressOrEmail(),
                 signInRequest.getPassword()
             )
         );

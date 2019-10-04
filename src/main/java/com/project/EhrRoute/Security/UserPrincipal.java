@@ -72,7 +72,7 @@ public class UserPrincipal implements UserDetails
 
     @Override
     public String getUsername() {
-        return "";
+        return address;
     }
 
     @Override

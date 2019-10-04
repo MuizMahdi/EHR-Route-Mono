@@ -4,7 +4,7 @@ import javax.validation.constraints.NotBlank;
 public class SignInRequest
 {
     @NotBlank
-    private String usernameOrEmail;
+    private String addressOrEmail;
 
     @NotBlank
     private String password;
@@ -12,13 +12,13 @@ public class SignInRequest
     public String getPassword() {
         return password;
     }
-    public String getUsernameOrEmail() {
-        return usernameOrEmail;
+    public String getAddressOrEmail() {
+        return addressOrEmail;
     }
     public void setPassword(String password) {
         this.password = password;
     }
-    public void setUsernameOrEmail(String usernameOrEmail) {
-        this.usernameOrEmail = usernameOrEmail;
+    public void setAddressOrEmail(String addressOrEmail) {
+        this.addressOrEmail = addressOrEmail;
     }
 }

@@ -33,10 +33,10 @@ public class AppUserDetailsService implements UserDetailsService
     @Override
     @Transactional
     // Returns a UserDetails object that Spring Security uses for performing various authentication and role based validations.
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String addressOrEmail) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() ->
-            new UsernameNotFoundException("User User not found with username or email: " + usernameOrEmail)
+        User user = userRepository.findByAddressOrEmail(addressOrEmail, addressOrEmail).orElseThrow(() ->
+            new UsernameNotFoundException("User User not found with address or email: " + addressOrEmail)
         );
 
         return userPrincipal.create(user);

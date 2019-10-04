@@ -108,6 +108,16 @@ public class UserService
 
 
     @Transactional
+    public User findUserByAddressOrEmail(String addressOrEmail) {
+        User user = userRepository.findByAddressOrEmail(addressOrEmail, addressOrEmail).orElseThrow(
+            () -> new ResourceNotFoundException("User", "address/email", addressOrEmail)
+        );
+
+        return user;
+    }
+
+
+    @Transactional
     public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
             new ResourceNotFoundException("User", "userID", id)
