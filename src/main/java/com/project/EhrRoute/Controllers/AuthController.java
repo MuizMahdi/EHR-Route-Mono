@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Set;
@@ -63,25 +64,19 @@ public class AuthController
         User user = userService.findUserByUsernameOrEmail(signInRequest.getUsernameOrEmail());
 
         if(user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User doesn't exist, wrong login credentials"),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User doesn't exist, wrong login credentials"));
         }
 
         if (!user.isEnabled()) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User didn't verify email"),
-                HttpStatus.UNAUTHORIZED
-            );
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse(false, "User didn't verify email"));
         }
 
         // Auth
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        signInRequest.getUsernameOrEmail(),
-                        signInRequest.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                signInRequest.getUsernameOrEmail(),
+                signInRequest.getPassword()
+            )
         );
 
         // Set Auth in SecurityContextHolder
@@ -98,12 +93,8 @@ public class AuthController
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest)
     {
-        if(userService.userEmailExists(signUpRequest.getEmail()))
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Email Address already in use!"),
-                HttpStatus.BAD_REQUEST
-            );
+        if(userService.userEmailExists(signUpRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email Address already in use"));
         }
 
         User user = userService.createUser(signUpRequest);
@@ -117,7 +108,7 @@ public class AuthController
 
 
     @RequestMapping("/registration-confirm/{verificationToken}")
-    public ResponseEntity<ApiResponse> confirmRegistration(@PathVariable("verificationToken") String token)
+    public ResponseEntity<ApiResponse> confirmRegistration(@NotBlank @PathVariable("verificationToken") String token)
     {
         // Get current calendar time
         Calendar cal = Calendar.getInstance();
@@ -126,23 +117,13 @@ public class AuthController
         VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
 
         // Invalid token
-        if (verificationToken == null)
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid or expired email verification link "),
-                HttpStatus.BAD_REQUEST
-            );
-
+        if (verificationToken == null) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid or expired email verification link"));
         }
 
         // Expired token
-        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0)
-        {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Expired email verification link"),
-                HttpStatus.BAD_REQUEST
-            );
-
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Expired email verification link"));
         }
 
         User user = verificationToken.getUser(); // Get the token's user
@@ -153,10 +134,7 @@ public class AuthController
         // Update user isEnabled on DB
         userService.saveUser(user);
 
-        return new ResponseEntity<>(
-                new ApiResponse(true, "User account verified successfully"),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "User account verified successfully"));
     }
 
 
@@ -187,12 +165,7 @@ public class AuthController
     public ResponseEntity<ApiResponse> roleChange(@PathVariable("verificationToken") String token, @RequestParam("role") String role, @RequestParam("institution") String institutionName)
     {
         // Check if role is a valid role
-        if (!isRoleValid(role)) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid Role"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
+        if (!isRoleValid(role)) return ResponseEntity.notFound().build();
 
         // Get current calendar time
         Calendar cal = Calendar.getInstance();
@@ -202,18 +175,12 @@ public class AuthController
 
         // Invalid token
         if (verificationToken == null) {
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Invalid or expired role change token"),
-                    HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid role change token"));
         }
 
         // Expired token
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-            return new ResponseEntity<>(
-                    new ApiResponse(false, "Expired role change token"),
-                    HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Expired role change token"));
         }
 
         // Get the token's user
@@ -235,10 +202,7 @@ public class AuthController
         // Persist the user updates to DB
         userService.saveUser(user);
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "User Role Was Added Successfully."),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "User Role Was Added Successfully."));
     }
 
 

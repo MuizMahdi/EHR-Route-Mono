@@ -27,8 +27,7 @@ public class VerificationTokenService
 
 
     @Transactional
-    public VerificationToken getVerificationToken(String token)
-    {
+    public VerificationToken getVerificationToken(String token) {
         return verificationTokenRepository.findByToken(token);
     }
 }
