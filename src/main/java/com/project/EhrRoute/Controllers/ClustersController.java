@@ -60,7 +60,7 @@ public class ClustersController
         logger.info("-----[ NODE [" + nodeUUID + "] SUBSCRIBED TO PROVIDERS ]-----");
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
+        //emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
         emitter.onError(error -> clustersContainer.removeNode(nodeUUID));
         emitter.onCompletion(() -> clustersContainer.removeNode(nodeUUID));
 
@@ -89,7 +89,7 @@ public class ClustersController
         logger.info("-----[ NODE [" + nodeUUID + "] SUBSCRIBED TO CONSUMERS ]-----");
 
         // Remove the emitter on timeout/error/completion
-        emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
+        //emitter.onTimeout(() -> clustersContainer.removeNode(nodeUUID));
         emitter.onError(error -> clustersContainer.removeNode(nodeUUID));
         emitter.onCompletion(() -> clustersContainer.removeNode(nodeUUID));
 
