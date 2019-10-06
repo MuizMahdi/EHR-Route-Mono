@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 
@@ -61,28 +62,11 @@ public class ProviderController
 
 
     @PostMapping("/current/address")
-    public ResponseEntity setCurrentProviderAddress(@Valid @RequestBody SimpleStringPayload address, @CurrentUser UserPrincipal currentUser)
+    public ResponseEntity setCurrentProviderAddress(@RequestBody @Valid @NotBlank SimpleStringPayload address, @CurrentUser UserPrincipal currentUser)
     {
-        // Validate authentication
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
-
-        if (user != null && !(address.getPayload().isEmpty()))
-        {
-            String providerAddress = address.getPayload();
-            System.out.println("Address payload: " + address.getPayload());
-            providerService.setProviderAddress(user, providerAddress);
-        }
-
-        return ResponseEntity.ok(
-            new ApiResponse(true, "Address was saved successfully")
-        );
+        User user = userService.findUserById(currentUser.getId());
+        providerService.setProviderAddress(user, address.getPayload());
+        return ResponseEntity.ok(new ApiResponse(true, "Address was saved successfully"));
     }
 
 
@@ -103,9 +87,9 @@ public class ProviderController
     }
 
 
-    @GetMapping("/search-providers-by-username")
-    public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerUsername)
+    @GetMapping("/search-providers-by-address")
+    public List<String> searchProvidersUsernamesByUsername(@RequestParam("keyword") String providerAddress)
     {
-        return userService.searchProviderUsername(providerUsername);
+        return userService.searchProvider(providerAddress);
     }
 }

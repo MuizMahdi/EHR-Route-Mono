@@ -2,25 +2,25 @@ package com.project.EhrRoute.Payload.App;
 
 public class ProviderAdditionRequest
 {
-    private String username;
+    private String address;
     private String institutionName;
 
 
     public ProviderAdditionRequest() { }
-    public ProviderAdditionRequest(String username, String institutionName) {
-        this.username = username;
+    public ProviderAdditionRequest(String address, String institutionName) {
+        this.address = address;
         this.institutionName = institutionName;
     }
 
 
-    public String getUsername() {
-        return username;
+    public String getAddress() {
+        return address;
     }
     public String getInstitutionName() {
         return institutionName;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setAddress(String address) {
+        this.address = address;
     }
     public void setInstitutionName(String institutionName) {
         this.institutionName = institutionName;

@@ -56,9 +56,7 @@ public class UserController
             );
         }
 
-        return ResponseEntity.ok(
-            userService.getUserInfo(currentUser.getId())
-        );
+        return ResponseEntity.ok(userService.getUserInfo(currentUser.getId()));
     }
 
 
@@ -107,21 +105,7 @@ public class UserController
     @PreAuthorize("hasRole('PROVIDER')")
     public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
     {
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
-
-        if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not found on DB"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
+        User user = userService.findUserById(currentUser.getId());
 
         Set<Network> userNetworks;
 
@@ -129,19 +113,13 @@ public class UserController
             userNetworks = userService.findUserNetworks(user);
         }
         catch (NullUserNetworkException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.NOT_FOUND
-            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, Ex.getMessage()));
         }
 
         // Map Networks set to UserNetworksResponse payload
         UserNetworksResponse userNetworksResponse = modelMapper.mapNetworksToUserNetworksResponse(userNetworks);
 
-        return new ResponseEntity<>(
-            userNetworksResponse,
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(userNetworksResponse);
     }
 
 
@@ -180,29 +158,19 @@ public class UserController
     }
 
 
-    @GetMapping("/search-by-username")
-    public List<String> searchUsersnamesByUsername(@RequestParam("keyword") String username)
+    @GetMapping("/search-by-address")
+    public List<String> searchUsersnamesByAddress(@RequestParam("keyword") String address)
     {
-        return userService.searchUsername(username);
+        return userService.searchAddress(address);
     }
 
 
-    @GetMapping("/get-by-username/{username}")
+    @GetMapping("/{address}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity getUserByUsername(@PathVariable("username") String username)
+    public ResponseEntity getUserByUsername(@PathVariable("address") String address)
     {
-        User user = userService.findUserByUsernameOrEmail(username);
-
-        if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Invalid username"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        return ResponseEntity.ok (
-            userService.getUserInfo(user.getId())
-        );
+        User user = userService.findUserByAddress(address);
+        return ResponseEntity.ok (userService.getUserInfo(user.getId()));
     }
 
 
@@ -211,13 +179,7 @@ public class UserController
     public ResponseEntity addProvider(@Valid @RequestBody ProviderAdditionRequest providerAdditionRequest)
     {
         /* Get and validate user with username */
-        User user = userService.findUserByUsernameOrEmail(providerAdditionRequest.getUsername());
-
-        if (user == null) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse(false, "Invalid username in provider addition request")
-            );
-        }
+        User user = userService.findUserByAddress(providerAdditionRequest.getAddress());
 
         /* Set user's role to Provider */
         // Get the role
@@ -236,8 +198,6 @@ public class UserController
         // Create an institution and generate provider details for user
         providerService.generateInstitutionProviderDetails(user, providerAdditionRequest.getInstitutionName());
 
-        return ResponseEntity.ok(
-            new ApiResponse(true, "Provider has been successfully added")
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "Provider has been successfully added"));
     }
 }

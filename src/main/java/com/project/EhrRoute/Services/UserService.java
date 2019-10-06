@@ -97,16 +97,6 @@ public class UserService
 
 
     @Transactional
-    public User findUserByUsernameOrEmail(String usernameOrEmail) {
-        User user = userRepository.findByUsernameOrEmail(
-                usernameOrEmail, usernameOrEmail
-        ).orElse(null);
-
-        return user;
-    }
-
-
-    @Transactional
     public User findUserByAddressOrEmail(String addressOrEmail) {
         User user = userRepository.findByAddressOrEmail(addressOrEmail, addressOrEmail).orElseThrow(
             () -> new ResourceNotFoundException("User", "address/email", addressOrEmail)
@@ -130,13 +120,6 @@ public class UserService
             new ResourceNotFoundException("User", "address", address)
         );
     }
-
-
-    @Transactional
-    public boolean isValidUserUsername(String username) {
-        return findUserByUsernameOrEmail(username) != null;
-    }
-
 
     @Transactional
     public boolean isUserFirstLogin(Long id)
@@ -224,14 +207,14 @@ public class UserService
 
 
     @Transactional
-    public List<String> searchUsername(String usernameKeyword) {
-        return userRepository.searchUsernamesByUsername(usernameKeyword);
+    public List<String> searchAddress(String addressKeyword) {
+        return userRepository.searchAddressesByAddress(addressKeyword);
     }
 
 
     @Transactional
-    public List<String> searchProviderUsername(String usernameKeyword) {
-        return userRepository.searchProvidersUsernamesByUsername(usernameKeyword);
+    public List<String> searchProvider(String addressKeyword) {
+        return userRepository.searchProvidersAddressesByAddress(addressKeyword);
     }
 
 

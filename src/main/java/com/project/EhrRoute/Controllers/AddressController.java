@@ -47,22 +47,11 @@ public class AddressController
     public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException
     {
         // Get user
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
-
-        // Validate user
-        if (user == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in. Invalid user"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
+        User user = userService.findUserById(currentUser.getId());
 
         // If its not the user's first time login
         if (!user.isFirstLogin()) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "Not the user's first login, user already has an address"),
-                HttpStatus.CONFLICT
-            );
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "Not the user's first login, user already has an address"));
         }
 
         // Generate keypair
