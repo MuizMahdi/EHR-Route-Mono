@@ -15,7 +15,7 @@ public class NetworkInvitationRequest
     // Invitation sender name
     @NotNull
     @NotBlank
-    private String senderName;
+    private String senderAddress;
 
     // Network that has been invited to join
     @NotNull
@@ -34,8 +34,8 @@ public class NetworkInvitationRequest
 
 
     public NetworkInvitationRequest() { }
-    public NetworkInvitationRequest(@NotNull @NotBlank String senderName, @NotNull @NotBlank String networkName, @NotNull @NotBlank String networkUUID, @NotNull @NotBlank String invitationToken) {
-        this.senderName = senderName;
+    public NetworkInvitationRequest(@NotNull @NotBlank String senderAddress, @NotNull @NotBlank String networkName, @NotNull @NotBlank String networkUUID, @NotNull @NotBlank String invitationToken) {
+        this.senderAddress = senderAddress;
         this.networkName = networkName;
         this.networkUUID = networkUUID;
         this.invitationToken = invitationToken;
@@ -45,8 +45,8 @@ public class NetworkInvitationRequest
     public Long getId() {
         return id;
     }
-    public String getSenderName() {
-        return senderName;
+    public String getSenderAddress() {
+        return senderAddress;
     }
     public String getNetworkName() {
         return networkName;
@@ -61,8 +61,8 @@ public class NetworkInvitationRequest
     public void setId(Long id) {
         this.id = id;
     }
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setSenderAddress(String senderAddress) {
+        this.senderAddress = senderAddress;
     }
     public void setNetworkName(String networkName) {
         this.networkName = networkName;

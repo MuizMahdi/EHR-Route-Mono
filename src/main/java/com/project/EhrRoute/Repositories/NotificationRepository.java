@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long>
 {
-    // TODO(MAYBE): FIND USER NOTIFICATION BY NOTIFICATION TYPE
+    // TODO: FIND USER NOTIFICATION BY NOTIFICATION TYPE
     Page<Notification> findByRecipient(User recipient, Pageable pageable);
 }

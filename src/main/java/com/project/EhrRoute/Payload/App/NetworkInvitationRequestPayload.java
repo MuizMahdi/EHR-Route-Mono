@@ -1,19 +1,20 @@
 package com.project.EhrRoute.Payload.App;
-
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class NetworkInvitationRequestPayload
 {
-    private String recipientUsername;
-    private String senderUsername;
-    private String networkName;
-    private String networkUUID;
-    private String invitationToken;
+    @NotNull @NotBlank private String recipientAddress;
+    @NotNull @NotBlank private String senderAddress;
+    @NotNull @NotBlank private String networkName;
+    @NotNull @NotBlank private String networkUUID;
+    @NotNull @NotBlank private String invitationToken;
 
 
     public NetworkInvitationRequestPayload() { }
-    public NetworkInvitationRequestPayload(String recipientUsername, String senderUsername, String networkName, String networkUUID, String invitationToken) {
-        this.recipientUsername = recipientUsername;
-        this.senderUsername = senderUsername;
+    public NetworkInvitationRequestPayload(String recipientAddress, String senderAddress, String networkName, String networkUUID, String invitationToken) {
+        this.recipientAddress = recipientAddress;
+        this.senderAddress = senderAddress;
         this.networkName = networkName;
         this.networkUUID = networkUUID;
         this.invitationToken = invitationToken;
@@ -26,14 +27,14 @@ public class NetworkInvitationRequestPayload
     public String getNetworkUUID() {
         return networkUUID;
     }
-    public String getSenderUsername() {
-        return senderUsername;
+    public String getSenderAddress() {
+        return senderAddress;
     }
     public String getInvitationToken() {
         return invitationToken;
     }
-    public String getRecipientUsername() {
-        return recipientUsername;
+    public String getRecipientAddress() {
+        return recipientAddress;
     }
     public void setNetworkName(String networkName) {
         this.networkName = networkName;
@@ -41,13 +42,13 @@ public class NetworkInvitationRequestPayload
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;
     }
-    public void setSenderUsername(String senderUsername) {
-        this.senderUsername = senderUsername;
+    public void setSenderAddress(String senderAddress) {
+        this.senderAddress = senderAddress;
     }
     public void setInvitationToken(String invitationToken) {
         this.invitationToken = invitationToken;
     }
-    public void setRecipientUsername(String recipientUsername) {
-        this.recipientUsername = recipientUsername;
+    public void setRecipientAddress(String recipientAddress) {
+        this.recipientAddress = recipientAddress;
     }
 }

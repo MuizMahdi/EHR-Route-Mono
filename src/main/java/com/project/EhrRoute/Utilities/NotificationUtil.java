@@ -56,8 +56,7 @@ public class NotificationUtil
         }
 
         String message =
-        notification.getSender().getUsername() + " from the " +
-        requesterNetworkName + " network, " +
+        "A provider from the " + requesterNetworkName + " network, " +
         " is asking for your consent to exchange your health record data.";
 
         return message;
@@ -72,8 +71,7 @@ public class NotificationUtil
         }
 
         String message =
-        notification.getSender().getUsername() + " from the " +
-        invitationRequest.getNetworkName() +
+        "A provider from the " + invitationRequest.getNetworkName() +
         " [" + invitationRequest.getNetworkUUID() + "] " + " network, " +
         " has invited you to join their network.";
 

@@ -49,7 +49,6 @@ public class UserService
     public User createUser(SignUpRequest request) {
         // Create user from request data
         User user = new User(
-            request.getUsername(),
             request.getEmail(),
             request.getPassword()
         );

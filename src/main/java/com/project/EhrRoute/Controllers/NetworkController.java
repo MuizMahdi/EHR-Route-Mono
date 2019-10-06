@@ -11,6 +11,7 @@ import com.project.EhrRoute.Entities.Core.Network;
 import com.project.EhrRoute.Entities.Core.UpdateConsentRequest;
 import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.NullUserNetworkException;
+import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.NotificationType;
 import com.project.EhrRoute.Payload.App.NetworkDetails;
 import com.project.EhrRoute.Payload.App.NetworkInvitationRequestPayload;
@@ -27,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.Calendar;
 import java.util.List;
 
@@ -68,16 +71,8 @@ public class NetworkController
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity createNetwork(@RequestBody String networkName, @CurrentUser UserPrincipal currentUser) throws Exception
     {
-        if (currentUser == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not logged in"));
-        }
-
         // Get current logged in user
-        User user = userService.findUserByUsernameOrEmail(currentUser.getUsername());
-
-        if (user == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User not found"));
-        }
+        User user = userService.findUserById(currentUser.getId());
 
         // Initialize genesis block, a random network UUID is generated for every call,
         // thus the hash of the block will also change.
@@ -166,18 +161,10 @@ public class NetworkController
             networkUUID = networkService.getNetworkUuidByName(networkName);
         }
         catch (NullUserNetworkException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
 
-        System.out.println(networkUUID);
-
-        return new ResponseEntity<>(
-            new SimpleStringPayload(networkUUID),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new SimpleStringPayload(networkUUID));
     }
 
 
@@ -191,14 +178,10 @@ public class NetworkController
             networkDetails = networkService.getNetworkDetails(networkUUID);
         }
         catch (Exception Ex) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse(false, Ex.getMessage())
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
 
-        return ResponseEntity.ok(
-            networkDetails
-        );
+        return ResponseEntity.ok(networkDetails);
     }
 
 
@@ -214,24 +197,21 @@ public class NetworkController
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity sendNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationRequest)
     {
-        // Get the invitation recipient and sender from NetworkInvitationRequestPayload data
-        User recipient = userService.findUserByUsernameOrEmail(invitationRequest.getRecipientUsername());
-        User sender = userService.findUserByUsernameOrEmail(invitationRequest.getSenderUsername());
         Network network = networkService.findNetwork(invitationRequest.getNetworkUUID());
+        User recipient;
+        User sender;
 
-        // Validate recipient
-        if (recipient == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid recipient username on invitation request"));
+        try {
+            recipient = userService.findUserByAddressOrEmail(invitationRequest.getRecipientAddress());
+            sender = userService.findUserByAddressOrEmail(invitationRequest.getSenderAddress());
         }
-
-        // Validate sender
-        if (sender == null) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid sender username on invitation request"));
+        catch (ResourceNotFoundException Ex) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Invalid recipient or sender address"));
         }
 
         // Check if recipient is already on network
         if (userService.userHasNetwork(recipient, network)) {
-            return new ResponseEntity<>(new ApiResponse(false, "User is already on the network"), HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(false, "User is already on the network"));
         }
 
         // Create a Notification object
@@ -240,7 +220,7 @@ public class NetworkController
         // Generate(and save) a NetworkInvitationRequest using NetworkInvitationRequestService
         NetworkInvitationRequest networkInvitationRequest = invitationRequestService.generateInvitationRequest(
             recipient,
-            invitationRequest.getSenderUsername(),
+            invitationRequest.getSenderAddress(),
             invitationRequest.getNetworkName(),
             invitationRequest.getNetworkUUID()
         );
@@ -262,7 +242,7 @@ public class NetworkController
 
     @PostMapping("/invitation-accept")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity acceptNetworkInvitationRequest(@RequestBody NetworkInvitationRequestPayload invitationResponse)
+    public ResponseEntity acceptNetworkInvitationRequest(@RequestBody @Valid NetworkInvitationRequestPayload invitationResponse)
     {
         NetworkInvitationRequest invitationRequest = modelMapper.mapInvitationResponseToRequest(invitationResponse);
 
@@ -285,7 +265,7 @@ public class NetworkController
             }
 
             // Add Network to User's networks
-            addUserNetwork(invitationResponse.getRecipientUsername(), invitationResponse.getNetworkUUID());
+            addUserNetwork(invitationResponse.getRecipientAddress(), invitationResponse.getNetworkUUID());
         }
         else {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "Invitation request doesn't exist"));
@@ -294,20 +274,15 @@ public class NetworkController
         return ResponseEntity.ok(new ApiResponse(true, "Invitation request accepted"));
     }
 
-    private void addUserNetwork(String invitedUserUsername, String networkUUID) {
+    private void addUserNetwork(String invitedUserAddress, String networkUUID) {
 
         // Get the invited User object
-        User invitedUser = userService.findUserByUsernameOrEmail(invitedUserUsername);
-
-        // Handle user not found on DB
-        if (invitedUser == null) {
-            throw new BadRequestException("A user with username: " + invitedUserUsername + " was not found. Adding network to user networks failed.");
-        }
+        User invitedUser = userService.findUserByAddress(invitedUserAddress);
 
         // Get the network of networkUUID
         Network network = networkService.findNetwork(networkUUID);
 
-        // Add network to user networks if no error occurred
+        // Add network to user networks
         invitedUser.addNetwork(network);
 
         // Save user to persist changes

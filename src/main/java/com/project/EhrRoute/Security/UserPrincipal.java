@@ -73,6 +73,10 @@ public class UserPrincipal implements UserDetails
     @Override
     public String getUsername() {
         return address;
+    } // returns base58 address which is used for authentication
+
+    public String getAddress() {
+        return getUsername();
     }
 
     @Override

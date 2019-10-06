@@ -64,7 +64,7 @@ public class NotificationService
 
 
     @Transactional
-    public PageResponse getCurrentUserNotifications(String username, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
+    public PageResponse getCurrentUserNotifications(String address, int pageNumber, int pageSize) throws ResourceNotFoundException, InvalidNotificationException
     {
         // Validate page number and size constraints
         validatePageNumberAndSize(pageNumber, pageSize);
@@ -73,11 +73,7 @@ public class NotificationService
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "createdAt");
 
         // Get currentUser User object
-        User user = userService.findUserByUsernameOrEmail(username);
-
-        if (user == null) {
-            throw new ResourceNotFoundException("User", "username", username);
-        }
+        User user = userService.findUserByAddressOrEmail(address);
 
         // Get a page of notifications using the pageable and current user as the notification recipient
         Page<Notification> notificationsPage = notificationRepository.findByRecipient(user, pageable);
@@ -111,14 +107,14 @@ public class NotificationService
                 NetworkInvitationRequest invitationRequest = (NetworkInvitationRequest) notification.getReference();
 
                 // recipient username is needed for the network invitation request payload
-                String recipientUsername = notification.getRecipient().getUsername();
+                String recipientAddress = notification.getRecipient().getAddress();
 
                 if (invitationRequest == null || invitationRequest.getId() == null) {
                     throw new InvalidNotificationException("Invalid NetworkInvitationRequest notification reference.");
                 }
 
                 // Set the notification reference object as a Network invitation request payload
-                notificationReference = modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientUsername);
+                notificationReference = modelMapper.mapNetworkInvitationRequestToPayload(invitationRequest, recipientAddress);
             }
 
             // Check for consent request notifications

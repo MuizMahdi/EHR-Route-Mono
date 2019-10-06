@@ -246,25 +246,13 @@ public class ModelMapper
 
     public NetworkInvitationRequest mapInvitationResponseToRequest(NetworkInvitationRequestPayload invitationResponse)
     {
-        String senderName = invitationResponse.getSenderUsername();
-        String networkName = invitationResponse.getNetworkName();
-        String networkUUID = invitationResponse.getNetworkUUID();
-        String invitationToken = invitationResponse.getInvitationToken();
-
-        // Validate NetworkInvitationResponse fields
-        if (senderName == null || senderName.isEmpty() || networkName == null || networkName.isEmpty() ||
-            networkUUID == null || networkUUID.isEmpty() || invitationToken == null || invitationToken.isEmpty()
-        ) {
-            throw new ResourceEmptyException("Invalid invitation response");
-        }
-
         // Create a request object using the response fields (will be used to validate the
         // response by checking whether a request with the fields of the response exists or not)
         NetworkInvitationRequest invitationRequest = new NetworkInvitationRequest(
-                invitationResponse.getSenderUsername(),
-                invitationResponse.getNetworkName(),
-                invitationResponse.getNetworkUUID(),
-                invitationResponse.getInvitationToken()
+            invitationResponse.getSenderAddress(),
+            invitationResponse.getNetworkName(),
+            invitationResponse.getNetworkUUID(),
+            invitationResponse.getInvitationToken()
         );
 
         return invitationRequest;
@@ -274,23 +262,23 @@ public class ModelMapper
     public NotificationResponse mapNotificationToNotificationResponse(Notification notification, Object reference)
     {
         return new NotificationResponse(
-                notification.getId(),
-                notification.getSender().getUsername(),
-                notification.getRecipient().getUsername(),
-                notification.getType().toString(),
-                reference
+            notification.getId(),
+            notification.getSender().getAddress(),
+            notification.getRecipient().getAddress(),
+            notification.getType().toString(),
+            reference
         );
     }
 
 
-    public NetworkInvitationRequestPayload mapNetworkInvitationRequestToPayload(NetworkInvitationRequest invitationRequest, String recipientUsername)
+    public NetworkInvitationRequestPayload mapNetworkInvitationRequestToPayload(NetworkInvitationRequest invitationRequest, String recipientAddress)
     {
         return new NetworkInvitationRequestPayload(
-                recipientUsername,
-                invitationRequest.getSenderName(),
-                invitationRequest.getNetworkName(),
-                invitationRequest.getNetworkUUID(),
-                invitationRequest.getInvitationToken()
+            recipientAddress,
+            invitationRequest.getSenderAddress(),
+            invitationRequest.getNetworkName(),
+            invitationRequest.getNetworkUUID(),
+            invitationRequest.getInvitationToken()
         );
     }
 

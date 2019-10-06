@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface NetworkInvitationRequestRepository extends JpaRepository<NetworkInvitationRequest, Long>
 {
-    @Query("SELECT r FROM NetworkInvitationRequest r WHERE r.invitationToken = :invitationToken AND r.networkUUID = :networkUUID AND r.senderName = :senderName")
-    Optional<NetworkInvitationRequest> findByInvitationTokenAndNetworkNameAndSenderName(@Param("invitationToken") String invitationToken, @Param("networkUUID") String networkUUID, @Param("senderName") String senderName);
+    @Query("SELECT r FROM NetworkInvitationRequest r WHERE r.invitationToken = :invitationToken AND r.networkUUID = :networkUUID AND r.senderAddress = :senderAddress")
+    Optional<NetworkInvitationRequest> findByInvitationTokenAndNetworkNameAndSenderAddress(@Param("invitationToken") String invitationToken, @Param("networkUUID") String networkUUID, @Param("senderAddress") String senderAddress);
 }

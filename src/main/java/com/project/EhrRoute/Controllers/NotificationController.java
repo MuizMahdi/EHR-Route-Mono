@@ -33,20 +33,14 @@ public class NotificationController
 
         try {
             userNotifications = notificationService.getCurrentUserNotifications(
-                currentUser.getUsername(), page, size
+                currentUser.getAddress(), page, size
             );
         }
         catch (Exception Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, Ex.getMessage()),
-                HttpStatus.BAD_REQUEST
-            );
+            return ResponseEntity.badRequest().body(new ApiResponse(false, Ex.getMessage()));
         }
 
-        return new ResponseEntity<>(
-            userNotifications,
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(userNotifications);
     }
 
 
@@ -58,15 +52,9 @@ public class NotificationController
         }
         // If resource doesn't exist
         catch (Exception Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(true, "Notification doesn't exist"),
-                HttpStatus.NO_CONTENT
-            );
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse(true, "Notification doesn't exist"));
         }
 
-        return new ResponseEntity<>(
-            new ApiResponse(true, "Notification has been deleted"),
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "Notification has been deleted"));
     }
 }

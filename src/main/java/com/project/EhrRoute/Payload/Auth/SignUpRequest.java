@@ -5,9 +5,7 @@ import javax.validation.constraints.Size;
 
 public class SignUpRequest
 {
-    @NotBlank
-    @Size(min=3, max=15)
-    private String username;
+    private String providerToken;
 
     @NotBlank
     @Size(max=40)
@@ -21,8 +19,8 @@ public class SignUpRequest
     public String getEmail() {
         return email;
     }
-    public String getUsername() {
-        return username;
+    public String getProviderToken() {
+        return providerToken;
     }
     public String getPassword() {
         return password;
@@ -31,8 +29,8 @@ public class SignUpRequest
     public void setEmail(String email) {
         this.email = email;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setProviderToken(String providerToken) {
+        this.providerToken = providerToken;
     }
     public void setPassword(String password) {
         this.password = password;

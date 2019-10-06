@@ -129,11 +129,9 @@ public class NetworkService
 
 
     @Transactional
-    private List<String> getNetworkMembersNames(String networkUUID) {
+    private List<String> getNetworkMembersAddresses(String networkUUID) {
         Set<User> networkMembers = getNetworkMembers(networkUUID);
-        // TODO: TEMPORARILY RETURN FORGED ARRAY UNTIL CHANGE
-        // networkMembers.stream().map(User::getName).collect(Collectors.toList());
-        return new ArrayList<>(Arrays.asList("MemberA", "MemberB", "MemberC"));
+        return networkMembers.stream().map(User::getAddress).collect(Collectors.toList());
     }
 
 
@@ -151,7 +149,7 @@ public class NetworkService
             networkUUID,
             getNetworkNameByUuid(networkUUID),
             getNetworkChainRoot(networkUUID),
-            getNetworkMembersNames(networkUUID),
+            getNetworkMembersAddresses(networkUUID),
             getNetworkInstitutions(networkUUID)
         );
     }

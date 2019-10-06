@@ -24,7 +24,7 @@ public class NetworkInvitationRequestService
 
 
     @Transactional
-    public NetworkInvitationRequest generateInvitationRequest(User recipient, String senderName, String networkName, String networkUUID)
+    public NetworkInvitationRequest generateInvitationRequest(User recipient, String senderAddress, String networkName, String networkUUID)
     {
         // Save token on DB, will be used to verify invitation request expiration
         String token = uuidUtil.generateUUID();
@@ -32,7 +32,7 @@ public class NetworkInvitationRequestService
 
         // Create invitation request
         NetworkInvitationRequest invitationRequest = new NetworkInvitationRequest(
-            senderName, networkName, networkUUID, token
+            senderAddress, networkName, networkUUID, token
         );
 
         // Save invitation request
@@ -50,6 +50,6 @@ public class NetworkInvitationRequestService
 
     @Transactional
     public boolean invitationRequestExists(NetworkInvitationRequest invitationRequest) {
-        return networkInvitationRequestRepository.findByInvitationTokenAndNetworkNameAndSenderName(invitationRequest.getInvitationToken(), invitationRequest.getNetworkUUID(), invitationRequest.getSenderName()).isPresent();
+        return networkInvitationRequestRepository.findByInvitationTokenAndNetworkNameAndSenderAddress(invitationRequest.getInvitationToken(), invitationRequest.getNetworkUUID(), invitationRequest.getSenderAddress()).isPresent();
     }
 }

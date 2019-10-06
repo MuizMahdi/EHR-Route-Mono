@@ -68,8 +68,7 @@ public class User extends DateAudit
 
 
     public User() { }
-    public User(@NotBlank @Size(max = 15) String username, @NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
-        this.username = username;
+    public User(@NotBlank @Email @Size(max = 40) String email, @NotBlank @Size(max = 100) String password) {
         this.email = email;
         this.password = password;
         this.isEnabled = true;
@@ -102,9 +101,6 @@ public class User extends DateAudit
     }
     public String getAddress() {
         return address;
-    }
-    public String getUsername() {
-        return username;
     }
     public String getPassword() {
         return password;
@@ -139,9 +135,6 @@ public class User extends DateAudit
     }
     public void setAddress(String address) {
         this.address = address;
-    }
-    public void setUsername(String username) {
-        this.username = username;
     }
     public void setPassword(String password) {
         this.password = password;
