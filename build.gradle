@@ -39,6 +39,7 @@ dependencies {
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-logging', version: '2.1.0.RELEASE'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.0.4.RELEASE'
     compile group: 'com.ibm.db2', name: 'jcc', version: '11.1.4.4'
+	compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.1.9.RELEASE'
     runtime('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')

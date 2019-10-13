@@ -32,7 +32,7 @@ public class AppUserDetailsServiceTest
     {
         User user = mock(User.class);
 
-        UserPrincipal aUserPrincipal = new UserPrincipal(1L, "Name", "Username", "Email", "Password", new ArrayList<GrantedAuthority>());
+        UserPrincipal aUserPrincipal = new UserPrincipal(1L, "Address", "Email", "Password", new ArrayList<GrantedAuthority>());
 
         when(userPrincipal.create(user)).thenReturn(aUserPrincipal);
     }
@@ -46,13 +46,13 @@ public class AppUserDetailsServiceTest
         Optional<User> userOptional = Optional.of(user);
         when(userRepository.findById(user.getId())).thenReturn(userOptional);
 
-        UserPrincipal aUserPrincipal = new UserPrincipal(123L, "Name", "Username", "Email", "Password", new ArrayList<GrantedAuthority>());
+        UserPrincipal aUserPrincipal = new UserPrincipal(123L, "Address", "Email", "Password", new ArrayList<GrantedAuthority>());
 
         when(userPrincipal.create(user)).thenReturn(aUserPrincipal);
 
         UserDetails resultUserDetails = userDetailsService.loadUserById(user.getId());
-        assertEquals(resultUserDetails.getUsername(), aUserPrincipal.getUsername());
-        assertEquals(resultUserDetails.getUsername(), "Username");
+        assertEquals(resultUserDetails.getUsername() , aUserPrincipal.getUsername());
+        assertEquals(resultUserDetails.getUsername(), "Address");
     }
 
     @Test(expected = UsernameNotFoundException.class)
