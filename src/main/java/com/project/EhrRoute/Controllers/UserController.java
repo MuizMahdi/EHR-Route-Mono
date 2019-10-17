@@ -47,15 +47,8 @@ public class UserController
 
     @GetMapping("/current")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity getCurrentUser(@CurrentUser UserPrincipal currentUser)
+    public ResponseEntity getCurrentUserInfo(@CurrentUser UserPrincipal currentUser)
     {
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
         return ResponseEntity.ok(userService.getUserInfo(currentUser.getId()));
     }
 
@@ -64,25 +57,10 @@ public class UserController
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser)
     {
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
         Set<Role> userRoles;
 
-        try {
-            // Get the user's set of Role
-            userRoles = userService.findUserRoles(currentUser.getId());
-        }
-        catch(ResourceNotFoundException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
+        // Get the user's set of Role
+        userRoles = userService.findUserRoles(currentUser.getId());
 
         // Create a set of UserRoleResponse 
         Set<UserRoleResponse> userRolesNames = new HashSet<>();
@@ -94,10 +72,7 @@ public class UserController
         }
 
         // Return the userRoleNames set
-        return new ResponseEntity<>(
-            userRolesNames,
-            HttpStatus.OK
-        );
+        return ResponseEntity.ok(userRolesNames);
     }
 
 
@@ -127,15 +102,7 @@ public class UserController
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
     public ResponseEntity getCurrentUserFirstLoginStatus(@CurrentUser UserPrincipal currentUser)
     {
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
         boolean isFirstLogin = userService.isUserFirstLogin(currentUser.getId());
-
         return ResponseEntity.ok(isFirstLogin);
     }
 
@@ -144,17 +111,8 @@ public class UserController
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity setCurrentUserHasAddedInfoStatus(@CurrentUser UserPrincipal currentUser)
     {
-        if (currentUser == null) {
-            return ResponseEntity.badRequest().body(
-                new ApiResponse(false, "User not logged in")
-            );
-        }
-
         userService.setUserHasAddedInfo(currentUser.getId());
-
-        return ResponseEntity.ok(
-            new ApiResponse(false, "Your info has been saved")
-        );
+        return ResponseEntity.ok(new ApiResponse(false, "Your info has been saved"));
     }
 
 

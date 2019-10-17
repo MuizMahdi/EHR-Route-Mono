@@ -5,8 +5,6 @@ import javax.validation.constraints.Size;
 
 public class SignUpRequest
 {
-    private String providerToken;
-
     @NotBlank
     @Size(max=40)
     @Email
@@ -15,6 +13,8 @@ public class SignUpRequest
     @NotBlank
     @Size(min=6, max=20)
     private String password;
+
+    private String providerToken;
 
     public String getEmail() {
         return email;
