@@ -193,7 +193,7 @@ public class AuthController
         user.setRoles(userRoles);
 
         // Create provider details for user, then find institution by name and set it as this user's institution
-        providerService.generateUserProviderDetails(user, institutionName);
+        //providerService.generateUserProviderDetails(user, institutionName);
 
         // Persist the user updates to DB
         userService.saveUser(user);

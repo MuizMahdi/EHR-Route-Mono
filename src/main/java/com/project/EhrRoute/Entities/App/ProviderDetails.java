@@ -18,6 +18,7 @@ public class ProviderDetails
     private String providerUUID;
 
     @NotNull
+    @NotBlank
     private String providerAddress;
 
     @OneToOne(targetEntity = Institution.class, fetch = FetchType.LAZY)
@@ -32,6 +33,12 @@ public class ProviderDetails
     public ProviderDetails() { }
     public ProviderDetails(User user, @NotBlank String providerUUID) {
         this.user = user;
+        this.providerUUID = providerUUID;
+    }
+    public ProviderDetails(User user, @NotBlank String providerAddress, Institution institution, @NotBlank String providerUUID) {
+        this.user = user;
+        this.providerAddress = providerAddress;
+        this.providerInstitution = institution;
         this.providerUUID = providerUUID;
     }
 

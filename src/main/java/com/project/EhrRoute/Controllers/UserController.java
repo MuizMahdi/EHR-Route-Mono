@@ -7,12 +7,14 @@ import com.project.EhrRoute.Exceptions.NullUserNetworkException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.App.ProviderAdditionRequest;
+import com.project.EhrRoute.Payload.App.ProviderInstitutionAdditionRequest;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Payload.Auth.UserRoleResponse;
 import com.project.EhrRoute.Payload.Core.UserNetworksResponse;
 import com.project.EhrRoute.Repositories.RoleRepository;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
+import com.project.EhrRoute.Services.InstitutionService;
 import com.project.EhrRoute.Services.ProviderService;
 import com.project.EhrRoute.Services.UserService;
 import com.project.EhrRoute.Utilities.ModelMapper;
@@ -32,31 +34,27 @@ import java.util.Set;
 public class UserController
 {
     private UserService userService;
-    private RoleRepository roleRepository;
-    private ProviderService providerService;
+    private InstitutionService institutionService;
     private ModelMapper modelMapper;
 
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper, RoleRepository roleRepository, ProviderService providerService) {
+    public UserController(UserService userService, ModelMapper modelMapper, InstitutionService institutionService) {
         this.userService = userService;
-        this.providerService = providerService;
-        this.roleRepository = roleRepository;
+        this.institutionService = institutionService;
         this.modelMapper = modelMapper;
     }
 
 
     @GetMapping("/current")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity getCurrentUserInfo(@CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity getCurrentUserInfo(@CurrentUser UserPrincipal currentUser) {
         return ResponseEntity.ok(userService.getUserInfo(currentUser.getId()));
     }
 
 
     @GetMapping("/current/roles")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity<?> getCurrentUserRoles(@CurrentUser UserPrincipal currentUser) {
         Set<Role> userRoles;
 
         // Get the user's set of Role
@@ -78,8 +76,7 @@ public class UserController
 
     @GetMapping("/current/networks")
     @PreAuthorize("hasRole('PROVIDER')")
-    public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity getCurrentUserNetwork(@CurrentUser UserPrincipal currentUser) {
         User user = userService.findUserById(currentUser.getId());
 
         Set<Network> userNetworks;
@@ -100,8 +97,7 @@ public class UserController
 
     @GetMapping("/current/first-login-status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity getCurrentUserFirstLoginStatus(@CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity getCurrentUserFirstLoginStatus(@CurrentUser UserPrincipal currentUser) {
         boolean isFirstLogin = userService.isUserFirstLogin(currentUser.getId());
         return ResponseEntity.ok(isFirstLogin);
     }
@@ -109,24 +105,21 @@ public class UserController
 
     @PostMapping("/current/info-addition-status")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity setCurrentUserHasAddedInfoStatus(@CurrentUser UserPrincipal currentUser)
-    {
+    public ResponseEntity setCurrentUserHasAddedInfoStatus(@CurrentUser UserPrincipal currentUser) {
         userService.setUserHasAddedInfo(currentUser.getId());
         return ResponseEntity.ok(new ApiResponse(false, "Your info has been saved"));
     }
 
 
     @GetMapping("/search-by-address")
-    public List<String> searchUsersnamesByAddress(@RequestParam("keyword") String address)
-    {
+    public List<String> searchUsersnamesByAddress(@RequestParam("keyword") String address) {
         return userService.searchAddress(address);
     }
 
 
     @GetMapping("/{address}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROVIDER')")
-    public ResponseEntity getUserByUsername(@PathVariable("address") String address)
-    {
+    public ResponseEntity getUserByUsername(@PathVariable("address") String address) {
         User user = userService.findUserByAddress(address);
         return ResponseEntity.ok (userService.getUserInfo(user.getId()));
     }
@@ -134,28 +127,13 @@ public class UserController
 
     @PostMapping("/providers")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity addProvider(@Valid @RequestBody ProviderAdditionRequest providerAdditionRequest)
-    {
-        /* Get and validate user with username */
+    public ResponseEntity addProvider(@Valid @RequestBody ProviderInstitutionAdditionRequest providerAdditionRequest) {
+        // Get and validate user with username */
         User user = userService.findUserByAddress(providerAdditionRequest.getAddress());
-
-        /* Set user's role to Provider */
-        // Get the role
-        Role userRole = roleRepository.findByName(RoleName.ROLE_PROVIDER).orElseThrow(() ->
-            new InternalErrorException("Invalid Role")
-        );
-
-        // Update the user roles set
-        Set<Role> userRoles = user.getRoles();
-        userRoles.add(userRole);
-        user.setRoles(userRoles);
-
-        // Persist changes of user roles
-        userService.saveUser(user);
-
+        // Give user the provider role
+        userService.addUserRole(user, RoleName.ROLE_PROVIDER);
         // Create an institution and generate provider details for user
-        providerService.generateInstitutionProviderDetails(user, providerAdditionRequest.getInstitutionName());
-
+        institutionService.generateInstitutionProviderDetails(providerAdditionRequest.getAddress(), providerAdditionRequest.getInstitutionName());
         return ResponseEntity.ok(new ApiResponse(true, "Provider has been successfully added"));
     }
 }

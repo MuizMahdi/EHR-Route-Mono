@@ -148,17 +148,36 @@ public class UserService
     }
 
 
-    // Checks if the user has a specific role
     public boolean userHasRole(User user, RoleName role) {
         Set<Role> userRoles = user.getRoles();
 
         for (Role userRole : userRoles) {
-            if (userRole.getName() == role) {
-                return true;
-            }
+            if (userRole.getName() == role) return true;
         }
 
         return false;
+    }
+
+
+    @Transactional
+    public void addUserRole(String userAddress, RoleName roleName) {
+        addUserRole(findUserByAddress(userAddress), roleName);
+    }
+
+
+    @Transactional
+    public void addUserRole(User user, RoleName roleName) {
+        Role role = roleRepository.findByName(roleName).orElseThrow(() ->
+                new ResourceNotFoundException("Role", "Name", roleName.toString())
+        );
+
+        // Update user roles
+        Set<Role> userRoles = user.getRoles();
+        userRoles.add(role);
+        user.setRoles(userRoles);
+
+        // Persist changes of user roles
+        saveUser(user);
     }
 
 

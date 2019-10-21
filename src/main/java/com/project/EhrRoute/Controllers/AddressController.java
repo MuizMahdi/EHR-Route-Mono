@@ -27,7 +27,6 @@ public class AddressController
 {
     private UserService userService;
     private EhrDetailService ehrDetailService;
-
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private AddressUtil addressUtil;

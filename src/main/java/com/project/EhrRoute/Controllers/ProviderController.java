@@ -32,32 +32,9 @@ public class ProviderController
 
 
     @GetMapping("/current/uuid")
-    public ResponseEntity getCurrentProviderUUID(@CurrentUser UserPrincipal currentUser)
-    {
-        // Validate authentication
-        if (currentUser == null) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User not logged in"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        String providerUUID;
-
-        // Get provider UUID
-        try {
-            providerUUID = providerService.getProviderUuidByUserID(currentUser.getId());
-        }
-        catch (ResourceNotFoundException Ex) {
-            return new ResponseEntity<>(
-                new ApiResponse(false, "User is not a provider"),
-                HttpStatus.BAD_REQUEST
-            );
-        }
-
-        return ResponseEntity.ok(
-            new SimpleStringPayload(providerUUID)
-        );
+    public ResponseEntity getCurrentProviderUUID(@CurrentUser UserPrincipal currentUser) {
+        String providerUUID = providerService.getProviderUuidByUserID(currentUser.getId());
+        return ResponseEntity.ok(new SimpleStringPayload(providerUUID));
     }
 
 

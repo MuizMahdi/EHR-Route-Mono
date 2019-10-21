@@ -13,43 +13,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProviderService
 {
-    private UuidUtil uuidUtil;
     private ProviderDetailsRepository providerDetailsRepository;
-    private InstitutionService institutionService;
+    private UserService userService;
+    private UuidUtil uuidUtil;
 
     @Autowired
-    public ProviderService(UuidUtil uuidUtil, ProviderDetailsRepository providerDetailsRepository, InstitutionService institutionService) {
-        this.uuidUtil = uuidUtil;
+    public ProviderService(ProviderDetailsRepository providerDetailsRepository, UserService userService, UuidUtil uuidUtil) {
         this.providerDetailsRepository = providerDetailsRepository;
-        this.institutionService = institutionService;
+        this.userService = userService;
+        this.uuidUtil = uuidUtil;
     }
 
 
     @Transactional
-    public void generateUserProviderDetails(User user, String institutionName)
-    {
-        // Find an institution with the given institution name
-        Institution institution = institutionService.getInstitutionByName(institutionName);
+    public ProviderDetails getProviderDetails(Long providerUserId) {
+        return providerDetailsRepository.findProviderDetailsByUserID(providerUserId).orElseThrow(() ->
+            new ResourceNotFoundException("Provider Details", "Provider User ID", providerUserId)
+        );
+    }
 
-        // Set the found institution of the user that sent the role change token as this users's institution
-        setProviderInstitution(user, institution);
+    @Transactional
+    public void generateUserProviderDetails(String userAddress, Institution institution) {
+        // Find user using address
+        User user = userService.findUserByAddress(userAddress);
+        // Generate provider UUID
+        String providerUUID = uuidUtil.generateUUID();
+        // Create and save a provider details
+        saveProviderDetails(new ProviderDetails(user, userAddress, institution, providerUUID));
     }
 
 
     @Transactional
-    public void generateInstitutionProviderDetails(User user, String institutionName)
-    {
-        // Generate and save an institution using given name
-        Institution institution = institutionService.generateInstitution(institutionName);
-
-        // Set the generated institution as the provider's institution
-        setProviderInstitution(user, institution);
-    }
-
-
-    @Transactional
-    public void setProviderAddress(User user, String address) throws ResourceNotFoundException
-    {
+    public void setProviderAddress(User user, String address) throws ResourceNotFoundException {
         // Get user's provider details
         ProviderDetails providerDetails = providerDetailsRepository.findProviderDetailsByUserID(
             user.getId()
@@ -66,25 +61,22 @@ public class ProviderService
 
 
     @Transactional
-    public String getProviderUuidByUserID(Long userID) throws ResourceNotFoundException
-    {
+    public String getProviderUuidByUserID(Long userID) throws ResourceNotFoundException {
         return providerDetailsRepository.findProviderUUIDByUserID(userID).orElseThrow(() ->
-            new ResourceNotFoundException("User", "ID", userID)
+            new ResourceNotFoundException("Provider", "User Id", userID)
         );
     }
 
 
     @Transactional
-    public boolean providerAddressExists(Long userID)
-    {
+    public boolean providerAddressExists(Long userID) {
         String address = providerDetailsRepository.findProviderAddressByUserID(userID).orElse(null);
         return !(address == null || address.isEmpty());
     }
 
 
     @Transactional
-    public String getProviderAddress(Long userID) throws ResourceNotFoundException
-    {
+    public String getProviderAddress(Long userID) throws ResourceNotFoundException {
         return providerDetailsRepository.findProviderAddressByUserID(userID).orElseThrow(() ->
             new ResourceNotFoundException("Address for a provider", "user ID", userID)
         );
@@ -92,8 +84,7 @@ public class ProviderService
 
 
     @Transactional
-    public String getProviderInstitution(Long userID) throws ResourceNotFoundException
-    {
+    public String getProviderInstitution(Long userID) throws ResourceNotFoundException {
         return providerDetailsRepository.findProviderInstitutionByUserID(userID).orElseThrow(() ->
             new ResourceNotFoundException("Institution of a provider", "user ID", userID)
         );
@@ -101,21 +92,8 @@ public class ProviderService
 
 
     @Transactional
-    private void setProviderInstitution(User user, Institution institution) throws ResourceNotFoundException
-    {
-        // Generate UUID
-        String providerUUID = uuidUtil.generateUUID();
-
-        // Create provider details for user
-        ProviderDetails providerDetails = new ProviderDetails(user, providerUUID);
-
-        // Address is sent by user at login
-        providerDetails.setProviderAddress("");
-
-        // Set the institution as the provider's institution
-        providerDetails.setProviderInstitution(institution);
-
-        // Persist the provider details
+    public ProviderDetails saveProviderDetails(ProviderDetails providerDetails) {
         providerDetailsRepository.save(providerDetails);
+        return providerDetails;
     }
 }
