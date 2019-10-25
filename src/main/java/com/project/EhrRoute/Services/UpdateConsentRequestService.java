@@ -25,8 +25,7 @@ public class UpdateConsentRequestService
 
 
     @Transactional
-    public UpdateConsentRequest createUpdateConsentRequest(ConsentRequestBlock consentRequestBlock, EhrDetails ehrDetails)
-    {
+    public UpdateConsentRequest createUpdateConsentRequest(ConsentRequestBlock consentRequestBlock, EhrDetails ehrDetails) {
         // Validate Consent Request Block
         consentRequestBlockService.consentRequestExists(consentRequestBlock);
 

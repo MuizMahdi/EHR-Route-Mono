@@ -3,12 +3,10 @@ import com.project.EhrRoute.Core.Utilities.AddressUtil;
 import com.project.EhrRoute.Core.Utilities.KeyUtil;
 import com.project.EhrRoute.Core.Utilities.RsaUtil;
 import com.project.EhrRoute.Entities.Auth.User;
-import com.project.EhrRoute.Models.RoleName;
 import com.project.EhrRoute.Payload.Core.AddressResponse;
 import com.project.EhrRoute.Payload.Auth.ApiResponse;
 import com.project.EhrRoute.Security.CurrentUser;
 import com.project.EhrRoute.Security.UserPrincipal;
-import com.project.EhrRoute.Services.EhrDetailService;
 import com.project.EhrRoute.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,15 +24,13 @@ import java.security.PublicKey;
 public class AddressController
 {
     private UserService userService;
-    private EhrDetailService ehrDetailService;
     private RsaUtil rsaUtil;
     private KeyUtil keyUtil;
     private AddressUtil addressUtil;
 
     @Autowired
-    public AddressController(UserService userService, EhrDetailService ehrDetailService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
+    public AddressController(UserService userService, RsaUtil rsaUtil, KeyUtil keyUtil, AddressUtil addressUtil) {
         this.userService = userService;
-        this.ehrDetailService = ehrDetailService;
         this.rsaUtil = rsaUtil;
         this.keyUtil = keyUtil;
         this.addressUtil = addressUtil;
@@ -43,8 +39,7 @@ public class AddressController
 
     @GetMapping("/generate")
     @PreAuthorize("hasRole('USER') or hasRole('PROVIDER')")
-    public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException
-    {
+    public ResponseEntity<?> generateUserAddress(@CurrentUser UserPrincipal currentUser) throws GeneralSecurityException {
         // Get user
         User user = userService.findUserById(currentUser.getId());
 

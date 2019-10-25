@@ -22,8 +22,7 @@ public class TransactionController
 
     @PostMapping("/record-consent-request")
     @PreAuthorize("hasRole('PROVIDER')")
-    public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition)
-    {
+    public ResponseEntity getUserConsent(@RequestBody BlockAddition blockAddition) {
         transactionService.getUserConsent(blockAddition);
         return ResponseEntity.accepted().body(new ApiResponse(true, "Consent request was sent"));
     }
@@ -31,8 +30,7 @@ public class TransactionController
 
     @PostMapping("/record-consent-response")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception
-    {
+    public ResponseEntity giveUserConsent(@RequestBody UserConsentResponse consentResponse) throws Exception {
         transactionService.giveUserConsent(consentResponse);
         return ResponseEntity.accepted().body(new ApiResponse(true, "Block has been signed and Broadcasted"));
     }
@@ -40,8 +38,7 @@ public class TransactionController
 
     @PostMapping("/record-update-consent-request")
     @PreAuthorize("hasRole('PROVIDER')")
-    public ResponseEntity getUserUpdateConsent(@RequestBody UpdatedBlockAddition updatedBlockAddition)
-    {
+    public ResponseEntity getUserUpdateConsent(@RequestBody UpdatedBlockAddition updatedBlockAddition) {
         transactionService.getUserUpdateConsent(updatedBlockAddition);
         return ResponseEntity.accepted().body("Update consent request was sent");
     }
@@ -49,8 +46,7 @@ public class TransactionController
 
     @PostMapping("/record-update-consent-response")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception
-    {
+    public ResponseEntity giveUserUpdateConsent(@RequestBody UserUpdateConsentResponse updateConsentResponse) throws Exception {
         transactionService.giveUserUpdateConsent(updateConsentResponse);
         return ResponseEntity.accepted().body(new ApiResponse(true, "Updated block has been signed and Broadcasted successfully"));
     }
