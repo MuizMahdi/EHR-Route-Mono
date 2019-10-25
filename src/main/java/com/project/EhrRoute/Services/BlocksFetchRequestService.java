@@ -89,7 +89,6 @@ public class BlocksFetchRequestService
         List<BlocksFetchRequest> blocksFetchRequests = blocksFetchRequestRepository.findAll();
 
         if (!blocksFetchRequests.isEmpty()) {
-
             for (BlocksFetchRequest fetchRequest : blocksFetchRequests) {
                 // Get the cluster of the network in the issued fetch request
                 Optional<Observer> cluster = clustersContainer.findNodesCluster(fetchRequest.getNetworkUUID());

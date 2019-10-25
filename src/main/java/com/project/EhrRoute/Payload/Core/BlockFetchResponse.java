@@ -8,13 +8,15 @@ public class BlockFetchResponse
     private String consumerUUID;
     private String networkUUID;
     private String networkChainRoot;
+    private Long networkLatestBlockIndex;
 
     public BlockFetchResponse() { }
-    public BlockFetchResponse(BlockResponse blockResponse, String consumerUUID, String networkUUID, String networkChainRoot) {
+    public BlockFetchResponse(BlockResponse blockResponse, String consumerUUID, String networkUUID, String networkChainRoot, Long networkLatestBlockIndex) {
         this.blockResponse = blockResponse;
         this.consumerUUID = consumerUUID;
         this.networkUUID = networkUUID;
         this.networkChainRoot = networkChainRoot;
+        this.networkLatestBlockIndex = networkLatestBlockIndex;
     }
 
     public String getNetworkUUID() {
@@ -28,6 +30,13 @@ public class BlockFetchResponse
     }
     public BlockResponse getBlockResponse() {
         return blockResponse;
+    }
+    public Long getNetworkLatestBlockIndex() {
+        return networkLatestBlockIndex;
+    }
+
+    public void setNetworkLatestBlockIndex(Long networkLatestBlockIndex) {
+        this.networkLatestBlockIndex = networkLatestBlockIndex;
     }
     public void setNetworkUUID(String networkUUID) {
         this.networkUUID = networkUUID;

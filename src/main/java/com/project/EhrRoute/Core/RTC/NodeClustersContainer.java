@@ -101,7 +101,7 @@ public class NodeClustersContainer implements Subject
         Optional<Observer> nodesCluster;
 
         try {
-            nodesCluster= Optional.of(nodesClusters.get(networkUUID));
+            nodesCluster = Optional.of(nodesClusters.get(networkUUID));
         }
         catch (NullPointerException Ex) {
             return Optional.empty();

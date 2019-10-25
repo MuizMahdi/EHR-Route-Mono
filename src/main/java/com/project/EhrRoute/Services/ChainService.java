@@ -92,6 +92,9 @@ public class ChainService
 
         // Increment the blocks range begin of the blocks fetch request
         blocksRequest.setBlocksRangeBegin(blocksRequest.getBlocksRangeBegin() + 1);
+        // Set the blocks range end as the provider has specified, this allows it to change with every blocks fetch response,
+        // which allows consumers to receive even the blocks that have been added before the blocks fetch request has ended.
+        blocksRequest.setBlocksRangeEnd(blockFetchResponse.getNetworkLatestBlockIndex());
         blocksFetchRequestService.saveBlocksFetchRequest(blocksRequest);
 
         // If no more requested blocks are left (range begin > range end)
