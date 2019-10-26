@@ -7,11 +7,11 @@ public class RecordUpdateData
 {
     List<String> conditions;
     List<String> allergies;
-    Map<String, Boolean> history;
+    List<TempEhrHistory> history;
 
 
     public RecordUpdateData() { }
-    public RecordUpdateData(List<String> conditions, List<String> allergies, Map<String, Boolean> history) {
+    public RecordUpdateData(List<String> conditions, List<String> allergies, List<TempEhrHistory> history) {
         this.conditions = conditions;
         this.allergies = allergies;
         this.history = history;
@@ -24,13 +24,13 @@ public class RecordUpdateData
     public List<String> getConditions() {
         return conditions;
     }
-    public Map<String, Boolean> getHistory() {
+    public List<TempEhrHistory> getHistory() {
         return history;
     }
     public void setAllergies(List<String> allergies) {
         this.allergies = allergies;
     }
-    public void setHistory(Map<String, Boolean> history) {
+    public void setHistory(List<TempEhrHistory> history) {
         this.history = history;
     }
     public void setConditions(List<String> conditions) {

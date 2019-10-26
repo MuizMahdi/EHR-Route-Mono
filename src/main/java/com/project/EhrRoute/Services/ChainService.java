@@ -8,6 +8,7 @@ import com.project.EhrRoute.Exceptions.BadRequestException;
 import com.project.EhrRoute.Exceptions.ResourceNotFoundException;
 import com.project.EhrRoute.Models.BlockSource;
 import com.project.EhrRoute.Payload.Core.BlockFetchResponse;
+import com.project.EhrRoute.Payload.Core.SSEs.BlockMetadata;
 import com.project.EhrRoute.Security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,7 +84,8 @@ public class ChainService
         }
 
         // Set the block source type
-        blockFetchResponse.getBlockResponse().getMetadata().setBlockSource(BlockSource.FETCH_REQUEST.toString());
+        //blockFetchResponse.getBlockResponse().getMetadata().setBlockSource(BlockSource.FETCH_REQUEST.toString());
+        blockFetchResponse.getBlockResponse().setMetadata(new BlockMetadata("", BlockSource.FETCH_REQUEST.toString()));
 
         // Send the block to the consumer with consumerUUID
         blockTransmitter.transmit(blockFetchResponse.getBlockResponse(), networkUUID, consumerUUID);

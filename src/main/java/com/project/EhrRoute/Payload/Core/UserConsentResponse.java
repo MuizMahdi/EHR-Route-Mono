@@ -1,9 +1,14 @@
 package com.project.EhrRoute.Payload.Core;
 
 
+import com.project.EhrRoute.Payload.EHR.TempEhrHistory;
+
+import java.util.List;
+
 public class UserConsentResponse
 {
     private SerializableBlock block;
+    private List<TempEhrHistory> medicalHistory;
     private String userPrivateKey;
     private String userAddress;
     private String consentRequestUUID;
@@ -13,8 +18,9 @@ public class UserConsentResponse
 
 
     public UserConsentResponse() { }
-    public UserConsentResponse(SerializableBlock block, String userPrivateKey, String userAddress, String consentRequestUUID, String providerUUID, String networkUUID, Long userID) {
+    public UserConsentResponse(SerializableBlock block, List<TempEhrHistory> medicalHistory, String userPrivateKey, String userAddress, String consentRequestUUID, String providerUUID, String networkUUID, Long userID) {
         this.block = block;
+        this.medicalHistory = medicalHistory;
         this.userPrivateKey = userPrivateKey;
         this.userAddress = userAddress;
         this.consentRequestUUID = consentRequestUUID;
@@ -66,5 +72,12 @@ public class UserConsentResponse
     }
     public void setConsentRequestUUID(String consentRequestUUID) {
         this.consentRequestUUID = consentRequestUUID;
+    }
+
+    public List<TempEhrHistory> getMedicalHistory() {
+        return medicalHistory;
+    }
+    public void setMedicalHistory(List<TempEhrHistory> medicalHistory) {
+        this.medicalHistory = medicalHistory;
     }
 }
